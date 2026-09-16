@@ -22,12 +22,10 @@
 }
 
 :root {
-  --bg: #FBF3EA;
-  --text: #2A211C;
-  --accent: #C1502E;
-  --tint: #D7C6CE;
-  --tint-blue: #C9D4DE;
-  --border: rgba(42,33,28,0.16);
+  --bg: #F1EFE7;
+  --text: #1C1B17;
+  --accent: #4B5842;
+  --border: rgba(28,27,23,0.15);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,23 +42,6 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: -10%;
-  z-index: -1;
-  background: linear-gradient(120deg, #FBF3EA 0%, #F3DCC9 35%, #EAD6DA 65%, #FBF3EA 100%);
-  background-size: 220% 220%;
-  animation: bgShift 22s ease-in-out infinite;
-}
-
-@keyframes bgShift {
-  0%   { background-position: 0% 40%; }
-  50%  { background-position: 100% 60%; }
-  100% { background-position: 0% 40%; }
 }
 
 a { color: inherit; text-decoration: none; }
@@ -88,88 +69,143 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.65;
 }
 
-/* Hero */
-.hero { max-width: 1120px; margin: 0 auto; width: 100%; padding: 0 clamp(18px, 5vw, 40px); }
-
-.hero-figure {
-  position: relative;
-  width: 100%;
-  padding: clamp(14px, 2.5vw, 20px) 0 clamp(18px, 3vw, 26px);
-  display: flex;
-  justify-content: center;
-}
-
-.hero-figure::before,
-.hero-figure::after {
-  content: '';
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  width: 132px;
-  height: 132px;
-  transform: translateX(-50%);
-}
-
-.hero-figure::before {
-  background: var(--accent);
-  transform: translateX(-50%) rotate(-3deg);
-}
-
-.hero-figure::after {
-  background: var(--tint);
-  transform: translateX(-50%) rotate(2.5deg);
-}
-
-.hero-figure img {
-  position: relative;
-  z-index: 2;
-  display: block;
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-.identity { max-width: 1120px; margin: 0 auto; width: 100%; padding: 0 clamp(18px, 5vw, 40px); }
-
-.name {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: clamp(28px, 6vw, 40px);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.meta-row {
+/* Top nav */
+.topnav {
   max-width: 1120px;
   margin: 0 auto;
   width: 100%;
   padding: 0 clamp(18px, 5vw, 40px);
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 18px;
-  margin-top: -18px;
-}
-
-.meta-row .divider {
-  width: 22px;
-  height: 1px;
-  background: var(--border);
-  display: block;
-}
-
-.meta-row a {
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
   font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.topnav .wordmark {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0.55;
+}
+
+.topnav .nav-contact {
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 2px;
+  white-space: nowrap;
+}
+
+.topnav .nav-contact:hover { opacity: 0.65; }
+
+.topnav .nav-right {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.5vw, 24px);
+}
+
+.corner-photo {
+  position: relative;
+  width: clamp(52px, 6vw, 84px);
+  height: clamp(52px, 6vw, 84px);
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: var(--border);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.corner-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.corner-photo .corner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4px;
+  background: rgba(28, 27, 23, 0.6);
+  color: var(--bg);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.corner-photo:hover .corner-overlay,
+.corner-photo:focus-visible .corner-overlay { opacity: 1; }
+
+/* Big-type hero */
+.type-hero {
+  max-width: 1120px;
+  margin: 0 auto;
+  width: 100%;
+  padding: clamp(46px, 9vw, 108px) clamp(18px, 5vw, 40px) 0;
+}
+
+.type-hero .kicker {
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+  margin-bottom: clamp(14px, 2.5vw, 22px);
+}
+
+.type-hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(58px, 13vw, 176px);
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+}
+
+.type-hero h1 span { display: block; }
+.type-hero h1 .accent { color: var(--accent); }
+
+.type-hero .sub {
+  margin-top: clamp(18px, 3vw, 30px);
+  font-size: 15px;
+  max-width: 440px;
+  opacity: 0.72;
+}
+
+.hero-meta {
+  max-width: 1120px;
+  margin: clamp(28px, 5vw, 56px) auto 0;
+  width: 100%;
+  padding: clamp(16px, 3vw, 22px) clamp(18px, 5vw, 40px) 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px 24px;
+  font-size: 13px;
+}
+
+.hero-meta .label { opacity: 0.6; }
+
+.hero-meta a {
   color: var(--text);
   border-bottom: 1px solid var(--accent);
   padding-bottom: 2px;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
-.meta-row a:hover { opacity: 1; }
+.hero-meta a:hover { opacity: 1; }
+
+@media (max-width: 720px) {
+  .topnav { flex-wrap: wrap; row-gap: 10px; }
+  .topnav .wordmark { display: none; }
+}
 
 /* Work section */
 .work { max-width: 1120px; margin: 0 auto; width: 100%; padding: 0 clamp(18px, 5vw, 40px); }
@@ -202,13 +238,25 @@ a { color: inherit; text-decoration: none; }
   padding: 0;
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  gap: clamp(14px, 2vw, 20px);
+  gap: clamp(16px, 2.4vw, 26px);
 }
 
 @media (min-width: 768px) {
-  .grid { grid-template-columns: repeat(4, 1fr); }
-  .c-offset-1 { margin-top: 20px; }
-  .c-offset-2 { margin-top: -8px; }
+  .grid { grid-template-columns: repeat(6, 1fr); }
+
+  .g1 { grid-column: span 3; }
+  .g2 { grid-column: span 3; margin-top: clamp(30px, 5vw, 64px); }
+  .g3 { grid-column: span 2; margin-top: clamp(10px, 2vw, 20px); }
+  .g4 { grid-column: span 4; margin-top: -10px; }
+  .g5 { grid-column: span 4; margin-top: clamp(24px, 4vw, 46px); }
+  .g6 { grid-column: span 2; }
+  .g7 { grid-column: 2 / span 4; margin-top: clamp(18px, 3vw, 36px); }
+
+  .card.tall a { min-height: clamp(190px, 22vw, 240px); }
+}
+
+@media (max-width: 767px) {
+  .grid li { grid-column: auto !important; margin-top: 0 !important; }
 }
 
 .card a {
@@ -217,7 +265,7 @@ a { color: inherit; text-decoration: none; }
   justify-content: space-between;
   gap: 26px;
   width: 100%;
-  min-height: 132px;
+  min-height: clamp(120px, 12vw, 140px);
   padding: 16px;
   border: 1px solid var(--accent);
   border-radius: 0;
@@ -302,30 +350,37 @@ footer a:hover { color: var(--accent); }
 
 <div class="page">
 
-  <header class="hero">
-    <div class="hero-figure">
-      <img src="hero-spider.jpg" alt="Illustrated spider carrying five pairs of children's boots">
+  <nav class="topnav">
+    <span class="wordmark">Portfolio</span>
+    <div class="nav-right">
+      <a class="nav-contact" href="mailto:mukeshrani465@gmail.com">Contact</a>
+      <div class="corner-photo" id="cornerPhoto" title="Click to change photo">
+        <img id="cornerImg" src="recent-work.jpg" alt="Recent work" onerror="this.style.display='none'">
+        <span class="corner-overlay">Change</span>
+        <input type="file" accept="image/*" id="cornerPhotoInput" hidden>
+      </div>
     </div>
+  </nav>
+
+  <header class="type-hero">
+    <p class="kicker">ART 3041 · Fall 2026</p>
+    <h1><span>Mukesh</span><span class="accent">Rani</span></h1>
+    <p class="sub">Design work made in conversation with AI, built one project at a time this semester.</p>
   </header>
 
-  <div class="identity">
-    <h1 class="name">Mukesh Rani</h1>
-  </div>
-
-  <div class="meta-row">
-    <span class="label">ART 3041 · Fall 2026</span>
-    <span class="divider"></span>
+  <div class="hero-meta" id="about">
+    <span class="label">Selected work · 01–07</span>
     <a href="mailto:mukeshrani465@gmail.com">mukeshrani465@gmail.com</a>
   </div>
 
-  <section class="work">
+  <section class="work" id="work">
     <div class="work-head">
       <h2>Work</h2>
       <span class="count">01 — 07</span>
     </div>
 
     <ol class="grid">
-      <li class="card c-offset-0">
+      <li class="card g1">
         <a href="#">
           <span class="num">01</span>
           <span class="title-row">
@@ -334,7 +389,7 @@ footer a:hover { color: var(--accent); }
           </span>
         </a>
       </li>
-      <li class="card c-offset-1">
+      <li class="card g2">
         <a href="#">
           <span class="num">02</span>
           <span class="title-row">
@@ -343,7 +398,7 @@ footer a:hover { color: var(--accent); }
           </span>
         </a>
       </li>
-      <li class="card c-offset-2">
+      <li class="card g3 tall">
         <a href="design-a.html">
           <span class="num">03</span>
           <span class="title-row">
@@ -352,7 +407,7 @@ footer a:hover { color: var(--accent); }
           </span>
         </a>
       </li>
-      <li class="card c-offset-0">
+      <li class="card g4">
         <a href="#">
           <span class="num">04</span>
           <span class="title-row">
@@ -361,7 +416,7 @@ footer a:hover { color: var(--accent); }
           </span>
         </a>
       </li>
-      <li class="card c-offset-1">
+      <li class="card g5">
         <a href="#">
           <span class="num">05</span>
           <span class="title-row">
@@ -370,7 +425,7 @@ footer a:hover { color: var(--accent); }
           </span>
         </a>
       </li>
-      <li class="card c-offset-2">
+      <li class="card g6 tall">
         <a href="#">
           <span class="num">06</span>
           <span class="title-row">
@@ -379,7 +434,7 @@ footer a:hover { color: var(--accent); }
           </span>
         </a>
       </li>
-      <li class="card card-open">
+      <li class="card g7 card-open">
         <a href="#">
           <span class="num num-open">07</span>
           <span class="title-row">
@@ -399,6 +454,36 @@ footer a:hover { color: var(--accent); }
   </footer>
 
 </div>
+<script>
+(function () {
+  var img = document.getElementById('cornerImg');
+  var box = document.getElementById('cornerPhoto');
+  var input = document.getElementById('cornerPhotoInput');
+  if (!img || !box || !input) return;
+
+  try {
+    var saved = localStorage.getItem('cornerPhoto');
+    if (saved) {
+      img.src = saved;
+      img.style.display = 'block';
+    }
+  } catch (e) {}
+
+  box.addEventListener('click', function () { input.click(); });
+
+  input.addEventListener('change', function () {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      img.src = e.target.result;
+      img.style.display = 'block';
+      try { localStorage.setItem('cornerPhoto', e.target.result); } catch (err) {}
+    };
+    reader.readAsDataURL(file);
+  });
+})();
+</script>
 
 </body>
 </html>
