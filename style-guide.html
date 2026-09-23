@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mukesh Rani — ART 3041</title>
+<title>A Style Guide for Your AI — Mukesh Rani</title>
 <style>
 
 @font-face {
@@ -22,178 +22,114 @@
 }
 
 :root {
-  --ink: #1C1B17;        /* heading color */
-  --text: #4a4a4a;       /* body text */
-  --muted: #8a8a8a;      /* small card labels */
-  --pink: #F8DCE3;       /* card fill */
-  --pink-deep: #C9788D;  /* card numbers */
-  --bg: #ffffff;         /* page background */
+  --ink: #1C1B17;
+  --text: #4a4a4a;
+  --muted: #8a8a8a;
+  --pink: #F8DCE3;
+  --pink-deep: #C9788D;
+  --bg: #ffffff;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 body {
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg); color: var(--text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 17px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden; /* stops tilted cards from causing sideways scroll */
+  font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
+h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: var(--ink); letter-spacing: -0.02em; line-height: 1.1; }
+a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { color: var(--ink); }
+code { font-family: inherit; font-weight: 600; color: var(--ink); }
 
-/* ---------- Round photo in the top-right corner (click to change) ---------- */
-.corner-photo {
-  position: fixed;
-  top: 18px;
-  right: 18px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--pink);
-  box-shadow: 0 4px 14px rgba(0,0,0,.15);
-  cursor: pointer;
-  z-index: 10;
-}
-.corner-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.corner-overlay {
-  position: absolute; inset: 0;
-  display: grid; place-items: center;
-  background: rgba(28,27,23,.55);
-  color: #fff; font-size: 9px; letter-spacing: .06em; text-transform: uppercase;
-  opacity: 0; transition: opacity .15s ease;
-}
-.corner-photo:hover .corner-overlay { opacity: 1; }
-
-/* ---------- Intro block ---------- */
-.intro {
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 110px 24px 40px;
-}
-.intro h1 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: clamp(32px, 6vw, 42px);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  color: var(--ink);
-  margin-bottom: 14px;
-}
+.intro, .section { max-width: 620px; margin: 0 auto; padding: 0 24px; }
+.intro { padding-top: 110px; padding-bottom: 20px; max-width: 520px; }
+.intro h1 { font-size: clamp(32px, 6vw, 42px); font-weight: 700; margin-bottom: 14px; }
 .intro p { margin-bottom: 12px; }
 
-/* Underlined links like the reference */
-.intro a {
-  color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-}
-.intro a:hover { color: var(--ink); }
+.section { margin-top: 70px; }
+.section > h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+.section > p { margin-bottom: 26px; }
 
-/* ---------- Row of tilted project cards ---------- */
-.cards {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 36px 44px;
-  max-width: 1100px;
-  margin: 30px auto 100px;
-  padding: 0 24px;
-}
-.card {
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  transform: rotate(var(--tilt, 0deg));   /* each card's angle is set in the HTML */
-  transition: transform .25s ease;
-}
-.card:hover,
-.card:focus-visible { transform: rotate(0deg) translateY(-6px); }
+/* Swatches: tilted like the homepage cards */
+.swatches { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 30px 34px; max-width: 800px; margin: 0 auto; padding: 0 24px; }
+.swatch { display: flex; flex-direction: column; align-items: center; gap: 10px; transform: rotate(var(--tilt)); transition: transform .25s ease; }
+.swatch:hover { transform: rotate(0deg) translateY(-6px); }
+.chip { width: 96px; height: 96px; border-radius: 18px; box-shadow: 0 10px 24px rgba(0,0,0,.14); }
+.sw-name { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.sw-hex { font-size: 14px; color: var(--ink); margin-top: -8px; }
+
+/* Type specimen */
+.specimen { background: var(--pink); border-radius: 18px; padding: 28px; box-shadow: 0 10px 24px rgba(0,0,0,.08); }
+.specimen .big { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(40px, 9vw, 64px); color: var(--ink); letter-spacing: -0.02em; line-height: 1; }
+.specimen .num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 56px; color: var(--pink-deep); line-height: 1; }
+.specimen .row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.specimen p { color: var(--text); }
+.specimen small { display: block; margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+/* Live card example */
+.demo { display: flex; justify-content: center; padding: 10px 0 0; }
+.card { text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 14px; transform: rotate(var(--tilt, 0deg)); transition: transform .25s ease; }
+.card:hover, .card:focus-visible { transform: rotate(0deg) translateY(-6px); }
 .card:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; border-radius: 20px; }
-
-/* The square "photo" part of each card */
-.card-face {
-  width: 150px;
-  height: 150px;
-  border-radius: 18px;
-  overflow: hidden;
-  background: var(--pink);
-  box-shadow: 0 10px 24px rgba(0,0,0,.14);
-  display: grid;
-  place-items: center;
-}
-.card-face img { width: 100%; height: 100%; object-fit: cover; }
-.card-face { position: relative; }   /* lets the little drawings sit on the card */
-
-/* Tiny drawing in the top-left corner of a card */
+.card-face { position: relative; width: 150px; height: 150px; border-radius: 18px; background: var(--pink); box-shadow: 0 10px 24px rgba(0,0,0,.14); display: grid; place-items: center; }
 .doodle { position: absolute; top: 8px; left: 8px; width: 38px; height: 38px; }
-/* Full-card drawing (used for the giraffe that wraps around 03) */
-.doodle-full { position: absolute; inset: 0; width: 100%; height: 100%; }
-.card-num {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 56px;
-  color: var(--pink-deep);
-}
-.card-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  text-align: center;
-  max-width: 160px;
-}
+.card-num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 56px; color: var(--pink-deep); }
+.card-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 
-/* ---------- Phones ---------- */
+/* Rules */
+.rules { list-style: none; }
+.rule { display: grid; grid-template-columns: 48px 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid var(--pink); }
+.rule:last-child { border-bottom: 1px solid var(--pink); }
+.rule-num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 26px; color: var(--pink-deep); line-height: 1; }
+.rule h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+
+footer { max-width: 620px; margin: 70px auto 80px; padding: 0 24px; }
+
 @media (max-width: 600px) {
   .intro { padding-top: 90px; }
-  .cards { gap: 28px 20px; }
-  .card-face { width: 130px; height: 130px; }
-  .card-num { font-size: 46px; }
+  .chip { width: 80px; height: 80px; }
+  .swatches { gap: 24px 20px; }
+  .specimen .row { flex-direction: column; align-items: flex-start; }
 }
-@media (prefers-reduced-motion: reduce) { .card { transition: none; } }
-
+@media (prefers-reduced-motion: reduce) { .card, .swatch { transition: none; } }
 </style>
 </head>
 <body>
 
-  <!-- Top-right round photo: shows recent-work.jpg from your repo; click to swap it -->
-  <div class="corner-photo" id="cornerPhoto" title="Click to change photo">
-    <img id="cornerImg" src="recent-work.jpg" alt="Recent work" onerror="this.style.display='none'">
-    <span class="corner-overlay">Change</span>
-    <input type="file" accept="image/*" id="cornerPhotoInput" hidden>
+<header class="intro">
+  <h1>A Style Guide for Your AI</h1>
+  <p>The rules my homepage is built on, written so any AI tool can rebuild or extend the site without drifting from the look.</p>
+  <p>The full text is in <a href="handoff.md">handoff.md</a>, which I paste into my custom instructions.</p>
+</header>
+
+<section class="section" aria-labelledby="c">
+  <h2 id="c">Colors</h2>
+  <p>White space does most of the work. Pink is only for cards and the things on them.</p>
+</section>
+<ul class="swatches">
+    <li class="swatch" style="--tilt:-5deg"><span class="chip" style="background:#FFFFFF"></span><span class="sw-name">Background</span><span class="sw-hex">#FFFFFF</span></li>
+    <li class="swatch" style="--tilt:4deg"><span class="chip" style="background:#1C1B17"></span><span class="sw-name">Ink</span><span class="sw-hex">#1C1B17</span></li>
+    <li class="swatch" style="--tilt:-3deg"><span class="chip" style="background:#4A4A4A"></span><span class="sw-name">Body text</span><span class="sw-hex">#4A4A4A</span></li>
+    <li class="swatch" style="--tilt:6deg"><span class="chip" style="background:#8A8A8A"></span><span class="sw-name">Labels</span><span class="sw-hex">#8A8A8A</span></li>
+    <li class="swatch" style="--tilt:-6deg"><span class="chip" style="background:#F8DCE3"></span><span class="sw-name">Card pink</span><span class="sw-hex">#F8DCE3</span></li>
+    <li class="swatch" style="--tilt:3deg"><span class="chip" style="background:#C9788D"></span><span class="sw-name">Deep pink</span><span class="sw-hex">#C9788D</span></li>
+</ul>
+
+<section class="section" aria-labelledby="t">
+  <h2 id="t">Type</h2>
+  <p>Space Grotesk for headings and card numbers, Inter for everything else.</p>
+  <div class="specimen">
+    <div class="row"><span class="big">Mukesh Rani</span><span class="num">02</span></div>
+    <p>Design work made in conversation with AI, built one project at a time this semester.</p>
+    <small>Space Grotesk Bold · Inter Regular 17px</small>
   </div>
+</section>
 
-  <!-- Intro text -->
-  <header class="intro">
-    <h1>Mukesh Rani</h1>
-    <p>Design work made in conversation with AI, built one project at a time this semester in ART 3041, Fall 2026.</p>
-    <p>Reach me at <a href="mailto:mukeshrani465@gmail.com">mukeshrani465@gmail.com</a>.</p>
-  </header>
-
-  <!-- Project cards. Replace href="#" with a project's page as you finish it.
-       To show a picture, put <img src="file.jpg" alt="..."> inside card-face and delete the card-num line. -->
-  <ul class="cards">
-    <li><a class="card" href="custom-instructions.html" style="--tilt:-7deg">
-      <div class="card-face">
-      <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <!-- lily: stem, leaf, three petals, stamens -->
-        <path d="M20 38 V22"/><path d="M20 32 q-7 -1 -9 -8 q7 1 9 8"/>
-        <path d="M20 22 C14 20 9 12 11 5 C15 9 18 14 20 22Z" fill="#fff"/>
-        <path d="M20 22 C26 20 31 12 29 5 C25 9 22 14 20 22Z" fill="#fff"/>
-        <path d="M20 22 C17 15 17 8 20 2 C23 8 23 15 20 22Z" fill="#fff"/>
-        <path d="M20 14 l-3 -6 M20 14 l3 -6"/><circle cx="17" cy="8" r="1" fill="#C9788D"/><circle cx="23" cy="8" r="1" fill="#C9788D"/>
-      </svg>
-      <span class="card-num">01</span></div>
-      <span class="card-label">Custom Instructions</span>
-    </a></li>
-    <li><a class="card" href="style-guide.html" style="--tilt:4deg">
+<section class="section" aria-labelledby="k">
+  <h2 id="k">The card</h2>
+  <p>Hover over it to see how every project card on the homepage behaves.</p>
+  <div class="demo">
+    <a class="card" href="index.html" style="--tilt:4deg">
       <div class="card-face">
       <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <!-- dog face: floppy ears, eyes, nose, smile -->
@@ -206,122 +142,32 @@ body {
       </svg>
       <span class="card-num">02</span></div>
       <span class="card-label">A Style Guide for Your AI</span>
-    </a></li>
-    <li><a class="card" href="design-a.html" style="--tilt:-3deg">
-      <div class="card-face">
-      <svg class="doodle-full" viewBox="0 0 150 150" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <!-- giraffe: long neck wraps around the number -->
-        <path d="M22 132 v14 M28 132 v14 M38 132 v14 M44 132 v14"/>
-        <path d="M14 124 q-6 4 -4 12"/>
-        <ellipse cx="30" cy="125" rx="17" ry="9" fill="#fff"/>
-        <path id="neck" d="M42 119 C70 130 116 122 122 94 C128 66 120 36 92 28 C66 21 44 28 36 40" stroke-width="9"/>
-        <path d="M42 119 C70 130 116 122 122 94 C128 66 120 36 92 28 C66 21 44 28 36 40" stroke="#fff" stroke-width="5"/>
-        <path d="M42 119 C70 130 116 122 122 94 C128 66 120 36 92 28 C66 21 44 28 36 40" stroke-width="3" stroke-dasharray="1 9"/>
-        <ellipse cx="29" cy="42" rx="10" ry="6.5" transform="rotate(25 29 42)" fill="#fff"/>
-        <path d="M30 34 l1 -7 M35 36 l3 -6"/><circle cx="31" cy="26.5" r="1.3" fill="#C9788D"/><circle cx="38.5" cy="29.5" r="1.3" fill="#C9788D"/>
-        <circle cx="28" cy="40" r="1.2" fill="#C9788D"/>
-      </svg>
-      <span class="card-num">03</span></div>
-      <span class="card-label">Design a ___</span>
-    </a></li>
-    <li><a class="card" href="commute-story.html" style="--tilt:8deg">
-      <div class="card-face">
-      <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <!-- snail: body, spiral shell, antennae -->
-        <path d="M5 33 H31 q5 0 5 -6 v-3"/>
-        <path d="M36 24 l-2 -7 M36 24 l3 -6"/><circle cx="34" cy="16.5" r="1.2" fill="#C9788D"/><circle cx="39" cy="17.5" r="1.2" fill="#C9788D"/>
-        <circle cx="19" cy="22" r="10" fill="#fff"/>
-        <path d="M19 22 m0 -5 a5 5 0 1 1 -5 5 a3 3 0 1 1 3 -3"/>
-      </svg>
-      <span class="card-num">04</span></div>
-      <span class="card-label">Commute Story</span>
-    </a></li>
-    <li><a class="card" href="#" style="--tilt:-5deg">
-      <div class="card-face">
-      <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <!-- butterfly: four wings, body, antennae -->
-        <path d="M20 19 C12 6 3 9 5 16 C7 22 15 21 20 19Z" fill="#fff"/>
-        <path d="M20 19 C28 6 37 9 35 16 C33 22 25 21 20 19Z" fill="#fff"/>
-        <path d="M20 21 C13 22 9 30 13 33 C17 34 19 27 20 21Z" fill="#C9788D"/>
-        <path d="M20 21 C27 22 31 30 27 33 C23 34 21 27 20 21Z" fill="#C9788D"/>
-        <path d="M20 14 V30 M20 14 q-2 -5 -5 -6 M20 14 q2 -5 5 -6"/>
-      </svg>
-      <span class="card-num">05</span></div>
-      <span class="card-label">Become a Crea(i)tive Director</span>
-    </a></li>
-    <li><a class="card" href="#" style="--tilt:6deg">
-      <div class="card-face">
-      <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <!-- cat face: pointy ears, eyes, nose, whiskers -->
-        <path d="M9 30 C7 22 8 14 10 8 L16 14 H24 L30 8 C32 14 33 22 31 30 C27 35 13 35 9 30Z" fill="#fff"/>
-        <path d="M16 21 q1 -1.5 2 0 M22 21 q1 -1.5 2 0"/>
-        <path d="M19 25 h2 l-1 1.5z" fill="#C9788D"/>
-        <path d="M14 26 H5 M14 28 l-8 2 M26 26 H35 M26 28 l8 2"/>
-      </svg>
-      <span class="card-num">06</span></div>
-      <span class="card-label">Experimental AI Interface</span>
-    </a></li>
-    <li><a class="card" href="#" style="--tilt:-4deg">
-      <div class="card-face">
-      <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <!-- star with two little sparkles -->
-        <path d="M18 6 l3.5 8 8.5 1 -6.5 6 2 8.5 -7.5 -4.5 -7.5 4.5 2 -8.5 -6.5 -6 8.5 -1z" fill="#fff"/>
-        <path d="M33 4 v6 M30 7 h6 M34 30 v4 M32 32 h4"/>
-      </svg>
-      <span class="card-num">07</span></div>
-      <span class="card-label">Open</span>
-    </a></li>
-    <li><a class="card" href="chair-sequence.html" style="--tilt:5deg">
-      <div class="card-face">
-      <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <!-- chair: tall slatted back, seat, legs -->
-        <path d="M12 5 V36 M28 24 V36 M12 9 H18 M12 14 H18 M12 19 H18 M18 7 V22"/>
-        <rect x="11" y="21" width="19" height="4" rx="1.5" fill="#fff"/>
-      </svg>
-      <span class="card-num">08</span></div>
-      <span class="card-label">Chair Sequence</span>
-    </a></li>
-    <li><a class="card" href="concert-tour.html" style="--tilt:-6deg">
-      <div class="card-face">
-      <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <!-- two joined music notes -->
-        <path d="M14 30 V10 L32 5 V25 M14 15 L32 10"/>
-        <ellipse cx="10.5" cy="30" rx="4" ry="3" fill="#C9788D"/>
-        <ellipse cx="28.5" cy="25" rx="4" ry="3" fill="#C9788D"/>
-      </svg>
-      <span class="card-num">09</span></div>
-      <span class="card-label">Concert Tour (AI Poster)</span>
-    </a></li>
-  </ul>
+    </a>
+  </div>
+</section>
 
-<script>
-// Corner photo: loads a saved photo if there is one, and lets you click to pick a new one
-(function () {
-  var img = document.getElementById('cornerImg');
-  var box = document.getElementById('cornerPhoto');
-  var input = document.getElementById('cornerPhotoInput');
-  if (!img || !box || !input) return;
+<section class="section" aria-labelledby="r">
+  <h2 id="r">The rules</h2>
+  <p>These are the numbered instructions the AI follows.</p>
+  <ol class="rules">
+    <li class="rule"><span class="rule-num">01</span><div><h3>Color</h3><p>White page background <code>#FFFFFF</code>. Headings in ink <code>#1C1B17</code>, body text in gray <code>#4A4A4A</code>, small labels in muted gray <code>#8A8A8A</code>. Cards are filled with blush pink <code>#F8DCE3</code>; numbers and drawings use deep pink <code>#C9788D</code>. No other colors.</p></div></li>
+    <li class="rule"><span class="rule-num">02</span><div><h3>Type</h3><p>Headings in Space Grotesk Bold, letter-spacing −0.02em, line-height 1.1, sized 32–42px. Body in Inter 400–600 at 17px, line-height 1.5. Both fonts are embedded in the file as base64 so they load without Google Fonts.</p></div></li>
+    <li class="rule"><span class="rule-num">03</span><div><h3>Intro</h3><p>One centered column, 520px wide, text aligned left, with 110px of space above the heading. Name as the heading, then one or two short sentences.</p></div></li>
+    <li class="rule"><span class="rule-num">04</span><div><h3>Links</h3><p>Inline links stay gray and underlined (1px line, 3px below the text). On hover they darken to ink. No buttons.</p></div></li>
+    <li class="rule"><span class="rule-num">05</span><div><h3>Project cards</h3><p>Projects sit in a centered, wrapping row. Each card is a 150px pink square with 18px rounded corners and a soft shadow, a large 56px deep-pink number in the middle, and a small uppercase gray label underneath.</p></div></li>
+    <li class="rule"><span class="rule-num">06</span><div><h3>Tilt</h3><p>Every card is rotated between −8° and +8°, alternating left and right so neighbors never lean the same way. The angle is set per card with <code>--tilt</code>.</p></div></li>
+    <li class="rule"><span class="rule-num">07</span><div><h3>Hover</h3><p>On hover or keyboard focus a card straightens to 0° and lifts 6px over 0.25s. Keyboard focus also shows a 2px ink outline.</p></div></li>
+    <li class="rule"><span class="rule-num">08</span><div><h3>Drawings</h3><p>Each card carries a small hand-drawn line drawing (an animal, flower or object) in deep pink: 2px rounded strokes, white fills, 38px in the top-left corner, or wrapped around the whole card.</p></div></li>
+    <li class="rule"><span class="rule-num">09</span><div><h3>Corner photo</h3><p>A 56px round photo is fixed in the top-right corner. Clicking it lets you pick a new photo, which is remembered in the browser.</p></div></li>
+    <li class="rule"><span class="rule-num">10</span><div><h3>Phones</h3><p>At 600px and below, cards shrink to 130px, numbers to 46px, and the gaps tighten so two cards fit per row.</p></div></li>
+    <li class="rule"><span class="rule-num">11</span><div><h3>Motion</h3><p>Hover is the only motion on the site. When the visitor has reduced motion turned on, cards don't animate.</p></div></li>
+    <li class="rule"><span class="rule-num">12</span><div><h3>Project pages</h3><p>Every project page uses the same fonts and colors and ends with a “back to homepage” link. These rules apply to every future build or edit unless I override them.</p></div></li>
+  </ol>
+</section>
 
-  try {
-    var saved = localStorage.getItem('cornerPhoto');
-    if (saved) { img.src = saved; img.style.display = 'block'; }
-  } catch (e) {}
-
-  box.addEventListener('click', function () { input.click(); });
-
-  input.addEventListener('change', function () {
-    var file = input.files && input.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      img.src = e.target.result;
-      img.style.display = 'block';
-      try { localStorage.setItem('cornerPhoto', e.target.result); } catch (err) {}
-    };
-    reader.readAsDataURL(file);
-  });
-})();
-</script>
+<footer>
+  <a href="index.html">&larr; back to homepage</a>
+</footer>
 
 </body>
 </html>

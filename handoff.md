@@ -1,14 +1,18 @@
-# Style Handoff — ART 3041
+# Style Handoff — Mukesh Rani, ART 3041
 
-1. Reference: dsgn-dept.com (Design Department) — big type, minimal, editorial. Replaces the earlier Linear/Spotify/Cienne moodboard entirely.
-2. Page background is stone (#F1EFE7); all body text is near-black ink (#1C1B17); the one accent color is deep moss green (#4B5842) — used only for the second line of the headline, link underlines, hover states, and the numbered badges, never as a large fill.
-3. Headings use Space Grotesk, weight 700. The hero name is the dominant visual element: oversized (clamp 58px–176px), line-height 0.86, tight letter-spacing (-0.03em), one word per line, first line in ink, second line in the accent color.
-4. Body text uses Inter, weight 400, ~15px, line-height 1.6, kept short (one to two sentences) under the headline.
-5. Nav is plain text, no boxed buttons: a small wordmark on the left; on the right, an underlined "Contact" link plus a small square photo thumbnail — no Home/Work/About links.
-6. The photo thumbnail in the nav is click-to-replace: clicking it opens a file picker so the image can be swapped at any time; the chosen photo is remembered locally in the browser.
-7. Below the headline, a single 1px hairline rule separates a small meta row (selected-work count on the left, email on the right) from the hero above.
-8. The hero is typographic only — no hero photo, no collage, no moving/animated background. Big type carries the page.
-9. Work list renders as an asymmetric CSS grid (6 columns on desktop): cards vary in width (2–4 columns) and sit at different vertical offsets so nothing lines up in straight rows. Collapses to a single stacked column on mobile.
-10. Work items are outlined cards: 1px solid accent border, transparent fill, square corners (no border-radius), a small numbered circle badge in the accent color.
-11. On hover, Work cards invert (fill becomes the accent color, text becomes the background color), lift slightly (translateY -3px), and rotate -1°.
-12. These rules apply site-wide and persist across every future build or edit unless explicitly overridden.
+These rules describe the current homepage (index.html). Follow them for every build or edit of this site.
+
+1. **Color.** White page background `#FFFFFF`. Headings in ink `#1C1B17`, body text in gray `#4A4A4A`, small labels in muted gray `#8A8A8A`. Cards are filled with blush pink `#F8DCE3`; numbers and drawings use deep pink `#C9788D`. No other colors.
+2. **Type.** Headings in Space Grotesk Bold, letter-spacing −0.02em, line-height 1.1, sized 32–42px. Body in Inter 400–600 at 17px, line-height 1.5. Both fonts are embedded in the file as base64 so they load without Google Fonts.
+3. **Intro.** One centered column, 520px wide, text aligned left, with 110px of space above the heading. Name as the heading, then one or two short sentences.
+4. **Links.** Inline links stay gray and underlined (1px line, 3px below the text). On hover they darken to ink. No buttons.
+5. **Project cards.** Projects sit in a centered, wrapping row. Each card is a 150px pink square with 18px rounded corners and a soft shadow, a large 56px deep-pink number in the middle, and a small uppercase gray label underneath.
+6. **Tilt.** Every card is rotated between −8° and +8°, alternating left and right so neighbors never lean the same way. The angle is set per card with `--tilt`.
+7. **Hover.** On hover or keyboard focus a card straightens to 0° and lifts 6px over 0.25s. Keyboard focus also shows a 2px ink outline.
+8. **Drawings.** Each card carries a small hand-drawn line drawing (an animal, flower or object) in deep pink: 2px rounded strokes, white fills, 38px in the top-left corner, or wrapped around the whole card.
+9. **Corner photo.** A 56px round photo is fixed in the top-right corner. Clicking it lets you pick a new photo, which is remembered in the browser.
+10. **Phones.** At 600px and below, cards shrink to 130px, numbers to 46px, and the gaps tighten so two cards fit per row.
+11. **Motion.** Hover is the only motion on the site. When the visitor has reduced motion turned on, cards don't animate.
+12. **Project pages.** Every project page uses the same fonts and colors and ends with a “back to homepage” link. These rules apply to every future build or edit unless I override them.
+
+Always give me a full downloadable file, never code snippets.
