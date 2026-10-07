@@ -30,10 +30,9 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 var(--ui);}
 *{box-sizing:border-box}
 .app{height:100%;display:grid;grid-template-columns:340px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);
   grid-template-areas:"side top" "side stage";gap:14px;padding:14px 16px;}
-.side{grid-area:side;display:flex;flex-direction:column;gap:12px;min-height:0}
-.panel{background:var(--panel);border-radius:var(--r-lg);padding:14px 16px;overflow:auto;min-height:0}
-.panel.content{flex:1 1 auto}
-.panel.structure{flex:0 0 auto;border-radius:4px;max-height:40%}
+.side{grid-area:side;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto;scrollbar-gutter:stable;padding-right:2px}
+.panel{background:var(--panel);border-radius:var(--r-lg);padding:14px 16px;flex:0 0 auto}
+.panel.structure,.panel.elements{border-radius:4px}
 .panel h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
 details{border-top:1px solid var(--line);padding-block:8px}
 details:first-of-type{border-top:0;padding-top:0}
@@ -56,24 +55,71 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .btn:hover{border-color:var(--fg)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 .btn.ghost{background:transparent}
+.btn.icon{padding:5px 10px;font-size:16px;line-height:1.1}
+.btn:disabled{opacity:.35;cursor:default}
+.btn:disabled:hover{border-color:var(--line)}
+.menu{position:relative}
+.menu-list{position:absolute;right:0;top:calc(100% + 6px);background:var(--field);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:6px;display:grid;gap:2px;min-width:250px;z-index:30}
+.menu-list button{all:unset;cursor:pointer;padding:8px 10px;border-radius:9px;display:grid;gap:1px;font-size:13px;font-weight:700;color:var(--fg)}
+.menu-list button span{font-weight:400;font-size:11px;color:var(--muted)}
+.menu-list button:hover,.menu-list button:focus-visible{background:var(--panel)}
 .btn[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-.generate{flex:0 0 auto;border-radius:var(--r-md);padding:14px;font-size:15px;letter-spacing:.02em;width:100%}
+.generate{border-radius:var(--r-md);padding:14px;font-size:15px;letter-spacing:.02em;width:100%}
+.side-foot{position:sticky;bottom:0;margin-top:auto;background:var(--bg);padding-top:4px;display:grid;gap:4px;z-index:2}
+.linkbtn{justify-self:center;background:none;border:0;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px}
+.linkbtn:hover{color:var(--fg)}
+.lt{display:flex;justify-content:space-between;gap:8px}
+.phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.phead h2{margin:0}
+.panel .hint{margin-bottom:8px}
 .hint{font-size:11px;color:var(--muted);margin:0}
-.top{grid-area:top;border:1.5px solid var(--accent);border-radius:var(--r-lg);background:var(--panel);padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
-.brand{display:flex;flex-direction:column;gap:1px}
+.top{grid-area:top;border:1.5px solid var(--accent);border-radius:var(--r-lg);background:var(--panel);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;position:relative;z-index:10}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .mark{width:30px;height:30px;flex:0 0 auto;color:var(--fg)}
+.brand-t{display:flex;flex-direction:column;gap:0}
 .brand b{font-size:16px;letter-spacing:-.01em}
 .back{font-size:11px;color:var(--muted);text-decoration:none}
 .back:hover{color:var(--fg);text-decoration:underline}
 .brand span{font-size:11px;color:var(--muted)}
-.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .seed{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-.seed input[type=number]{width:92px;font-variant-numeric:tabular-nums}
+.seed input[type=number]{width:84px;font-variant-numeric:tabular-nums;padding:5px 8px}
 .sep{width:1px;height:24px;background:var(--line)}
-.stage{grid-area:stage;background:var(--stage);border-radius:4px;display:grid;place-items:center;padding:24px;min-height:0;overflow:hidden;position:relative}
-#poster{position:absolute;inset:24px;display:flex;align-items:center;justify-content:center}
+.stage{grid-area:stage;background:var(--stage);border-radius:4px;display:flex;flex-direction:column;gap:8px;padding:16px 16px 12px;min-height:0;overflow:hidden;position:relative}
+.canvas{position:relative;flex:1 1 auto;min-height:0}
+#poster{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.caption{margin:0;text-align:center;font-size:11px;color:var(--muted);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.series{flex:0 0 auto;display:grid;gap:8px;border-top:1px solid var(--line);padding-top:8px}
+.series-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:12px;color:var(--muted)}
+.series-bar b{color:var(--fg);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.series-bar .btn:first-of-type{margin-left:auto}
+.series-strip{display:flex;gap:12px;overflow-x:auto;padding:6px 6px 4px}
+.sitem{position:relative;flex:0 0 auto;height:72px}
+.sitem .open{all:unset;cursor:pointer;display:block;height:100%}
+.sitem .open:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sitem svg{height:100%;width:auto;display:block;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:transform .15s}
+.sitem .open:hover svg{transform:translateY(-2px)}
+.sitem .rm{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;border:0;background:var(--fg);color:var(--bg);font-size:12px;line-height:20px;text-align:center;cursor:pointer;padding:0;opacity:0;transition:opacity .15s}
+.sitem:hover .rm,.sitem .rm:focus-visible{opacity:1}
+.seltools{position:absolute;top:0;left:0;display:grid;grid-template-columns:auto auto auto;align-items:center;gap:4px 2px;background:var(--fg);color:var(--bg);padding:10px 8px;border-radius:14px;font-size:12px;z-index:6;box-shadow:var(--shadow);white-space:nowrap;width:150px}
+.seltools b{grid-column:1/-1;padding:0 6px 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.seltools #stHide,.seltools #stReset{grid-column:span 3;text-align:left}
+.seltools button{all:unset;cursor:pointer;padding:5px 8px;border-radius:8px;font-weight:700;text-align:center}
+.seltools button:hover,.seltools button:focus-visible{background:color-mix(in srgb,var(--bg) 20%,transparent)}
+.seltools span{min-width:40px;text-align:center;font-variant-numeric:tabular-nums;opacity:.8}
+.elrow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:4px 6px;border-top:1px solid var(--line);border-radius:6px}
+.elrow:first-child{border-top:0}
+.elrow label{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--fg);cursor:pointer;grid-template-columns:none}
+.elrow.off label{color:var(--muted);text-decoration:line-through}
+.elrow.sel{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.sz{display:flex;align-items:center;gap:2px}
+.sz button{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:var(--field);color:var(--fg);cursor:pointer;font:inherit;font-weight:700;line-height:1;padding:0}
+.sz button:hover{border-color:var(--fg)}
+.sz button:disabled{opacity:.35;cursor:default}
+.sz span{min-width:42px;text-align:center;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted)}
 #poster svg{height:100%;width:auto;max-width:100%;box-shadow:var(--shadow);display:block}
-.grid9{position:absolute;inset:0;padding:18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:14px;background:var(--stage);overflow:auto}
-.grid9 button{border:0;background:none;padding:0;cursor:pointer;display:grid;place-items:center;min-height:0}
+.grid9{position:absolute;inset:0;padding:6px;z-index:4;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:14px;background:var(--stage);overflow:auto}
+.grid9 button{border:0;background:none;padding:0;cursor:pointer;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:3px;place-items:center;min-height:0;color:var(--muted);font:inherit;font-size:10px;font-variant-numeric:tabular-nums}
 .grid9 svg{height:100%;width:auto;max-width:100%;box-shadow:var(--shadow);transition:transform .15s}
 .grid9 button:hover svg,.grid9 button:focus-visible svg{transform:scale(1.02)}
 .btn.small{padding:4px 10px;font-size:12px;font-weight:500}
@@ -87,13 +133,19 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ui-ov.sel{stroke:var(--accent);stroke-width:2;stroke-dasharray:6 4}
 .ui-ov.hov{stroke:var(--accent);stroke-width:1.2;opacity:.55}
 .ui-ov.guide{stroke:#E0457B;stroke-width:1}
-.movehint{position:absolute;left:16px;top:12px;font-size:12px;color:var(--muted);background:var(--panel);padding:4px 10px;border-radius:999px;pointer-events:none}
+.movehint{position:absolute;left:0;bottom:0;max-width:150px;white-space:normal;line-height:1.45;border-radius:12px !important;font-size:12px;color:var(--muted);background:var(--panel);padding:4px 10px;border-radius:999px;pointer-events:none}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:calc(100% - 32px)}
 .toast.show{opacity:1}
 @media (max-width:900px){
   .app{height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:auto;grid-template-areas:"top" "stage" "side"}
-  .stage{height:auto;padding:16px}
+  .stage{height:auto;padding:12px}
+  .canvas{flex:none}
   #poster{position:static;inset:auto}
+  .side{overflow:visible}
+  .seltools{position:sticky;top:6px;left:auto;margin:0 auto 6px;width:auto;grid-template-columns:repeat(6,auto);justify-content:center}
+  .seltools b{grid-column:auto;padding:0 6px}
+  .seltools #stHide,.seltools #stReset{grid-column:auto}
+  .movehint{position:static;display:block;margin-top:6px;max-width:none}
   #poster svg{width:100%;height:auto}
   .grid9{position:static}
   .panel.structure{max-height:none}
@@ -103,20 +155,28 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
 <div class="app">
   <header class="top">
-    <div class="brand"><a class="back" href="index.html">← All projects</a><b>TM 8.9 Poster Generator</b><span>After <i>Typografische Monatsblätter</i> 8.9, 1972</span></div>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M3 6h3M10 6h5M19 6h8M31 6h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="3" y="11" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="12" y="11" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="24" y="11" width="14" height="14" fill="currentColor"/></svg>
+      <div class="brand-t"><a class="back" href="index.html">← All projects</a><b>TM 8.9 Poster Generator</b></div>
+    </div>
     <div class="tools">
-      <button class="btn ghost" id="btnText" title="Load a random text from the bank">Shuffle text</button>
-      <button class="btn ghost" id="btnVar" aria-pressed="false">9 variations</button>
-      <button class="btn ghost" id="btnReset">Reset to TM 8.9</button>
-      <button class="btn ghost" id="btnMove" aria-pressed="false">Move elements</button>
-      <button class="btn ghost" id="btnClearMoves" hidden>Clear moves</button>
+      <button class="btn ghost icon" id="btnUndo" title="Undo (Ctrl/⌘ Z)" aria-label="Undo" disabled>↶</button>
+      <button class="btn ghost icon" id="btnRedo" title="Redo (Shift Ctrl/⌘ Z)" aria-label="Redo" disabled>↷</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="btn ghost" id="btnText" title="Load a random text from the bank (T)">Shuffle text</button>
+      <button class="btn ghost" id="btnVar" aria-pressed="false" title="Show 9 variations (V)">9 variations</button>
+      <button class="btn ghost" id="btnMove" aria-pressed="false" title="Click, drag, resize or hide elements on the poster (E)">Edit elements</button>
       <span class="sep" aria-hidden="true"></span>
       <label class="seed" for="seed">Seed <input type="number" id="seed" min="1" max="999999"></label>
-      <label class="seed" for="seedLock"><input type="checkbox" id="seedLock"> Lock seed</label>
-      <span class="sep" aria-hidden="true"></span>
-      <button class="btn" id="exSVG">Export SVG</button>
-      <button class="btn" id="exPDF">Export PDF</button>
-      <button class="btn" id="exPNG">Export PNG</button>
+      <label class="seed" for="seedLock" title="Keep this seed when you press Generate"><input type="checkbox" id="seedLock"> Lock</label>
+      <div class="menu">
+        <button class="btn" id="btnExport" aria-haspopup="true" aria-expanded="false">Export ▾</button>
+        <div class="menu-list" id="exportMenu" role="menu" hidden>
+          <button role="menuitem" id="exPDF">PDF<span>Print size, vector, fonts embedded</span></button>
+          <button role="menuitem" id="exSVG">SVG<span>Editable in Illustrator, named groups</span></button>
+          <button role="menuitem" id="exPNG">PNG<span>Image at 3× resolution</span></button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -150,9 +210,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <section class="panel structure" aria-label="Structure and style">
       <h2>Structure &amp; Style</h2>
       <div class="fields" style="padding-top:0">
-        <label for="boxCount">Boxes <span class="val" id="boxCountV"></span><input type="range" id="boxCount" min="0" max="5" step="1"></label>
-        <div class="ctl"><label for="ratio">Growth ratio <span class="val" id="ratioV"></span><input type="range" id="ratio" min="1.3" max="1.8" step="0.01"></label><label class="lock" for="L_ratio"><input type="checkbox" id="L_ratio">Lock</label></div>
-        <div class="ctl"><label for="dashCount">Dashes <span class="val" id="dashCountV"></span><input type="range" id="dashCount" min="5" max="9" step="2"></label><label class="lock" for="L_dashCount"><input type="checkbox" id="L_dashCount">Lock</label></div>
+        <label for="boxCount"><span class="lt">Boxes <span class="val" id="boxCountV"></span></span><input type="range" id="boxCount" min="0" max="5" step="1"></label>
+        <div class="ctl"><label for="ratio"><span class="lt">Growth ratio <span class="val" id="ratioV"></span></span><input type="range" id="ratio" min="1.3" max="1.8" step="0.01"></label><label class="lock" for="L_ratio"><input type="checkbox" id="L_ratio">Lock</label></div>
+        <div class="ctl"><label for="dashCount"><span class="lt">Dashes <span class="val" id="dashCountV"></span></span><input type="range" id="dashCount" min="5" max="9" step="2"></label><label class="lock" for="L_dashCount"><input type="checkbox" id="L_dashCount">Lock</label></div>
         <div class="ctl"><label for="titlePos">Title block<select id="titlePos"><option value="top">Top</option><option value="middle">Middle</option><option value="bottom">Bottom</option></select></label><label class="lock" for="L_titlePos"><input type="checkbox" id="L_titlePos">Lock</label></div>
         <div class="ctl"><label for="diagramPos">Diagram<select id="diagramPos"><option value="bottom">Bottom</option><option value="middle">Middle</option><option value="top">Top</option><option value="left">Left side</option><option value="right">Right side</option></select></label><label class="lock" for="L_diagramPos"><input type="checkbox" id="L_diagramPos">Lock</label></div>
         <div class="ctl"><label for="align">Boxes hang from<select id="align"><option value="top">Top / outer edge</option><option value="bottom">Bottom / inner edge</option></select></label><label class="lock" for="L_align"><input type="checkbox" id="L_align">Lock</label></div>
@@ -161,17 +221,45 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <label for="format">Format<select id="format"></select></label>
         <label for="font">Typeface<select id="font"></select></label>
         <label for="upload">Upload a font (.ttf, .otf, .woff)<input type="file" id="upload" accept=".ttf,.otf,.woff,.woff2"></label>
-        <p class="hint">Generate picks a new seed and re-rolls every unlocked setting. Your text never changes.</p>
+        <p class="hint">Generate picks a new seed and re-rolls every unlocked setting. Your text, sizes and hidden elements stay as they are.</p>
       </div>
     </section>
 
-    <button class="btn primary generate" id="btnGen">Generate</button>
+    <section class="panel elements" aria-label="Elements">
+      <div class="phead"><h2>Elements</h2><button class="btn ghost small" id="elReset" type="button">Reset all</button></div>
+      <p class="hint">Untick to hide an element. Use − and + to resize it. In Edit elements you can also click it on the poster.</p>
+      <div id="elList"></div>
+    </section>
+
+    <div class="side-foot">
+      <button class="btn primary generate" id="btnGen" title="New poster (G)">Generate</button>
+      <button class="linkbtn" id="btnReset" type="button">Reset to the TM 8.9 original</button>
+    </div>
   </aside>
 
   <main class="stage" aria-label="Poster preview">
-    <div id="poster"></div>
-    <div class="movehint" id="moveHint" hidden>Drag to move · arrows nudge (Shift ×10) · Shift-drag skips snapping · Backspace resets the element</div>
-    <div class="grid9" id="grid9" hidden></div>
+    <div class="canvas">
+      <div id="poster"></div>
+      <div class="seltools" id="selTools" hidden>
+        <b id="selName"></b>
+        <button id="stSmaller" title="Smaller (−)" aria-label="Make smaller">A−</button>
+        <span id="stSize">100%</span>
+        <button id="stBigger" title="Bigger (+)" aria-label="Make bigger">A+</button>
+        <button id="stHide" title="Hide (H)">Hide</button>
+        <button id="stReset" title="Reset size and position (Backspace)">Reset</button>
+      </div>
+      <div class="movehint" id="moveHint" hidden>Click an element, then drag it. + / − resize, H hides, arrows nudge. Hold Shift to place freely.</div>
+      <div class="grid9" id="grid9" hidden></div>
+    </div>
+    <p class="caption" id="caption"></p>
+    <section class="series" aria-label="Series">
+      <div class="series-bar">
+        <b>Series</b><span id="seriesCount">Collect your final posters here</span>
+        <button class="btn small" id="btnAddSeries" type="button" title="Save this poster to your series (S)">＋ Add this poster</button>
+        <button class="btn ghost small" id="btnExportSeries" type="button" hidden>Export all as PDF</button>
+      </div>
+      <div class="series-strip" id="seriesStrip" hidden></div>
+    </section>
   </main>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -190,7 +278,7 @@ const EMBED_FONTS={
 </script>
 <script>
 /* ============================================================
-   TM 8.9 Poster Generator — rules from skills.md v1.1
+   TM 8.9 Poster Generator — rules from skills.md v1.4
    ============================================================ */
 
 // ---------- Fonts (static instances, named by PostScript name so Illustrator matches them) ----------
@@ -282,10 +370,10 @@ const DEFAULT = ()=>({
     boxes:BANK[0].boxes.map(b=>({label:b[0],sub:b[1]})),footer:[...TM_FOOTER],designer:"TM 8.9 Poster Generator"},
   settings:{boxCount:3,ratio:1.57,dashCount:7,align:"top",drift:"down",palette:"classic",font:"Inter Tight",format:"tm",titlePos:"top",diagramPos:"bottom"},
   locks:{ratio:false,dashCount:false,align:false,drift:false,palette:false,titlePos:false,diagramPos:false},
-  seed:1972, seedLock:false, jitter:false, offsets:{}
+  seed:1972, seedLock:false, jitter:false, offsets:{}, elements:{}
 });
 let state=DEFAULT();
-try{ const s=JSON.parse(localStorage.getItem("tm89-state")||"null"); if(s&&s.content&&s.settings){ const d=DEFAULT(); state=Object.assign(d,s,{settings:{...d.settings,...s.settings},locks:{...d.locks,...(s.locks||{})},offsets:s.offsets||{}}); if(!FORMATS[state.settings.format]) state.settings.format="tm"; if(!PALETTES[state.settings.palette]) state.settings.palette="classic"; } }catch(e){}
+try{ const s=JSON.parse(localStorage.getItem("tm89-state")||"null"); if(s&&s.content&&s.settings){ const d=DEFAULT(); state=Object.assign(d,s,{settings:{...d.settings,...s.settings},locks:{...d.locks,...(s.locks||{})},offsets:s.offsets||{},elements:s.elements||{}}); if(!FORMATS[state.settings.format]) state.settings.format="tm"; if(!PALETTES[state.settings.palette]) state.settings.palette="classic"; } }catch(e){}
 let warnedImg=false;
 function save(){
   try{ localStorage.setItem("tm89-state",JSON.stringify(state)); }
@@ -321,7 +409,38 @@ const FORMATS={
 // ---------- Layout engine: returns a list of drawing items ----------
 function shiftItems(list,dy){ list.forEach(it=>{ if(it.type==="text"){ if(it.rot) it.rot.py+=dy; else it.y+=dy; } else if(it.type==="line"){ it.y1+=dy; it.y2+=dy; } else it.y+=dy; }); return list; }
 
-function layout(content,settings,seed,jitter,offsets){
+// Element ids users can hide / resize / move (box ids are added per box count)
+const ELEMENTS=[["tag","Issue tag"],["hero","Big number"],["title","Title word"],["headline","Headline"],["credit","Attribution"],["subhead","Subhead"],["ruler","Dash ruler"],["box-1","Box 1"],["box-2","Box 2"],["box-3","Box 3"],["box-4","Box 4"],["box-5","Box 5"],["designer","Vertical credit"],["footer","Footer"]];
+const elName=id=>(ELEMENTS.find(e=>e[0]===id)||[id,id])[1];
+
+// bounding box of one drawing item (poster units)
+function itemBox(it){
+  if(it.type==="text"){ const w=runsWidth(it.runs,it.size);
+    if(it.rot) return [it.rot.px-0.75*it.size, it.rot.py-(it.x+w), it.rot.px+0.25*it.size, it.rot.py-it.x];
+    return [it.x, it.y-0.75*it.size, it.x+w, it.y+0.25*it.size]; }
+  if(it.type==="line") return [Math.min(it.x1,it.x2),Math.min(it.y1,it.y2),Math.max(it.x1,it.x2),Math.max(it.y1,it.y2)];
+  return [it.x,it.y,it.x+it.w,it.y+it.h];
+}
+// scale every item of a group about the group's centre
+function scaleGroup(list,k){
+  if(!list.length||k===1) return;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9; list.forEach(it=>{ const b=itemBox(it); x0=Math.min(x0,b[0]); y0=Math.min(y0,b[1]); x1=Math.max(x1,b[2]); y1=Math.max(y1,b[3]); });
+  const cx=(x0+x1)/2, cy=(y0+y1)/2, S=(v,c)=>c+(v-c)*k;
+  list.forEach(it=>{
+    if(it.type==="text"){ it.size*=k; it.runs=it.runs.map(r=>({...r,ls:(r.ls||0)*k}));
+      if(it.rot){ it.rot={px:S(it.rot.px,cx),py:S(it.rot.py,cy)}; it.x*=k; } else { it.x=S(it.x,cx); it.y=S(it.y,cy); } }
+    else if(it.type==="line"){ it.x1=S(it.x1,cx); it.x2=S(it.x2,cx); it.y1=S(it.y1,cy); it.y2=S(it.y2,cy); }
+    else { it.x=S(it.x,cx); it.y=S(it.y,cy); it.w*=k; it.h*=k; }
+  });
+}
+
+function layout(content,settings,seed,jitter,offsets,elements){
+  const E=elements||{}, hid=id=>!!(E[id]&&E[id].hidden);
+  // hidden text elements are blanked so the layout closes the gap
+  content={...content,
+    tag:hid("tag")?"":content.tag, hero:hid("hero")?"":content.hero, title:hid("title")?"":content.title,
+    headline:hid("headline")?"":content.headline, credit:hid("credit")?"":content.credit,
+    sub:hid("subhead")?"":content.sub, designer:hid("designer")?"":content.designer};
   const F=FORMATS[settings.format]||FORMATS.tm;
   const W=900, H=Math.round(W*F.r);
   let G="misc";
@@ -344,7 +463,7 @@ function layout(content,settings,seed,jitter,offsets){
   if(side){ const gut=0.07*cw; dW=0.30*cw; tW=cw-dW-gut; if(dpos==="right") dX=m+tW+gut; else tX=m+dW+gut; }
 
   // 0 issue tag
-  G="tag"; { const s=0.014*H, runs=[{t:content.tag,w:400,c:tint(.6)}]; mkT(items)(place("right",W-m,runs,s),0.03*H,s,runs); }
+  G="tag"; if(content.tag.trim()){ const s=0.014*H, runs=[{t:content.tag,w:400,c:tint(.6)}]; mkT(items)(place("right",W-m,runs,s),0.03*H,s,runs); }
 
   // keyword
   const lines=content.headline.split("\n").map(l=>l.trim()).filter(Boolean);
@@ -367,8 +486,10 @@ function layout(content,settings,seed,jitter,offsets){
     G="title";
     const tTop=content.hero.trim()?0.73*hs+0.08*H+jHT:0;
     let ts=0.055*H; const mk=s=>[{t:content.title.toUpperCase(),w:300,c:ink,ls:0.03*s},{t:":",w:300,c:tint(.35)}];
-    ts=fitSize(mk(ts),ts,tW); const tr=mk(ts); const tBase=tTop+0.73*ts; T(place("center",cx,tr,ts),tBase,ts,tr);
-    const hTop=tBase+0.04*H, lead=1.1*fs;
+    ts=fitSize(mk(ts),ts,tW); const tr=mk(ts); const hasTitle=!!content.title.trim();
+    const tBase=hasTitle? tTop+0.73*ts : (content.hero.trim()? 0.73*hs : 0);
+    if(hasTitle) T(place("center",cx,tr,ts),tBase,ts,tr);
+    const hTop=hasTitle? tBase+0.04*H : (content.hero.trim()? tBase+0.06*H : 0), lead=1.1*fs;
     G="headline";
     lines.forEach((line,i)=>{
       const y=hTop+0.73*fs+i*lead;
@@ -389,7 +510,7 @@ function layout(content,settings,seed,jitter,offsets){
     });
     G="credit"; if(content.credit.trim()){ const s=0.0075*H, runs=[{t:content.credit,w:400,c:tint(.5)}]; T(tX,hTop+s*0.75,s,runs); }
     const lastBase=lines.length? hTop+0.73*fs+(lines.length-1)*lead : tBase;
-    return {items:it,h:lastBase+(lines.length?0.22*fs:0.2*ts)};
+    return {items:it,h:Math.max(1,lastBase+(lines.length?0.22*fs:(hasTitle?0.2*ts:0.2*hs)))};
   }
 
   // ---- one box with its label ----
@@ -509,15 +630,20 @@ function layout(content,settings,seed,jitter,offsets){
         if(/^[A-ZÄÖÜÉÈ]/.test(wd)){ out.push({t:wd[0],w:700,c:ink}); if(wd.length>1) out.push({t:wd.slice(1),w:300,c:tint(.6)}); }
         else out.push({t:wd,w:300,c:tint(.6)});
         if(i<a.length-1) out.push({t:" ",w:300,c:tint(.6)}); }); return out.length?out:[{t:" ",w:300,c:ink}]; };
-    G="footer"; const groups=content.footer.map(groupRuns);
+    G="footer"; if(!hid("footer")){ const groups=content.footer.map(groupRuns);
     const unitW=groups.reduce((a,g)=>a+runsWidth(g,1),0);
     const fz=Math.min(0.02*H, unitW>0? cw*0.93/unitW : 0.016*H), fy=0.975*H, T=mkT(items);
     const w0=runsWidth(groups[0],fz), w2=runsWidth(groups[2],fz);
     T(m,fy,fz,groups[0]);
     T(((m+w0)+(W-m-w2))/2-runsWidth(groups[1],fz)/2,fy,fz,groups[1]);
-    T(W-m-w2,fy,fz,groups[2]); }
+    T(W-m-w2,fy,fz,groups[2]); } }
 
-  // manual moves from "Move elements"
+  // hidden graphic elements (ruler, single boxes, footer) are dropped
+  for(let i=items.length-1;i>=0;i--) if(hid(items[i].g)) items.splice(i,1);
+  // per-element size
+  const byG={}; items.forEach(it=>{ (byG[it.g]=byG[it.g]||[]).push(it); });
+  Object.keys(byG).forEach(g=>{ const k=E[g]&&E[g].scale; if(k&&k!==1) scaleGroup(byG[g],k); });
+  // manual moves from "Edit elements"
   const off=offsets||{};
   items.forEach(it=>{ const o=off[it.g]; if(!o) return; const dx=o.dx||0, dy=o.dy||0;
     if(it.type==="line"){ it.x1+=dx; it.x2+=dx; it.y1+=dy; it.y2+=dy; }
@@ -613,6 +739,9 @@ async function saveFile(filename,data,mime){
 }
 
 const $=id=>document.getElementById(id);
+const IMG_STORE={};
+function registerImages(boxes){ (boxes||[]).forEach(b=>{ if(b&&b.img&&b.img.id) IMG_STORE[b.img.id]=b.img; }); }
+registerImages(state.content.boxes);
 // ---------- Box images: square crop for "Fill", scaled copy for "Fit" ----------
 function processImage(file){
   return new Promise((res,rej)=>{
@@ -664,17 +793,47 @@ function snap(b,ddx,ddy){
 function setEdit(on){
   editMode=on; document.body.classList.toggle("editing",on);
   $("btnMove").setAttribute("aria-pressed",String(on)); $("moveHint").hidden=!on;
-  if(on){ $("btnVar").setAttribute("aria-pressed","false"); $("grid9").hidden=true; }
-  sel=null; hoverId=null; overlay();
+  if(on) closeGrid();
+  sel=null; hoverId=null; overlay(); selUI();
 }
 function clearMoves(){ state.offsets={}; sel=null; }
 $("btnMove").addEventListener("click",()=>setEdit(!editMode));
-$("btnClearMoves").addEventListener("click",()=>{ clearMoves(); render(); toast("All elements back in place"); });
+
+// ---- element size / visibility ----
+const SCALE_MIN=0.3, SCALE_MAX=3;
+const elOf=id=>state.elements[id]||{};
+function setEl(id,patch){ const e={...elOf(id),...patch}; if(e.scale===1) delete e.scale; if(!e.hidden) delete e.hidden;
+  if(Object.keys(e).length) state.elements[id]=e; else delete state.elements[id]; }
+function resizeEl(id,dir){ pushHist(); const cur=elOf(id).scale||1; let k=Math.round((cur+dir*0.1)*100)/100; k=Math.max(SCALE_MIN,Math.min(SCALE_MAX,k)); setEl(id,{scale:k}); render(); }
+function hideEl(id,h){ pushHist(); setEl(id,{hidden:h}); if(h&&sel===id) sel=null; render(); if(h) toast(`${elName(id)} hidden. Tick it in Elements to bring it back.`); }
+function resetEl(id){ pushHist(); delete state.elements[id]; delete state.offsets[id]; render(); }
+function selUI(){
+  const on=editMode&&!!sel; $("selTools").hidden=!on;
+  if(on){ $("selName").textContent=elName(sel); $("stSize").textContent=Math.round((elOf(sel).scale||1)*100)+"%"; }
+  document.querySelectorAll(".elrow").forEach(r=>r.classList.toggle("sel",editMode&&r.dataset.id===sel));
+}
+$("stSmaller").addEventListener("click",()=>sel&&resizeEl(sel,-1));
+$("stBigger").addEventListener("click",()=>sel&&resizeEl(sel,1));
+$("stHide").addEventListener("click",()=>sel&&hideEl(sel,true));
+$("stReset").addEventListener("click",()=>sel&&resetEl(sel));
+function elementsPanel(){
+  const n=state.settings.boxCount;
+  const ids=ELEMENTS.filter(([id])=>!/^box-/.test(id)||+id.slice(4)<=n);
+  $("elList").innerHTML=ids.map(([id,name])=>{ const e=elOf(id), k=Math.round((e.scale||1)*100);
+    return `<div class="elrow${e.hidden?" off":""}" data-id="${id}">
+      <label for="ev-${id}"><input type="checkbox" id="ev-${id}"${e.hidden?"":" checked"}>${name}</label>
+      <div class="sz"><button type="button" data-d="-1" aria-label="Make ${name} smaller"${e.hidden||k<=SCALE_MIN*100?" disabled":""}>−</button><span>${k}%</span><button type="button" data-d="1" aria-label="Make ${name} bigger"${e.hidden||k>=SCALE_MAX*100?" disabled":""}>+</button></div></div>`; }).join("");
+  $("elList").querySelectorAll(".elrow").forEach(row=>{ const id=row.dataset.id;
+    row.querySelector("input").addEventListener("change",e=>hideEl(id,!e.target.checked));
+    row.querySelectorAll(".sz button").forEach(b=>b.addEventListener("click",()=>resizeEl(id,+b.dataset.d))); });
+  const any=Object.keys(state.elements).length||Object.keys(state.offsets).length; $("elReset").disabled=!any;
+}
+$("elReset").addEventListener("click",()=>{ pushHist(); state.elements={}; clearMoves(); render(); toast("All elements back to their original size, place and visibility"); });
 $("poster").addEventListener("pointerdown",e=>{
   if(!editMode) return; const svg=$("poster").querySelector("svg"); if(!svg) return;
   const g=e.target.closest&&e.target.closest("g[data-id]");
-  if(!g){ sel=null; overlay(); return; }
-  sel=g.dataset.id;
+  if(!g){ sel=null; overlay(); selUI(); return; }
+  sel=g.dataset.id; selUI();
   drag={id:sel,g,svg,start:svgPt(svg,e),base:{dx:0,dy:0,...(state.offsets[sel]||{})},bbox:g.getBBox(),ddx:0,ddy:0};
   try{ svg.setPointerCapture(e.pointerId); }catch(_){}
   e.preventDefault(); overlay();
@@ -687,17 +846,20 @@ $("poster").addEventListener("pointermove",e=>{
   drag.ddx=ddx; drag.ddy=ddy; drag.g.setAttribute("transform",`translate(${ddx.toFixed(2)} ${ddy.toFixed(2)})`); overlay(guides);
 });
 const endDrag=()=>{ if(!drag) return; const d=drag; drag=null;
-  if(Math.abs(d.ddx)+Math.abs(d.ddy)>0.1) state.offsets[d.id]={dx:d.base.dx+d.ddx,dy:d.base.dy+d.ddy};
+  if(Math.abs(d.ddx)+Math.abs(d.ddy)>0.1){ pushHist(); } if(Math.abs(d.ddx)+Math.abs(d.ddy)>0.1) state.offsets[d.id]={dx:d.base.dx+d.ddx,dy:d.base.dy+d.ddy};
   render(); };
 $("poster").addEventListener("pointerup",endDrag);
 $("poster").addEventListener("pointercancel",endDrag);
 document.addEventListener("keydown",e=>{
-  if(!editMode||!sel) return; if(/input|textarea|select/i.test(e.target.tagName)) return;
+  if(!editMode||!sel) return; if(/input|textarea|select/i.test(e.target.tagName)) return; if(e.metaKey||e.ctrlKey||e.altKey) return;
   const step=e.shiftKey?10:1, o={dx:0,dy:0,...(state.offsets[sel]||{})};
   const mv={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,-step],ArrowDown:[0,step]}[e.key];
-  if(mv){ o.dx+=mv[0]; o.dy+=mv[1]; state.offsets[sel]=o; e.preventDefault(); render(); }
-  else if(e.key==="Backspace"||e.key==="Delete"){ delete state.offsets[sel]; e.preventDefault(); render(); }
-  else if(e.key==="Escape"){ sel=null; overlay(); }
+  if(mv){ if(!e.repeat) pushHist(); o.dx+=mv[0]; o.dy+=mv[1]; state.offsets[sel]=o; e.preventDefault(); render(); }
+  else if(e.key==="Backspace"||e.key==="Delete"){ e.preventDefault(); resetEl(sel); }
+  else if(e.key==="+"||e.key==="="){ e.preventDefault(); resizeEl(sel,1); }
+  else if(e.key==="-"||e.key==="_"){ e.preventDefault(); resizeEl(sel,-1); }
+  else if(e.key==="h"||e.key==="H"){ e.preventDefault(); hideEl(sel,true); }
+  else if(e.key==="Escape"){ sel=null; overlay(); selUI(); }
 });
 
 // ---------- UI wiring ----------
@@ -737,7 +899,7 @@ function boxFields(){
       $("bk"+i).addEventListener("change",e=>{ b.keepLabel=e.target.checked; schedule(); });
       $("bx"+i).addEventListener("click",()=>{ delete b.img; boxFields(); schedule(); });
     } else $("bi"+i).addEventListener("change",async e=>{ const file=e.target.files[0]; if(!file) return;
-      try{ b.img=await processImage(file); b.fit=b.fit||"fill"; if(b.keepLabel===undefined) b.keepLabel=true; boxFields(); schedule(); toast(`Image placed in box ${i+1}`); }
+      try{ b.img=await processImage(file); IMG_STORE[b.img.id]=b.img; b.fit=b.fit||"fill"; if(b.keepLabel===undefined) b.keepLabel=true; boxFields(); schedule(); toast(`Image placed in box ${i+1}`); }
       catch(err){ toast("That file could not be read as an image. Try a JPG, PNG or SVG."); } });
   }
 }
@@ -753,14 +915,89 @@ function syncForm(){
 }
 
 let raf=0; function schedule(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(render); }
-function current(){ return layout(state.content,state.settings,state.seed,state.jitter,state.offsets); }
+function current(){ return layout(state.content,state.settings,state.seed,state.jitter,state.offsets,state.elements); }
 function render(){
-  const L=current(); lastL=L; $("poster").innerHTML=toSVG(L); overlay();
-  $("btnClearMoves").hidden=!Object.keys(state.offsets||{}).length;
+  const L=current(); lastL=L; $("poster").innerHTML=toSVG(L);
+  if(sel&&!$("poster").querySelector(`g[data-id="${sel}"]`)) sel=null;
+  overlay(); elementsPanel(); selUI(); caption(); histSoon();
   $("boxCountV").textContent=state.settings.boxCount; $("ratioV").textContent=(+state.settings.ratio).toFixed(2); $("dashCountV").textContent=state.settings.dashCount;
   if($("btnVar").getAttribute("aria-pressed")==="true") renderGrid();
   save();
 }
+
+function caption(){
+  const F=FORMATS[state.settings.format]||FORMATS.tm, P=PALETTES[state.settings.palette]||PALETTES.classic;
+  $("caption").textContent=`Seed ${state.seed} · ${F.name} · ${P.name}`;
+}
+
+// ---------- Undo / redo ----------
+const HIST={stack:[],i:-1,lock:false,t:0};
+function snapState(){ return JSON.stringify({content:state.content,settings:state.settings,locks:state.locks,offsets:state.offsets,elements:state.elements,seed:state.seed,jitter:state.jitter},
+  (k,v)=>k==="img"&&v&&v.id?{__img:v.id}:v); }
+function applySnap(str){ const o=JSON.parse(str,(k,v)=>v&&typeof v==="object"&&v.__img?IMG_STORE[v.__img]:v); Object.assign(state,o);
+  if(state.settings.font==="__custom"&&!customFont) state.settings.font="Inter Tight"; }
+function pushHist(){ if(HIST.lock) return; const s=snapState(); if(HIST.stack[HIST.i]===s) return;
+  HIST.stack=HIST.stack.slice(0,HIST.i+1); HIST.stack.push(s); if(HIST.stack.length>100) HIST.stack.shift(); HIST.i=HIST.stack.length-1; histUI(); }
+function histSoon(){ clearTimeout(HIST.t); HIST.t=setTimeout(pushHist,350); }
+function histUI(){ $("btnUndo").disabled=HIST.i<=0; $("btnRedo").disabled=HIST.i>=HIST.stack.length-1; }
+function stepHist(d){ clearTimeout(HIST.t); pushHist(); const j=HIST.i+d; if(j<0||j>=HIST.stack.length) return;
+  HIST.i=j; HIST.lock=true; applySnap(HIST.stack[j]); sel=null; syncForm(); render(); clearTimeout(HIST.t); HIST.lock=false; histUI(); }
+$("btnUndo").addEventListener("click",()=>stepHist(-1));
+$("btnRedo").addEventListener("click",()=>stepHist(1));
+
+// ---------- Series (collect posters for the final set) ----------
+const SERIES_MAX=12; let series=[];
+try{ series=JSON.parse(localStorage.getItem("tm89-series")||"[]")||[]; }catch(e){ series=[]; }
+function saveSeries(){ try{ localStorage.setItem("tm89-series",JSON.stringify(series)); }catch(e){
+  try{ localStorage.setItem("tm89-series",JSON.stringify(series.map(x=>({...x,snap:x.snap.replace(/\{"__img":"[^"]*"\}/g,"null")})))); }catch(_){} } }
+// lay out a saved poster with its own typeface, then hand it to fn (toSVG / toPDF)
+function withSnap(str,fn){ const o=JSON.parse(str,(k,v)=>v&&typeof v==="object"&&v.__img?(IMG_STORE[v.__img]||null):v);
+  const keep=state.settings.font; state.settings.font=(o.settings.font==="__custom"&&!customFont)?"Inter Tight":o.settings.font;
+  try{ return fn(layout(o.content,o.settings,o.seed,o.jitter,o.offsets,o.elements)); } finally{ state.settings.font=keep; } }
+function renderSeries(){
+  $("seriesCount").textContent=series.length?`${series.length} of ${SERIES_MAX} posters`:"Collect your final posters here";
+  $("btnExportSeries").hidden=!series.length; $("seriesStrip").hidden=!series.length;
+  $("btnAddSeries").disabled=series.length>=SERIES_MAX;
+  $("seriesStrip").innerHTML=series.map((x,i)=>{ let svg=""; try{ svg=withSnap(x.snap,toSVG); }catch(e){}
+    return `<div class="sitem"><button class="open" data-i="${i}" title="Open poster ${i+1} (seed ${x.seed})" aria-label="Open poster ${i+1}">${svg}</button><button class="rm" data-i="${i}" aria-label="Remove poster ${i+1} from the series">×</button></div>`; }).join("");
+  $("seriesStrip").querySelectorAll(".open").forEach(b=>b.addEventListener("click",()=>{ pushHist(); applySnap(series[+b.dataset.i].snap); sel=null; syncForm(); render(); toast(`Poster ${+b.dataset.i+1} opened`); }));
+  $("seriesStrip").querySelectorAll(".rm").forEach(b=>b.addEventListener("click",()=>{ series.splice(+b.dataset.i,1); saveSeries(); renderSeries(); }));
+}
+function addToSeries(){
+  if(series.length>=SERIES_MAX){ toast(`The series holds ${SERIES_MAX} posters. Remove one first.`); return; }
+  const snap=snapState(); if(series.some(x=>x.snap===snap)){ toast("This poster is already in your series"); return; }
+  series.push({snap,seed:state.seed}); saveSeries(); renderSeries(); toast(`Added to your series (${series.length})`);
+}
+$("btnAddSeries").addEventListener("click",addToSeries);
+$("btnExportSeries").addEventListener("click",async()=>{
+  if(!window.jspdf){ toast("PDF library did not load. Check your connection and reload."); return; }
+  for(let i=0;i<series.length;i++){ let fmt="tm"; const pdf=withSnap(series[i].snap,L=>{ fmt=L.format||"tm"; return toPDF(L); });
+    await saveFile(`tm-series-${String(i+1).padStart(2,"0")}-seed${series[i].seed}-${fmt}.pdf`,new Blob([pdf],{type:"application/pdf"}),"application/pdf");
+    await new Promise(r=>setTimeout(r,350)); }
+});
+
+// ---------- Export menu ----------
+function menu(open){ $("exportMenu").hidden=!open; $("btnExport").setAttribute("aria-expanded",String(open)); if(open) $("exportMenu").querySelector("button").focus(); }
+$("btnExport").addEventListener("click",e=>{ e.stopPropagation(); menu($("exportMenu").hidden); });
+document.addEventListener("click",e=>{ if(!e.target.closest(".menu")) menu(false); });
+$("exportMenu").addEventListener("click",()=>menu(false));
+
+// ---------- Keyboard shortcuts ----------
+document.addEventListener("keydown",e=>{
+  const typing=/input|textarea|select/i.test(e.target.tagName)||e.target.isContentEditable;
+  const mod=e.metaKey||e.ctrlKey;
+  if(mod&&!typing&&(e.key==="z"||e.key==="Z")){ e.preventDefault(); stepHist(e.shiftKey?1:-1); return; }
+  if(mod&&!typing&&(e.key==="y"||e.key==="Y")){ e.preventDefault(); stepHist(1); return; }
+  if(typing||mod||e.altKey) return;
+  if(e.key==="Escape"){ menu(false); closeGrid(); return; }
+  if(editMode&&sel) return; // edit-mode keys handled above
+  const k=e.key.toLowerCase();
+  if(k==="g"){ e.preventDefault(); $("btnGen").click(); }
+  else if(k==="v"){ e.preventDefault(); $("btnVar").click(); }
+  else if(k==="e"){ e.preventDefault(); $("btnMove").click(); }
+  else if(k==="t"){ e.preventDefault(); $("btnText").click(); }
+  else if(k==="s"){ e.preventDefault(); addToSeries(); }
+});
 
 // text inputs
 ["tag","hero","title","credit","sub","designer"].forEach(k=>$(k).addEventListener("input",e=>{state.content[k]=e.target.value;schedule();}));
@@ -781,30 +1018,32 @@ function applySeed(seed){
   state.settings=rollSettings(seed,state.settings,state.locks);
   syncForm(); render();
 }
-$("btnGen").addEventListener("click",()=>{ applySeed(state.seedLock?state.seed:newSeed()); });
-$("btnText").addEventListener("click",()=>{
+$("btnGen").addEventListener("click",()=>{ pushHist(); applySeed(state.seedLock?state.seed:newSeed()); });
+$("btnText").addEventListener("click",()=>{ pushHist();
   const cur=state.content.title; let b; do{ b=BANK[Math.floor(Math.random()*BANK.length)]; }while(BANK.length>1&&b.title===cur);
   const hero=`${1+Math.floor(Math.random()*12)}.${1+Math.floor(Math.random()*9)}`;
   Object.assign(state.content,{title:b.title,credit:b.credit,headline:b.headline,keyword:b.keyword,sub:b.sub,
     boxes:b.boxes.map((x,i)=>({...(state.content.boxes[i]||{}),label:x[0],sub:x[1]})),hero,tag:`Nr. ${hero}|${new Date().getFullYear()}`});
   clearMoves(); syncForm(); render();
 });
-$("btnReset").addEventListener("click",()=>{ const keepFont=customFont; state=DEFAULT(); fillSelects(); syncForm(); render(); toast("Back to the TM 8.9 recreation"); });
+$("btnReset").addEventListener("click",()=>{ pushHist(); state=DEFAULT(); sel=null; fillSelects(); syncForm(); render(); toast("Back to the TM 8.9 original. Undo brings your poster back."); });
 
 // 9 variations
 function renderGrid(){
   const g=$("grid9"); const base=state.seed; const cells=[];
   for(let i=1;i<=9;i++){ const sd=((base*31+i*977)%999998)+1;
-    const L=layout(state.content,rollSettings(sd,state.settings,{}),sd,true);
-    cells.push(`<button data-seed="${sd}" aria-label="Use variation with seed ${sd}">${toSVG(L)}</button>`); }
+    const L=layout(state.content,rollSettings(sd,state.settings,state.locks),sd,true,{},state.elements);
+    cells.push(`<button data-seed="${sd}" aria-label="Use variation with seed ${sd}">${toSVG(L)}<span>Seed ${sd}</span></button>`); }
   g.innerHTML=cells.join("");
   g.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
-    const sd=+b.dataset.seed; state.seed=sd; state.jitter=true; clearMoves(); state.settings=rollSettings(sd,state.settings,{});
-    $("btnVar").setAttribute("aria-pressed","false"); g.hidden=true; syncForm(); render(); toast(`Seed ${sd} applied`); }));
+    const sd=+b.dataset.seed; pushHist(); state.seed=sd; state.jitter=true; clearMoves(); state.settings=rollSettings(sd,state.settings,state.locks);
+    closeGrid(); syncForm(); render(); toast(`Seed ${sd} applied`); }));
 }
+function closeGrid(){ $("btnVar").setAttribute("aria-pressed","false"); $("grid9").hidden=true; }
 $("btnVar").addEventListener("click",e=>{
   const on=e.currentTarget.getAttribute("aria-pressed")!=="true"; if(on&&editMode) setEdit(false);
-  e.currentTarget.setAttribute("aria-pressed",String(on)); $("grid9").hidden=!on; if(on) renderGrid(); });
+  e.currentTarget.setAttribute("aria-pressed",String(on)); $("grid9").hidden=!on;
+  if(on){ renderGrid(); if(Object.values(state.locks).some(Boolean)) toast("Locked settings stay fixed in the variations"); } });
 
 // uploads
 $("upload").addEventListener("change",async e=>{
@@ -816,7 +1055,7 @@ $("upload").addEventListener("change",async e=>{
 });
 
 // exports
-const fname=ext=>`tm-poster-${state.seed}.${ext}`;
+const fname=ext=>`tm-poster-${state.seed}-${state.settings.format}.${ext}`;
 $("exSVG").addEventListener("click",()=>saveFile(fname("svg"),toSVG(current(),{embed:true}),"image/svg+xml"));
 $("exPNG").addEventListener("click",async()=>{ try{ saveFile(fname("png"),await toPNG(current(),3),"image/png"); }catch(e){ toast(e.message); } });
 $("exPDF").addEventListener("click",()=>{
@@ -828,6 +1067,6 @@ $("exPDF").addEventListener("click",()=>{
 // boot
 fillSelects(); if(state.settings.font==="__custom") state.settings.font="Inter Tight";
 syncForm();
-loadFonts().then(()=>{ render(); window.__ready=true; });
+loadFonts().then(()=>{ render(); renderSeries(); clearTimeout(HIST.t); pushHist(); window.__ready=true; });
 render();
 </script>

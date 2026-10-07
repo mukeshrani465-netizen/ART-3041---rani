@@ -1,4 +1,4 @@
-# skills.md (v1.3) — Designing in the manner of *Typografische Monatsblätter* 8.9 (1972)
+# skills.md (v1.4) — Designing in the manner of *Typografische Monatsblätter* 8.9 (1972)
 
 ## Purpose
 This file teaches an AI how to design posters in the style of the 1972 TM 8.9 cover ("SCHRIFT: Ein System von visuellen Zeichen…"). It is the rulebook for a **poster generator web app**: every poster the app makes must obey these rules, and the randomness only varies things *inside* them. Reference image: `reference-tm-8.9-1972.jpg`.
@@ -125,7 +125,7 @@ Generator algorithm:
 - **Ink/paper pair** from a curated list: 3 neutrals (incl. the original) and 13 strong colours (Swiss red, signal yellow, cobalt, orange, pink, mint, sky, lilac, green, oxblood, ochre, red on black, white on red). Random picks favour colour (~80%). Always one ink + its tints on one paper.
 - Headline size shrinks automatically so every block fits.
 
-- **Manual moves:** the user can drag any element (hero, title, headline, attribution, subhead, ruler, each box, footer, credits). Moves snap to the margins, centre axis, top and bottom lines; they are cleared when a new seed is generated.
+- **Manual edits:** the user can move (drag, snap to margins / centre axis / top and bottom lines), resize (30–300% in 10% steps, scaled about the element's centre) or hide any element: issue tag, big number, title word, headline, attribution, subhead, dash ruler, each box, vertical credit, footer. Hiding a text element closes its gap in the layout; hiding a ruler, box or footer leaves the space. Moves clear when a new seed is generated; sizes and hidden elements stay. These are user overrides: the generator itself never breaks the rules above.
 
 ## 12. Self-check before output
 - Can you read the hierarchy in the order of §5 at a glance?
