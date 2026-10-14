@@ -250,6 +250,12 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <label for="font">Typeface<select id="font"></select></label>
         <label for="varHero" style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="varHero" style="width:auto">Variable big number: width follows fullness</label>
         <p class="hint" id="varHeroHint">The big number widens as the system fills (Archivo width axis 62–125). Needs Archivo: Inter Tight has no width axis.</p>
+        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+          <label for="vfPrev" style="flex:1 1 140px"><span class="lt">Preview width <span class="val" id="vfPrevV">live</span></span><input type="range" id="vfPrev" min="0" max="100" step="1" value="50"></label>
+          <button class="btn ghost small" id="vfSweep" type="button" title="Loop empty → full → empty every 4 s (W)">Sweep</button>
+          <button class="btn ghost small" id="vfLive" type="button" title="Back to the live width">Live</button>
+        </div>
+        <p class="hint">Preview only moves the width so you can see the axis; the numbers stay live, the issue tag says “Width preview”, and exports always use the live width.</p>
         <label for="upload">Upload a font (.ttf, .otf, .woff)<input type="file" id="upload" accept=".ttf,.otf,.woff,.woff2"></label>
         <p class="hint">Generate picks a new seed and re-rolls every unlocked setting and the element sizes. The data only changes numbers and box sizes, never the layout.</p>
       </div>
@@ -549,8 +555,9 @@ function layout(content,settings,seed,jitter,offsets,elements){
     // Why width: fullness is about space. A fuller system takes up more room, so the number literally gets wider;
     // the same "form acts out meaning" idea as the boxes (area = count) and the Sperrsatz keyword.
     // Weight stays 700 so the poster keeps its Light/Bold contrast (skills.md §13.9).
-    if(settings.varHero && VF_OK && settings.font==="Archivo" && typeof content.fullness==="number")
-      hr[0].vf={wdth:+(62+63*Math.max(0,Math.min(1,content.fullness))).toFixed(1), wght:700};
+    const vfF=typeof content.vfFullness==="number"?content.vfFullness:content.fullness; // preview value, else live
+    if(settings.varHero && VF_OK && settings.font==="Archivo" && typeof vfF==="number")
+      hr[0].vf={wdth:+(62+63*Math.max(0,Math.min(1,vfF))).toFixed(1), wght:700};
     hs=fitSize(hr,hs,tW); hr[0].ls=-0.02*hs;
     G="hero"; if(content.hero.trim()) T(place("center",cx,hr,hs),0.73*hs,hs,hr);
     G="title";
@@ -1144,14 +1151,17 @@ function syncForm(){
 }
 
 let raf=0; function schedule(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(render); }
+// Session 6 · width preview: lets you see the axis move without waiting for the feed (never used in exports)
+const PREVIEW={v:null,sweep:false,t0:0,raf:0};
 function current(){ const [c,s]=liveView(state.content,state.settings,LIVE.shown,LIVE.stale&&LIVE.on);
+  if(PREVIEW.v!==null&&typeof c.fullness==="number"){ c.vfFullness=PREVIEW.v; c.tag="Width preview · not live data"; }
   state.settings.boxCount=s.boxCount; return layout(c,s,state.seed,state.jitter,state.offsets,state.elements); }
 function render(){
   const L=current(); lastL=L; $("poster").innerHTML=toSVG(L);
   if(sel&&!$("poster").querySelector(`g[data-id="${sel}"]`)) sel=null;
   overlay(); elementsPanel(); selUI(); caption(); histSoon();
-  $("dashCountV").textContent=state.settings.dashCount; readoutUI(); liveUI();
-  if($("btnVar").getAttribute("aria-pressed")==="true") renderGrid();
+  $("dashCountV").textContent=state.settings.dashCount; readoutUI(); liveUI(); vfUI(L);
+  if($("btnVar").getAttribute("aria-pressed")==="true"&&!PREVIEW.sweep) renderGrid();
   save();
 }
 
@@ -1196,7 +1206,7 @@ function renderSeries(){
     syncForm(); render(); toast(`Poster ${+b.dataset.i+1} opened with its data from ${x.data?HHMM(x.data.t):"—"}. Press Live to resume.`); }));
   $("seriesStrip").querySelectorAll(".rm").forEach(b=>b.addEventListener("click",()=>{ series.splice(+b.dataset.i,1); saveSeries(); renderSeries(); }));
 }
-function addToSeries(){
+function addToSeries(){ stopPreview();
   if(series.length>=SERIES_MAX){ toast(`The series holds ${SERIES_MAX} posters. Remove one first.`); return; }
   const snap=snapState(), d=LIVE.shown; if(!d){ toast("Wait for the live data first"); return; }
   if(series.some(x=>x.snap===snap&&x.data&&x.data.t===d.t)){ toast("This poster is already in your series"); return; }
@@ -1247,6 +1257,28 @@ $("dashCount").addEventListener("input",e=>{state.settings.dashCount=+e.target.v
 $("varHero").addEventListener("change",e=>{ pushHist(); state.settings.varHero=e.target.checked;
   if(e.target.checked&&state.settings.font!=="Archivo"){ state.settings.font="Archivo"; $("font").value="Archivo"; toast("Typeface set to Archivo: it has the width axis"); }
   schedule(); });
+function vfUI(L){
+  const r=L&&L.items.find(it=>it.g==="hero"&&it.type==="text"), vf=r&&r.runs[0].vf;
+  const w=vf?`wdth ${vf.wdth.toFixed(0)}`:"off";
+  $("vfPrevV").textContent = PREVIEW.v===null ? `live · ${w}` : `${Math.round(PREVIEW.v*100)}% · ${w}`;
+  if(PREVIEW.v!==null&&!PREVIEW.sweep) $("vfPrev").value=Math.round(PREVIEW.v*100);
+  $("vfSweep").textContent=PREVIEW.sweep?"Stop":"Sweep"; $("vfSweep").setAttribute("aria-pressed",PREVIEW.sweep);
+}
+function vfEnsureOn(){ if(!state.settings.varHero||state.settings.font!=="Archivo"){ state.settings.varHero=true; state.settings.font="Archivo"; $("varHero").checked=true; $("font").value="Archivo"; } }
+function stopSweep(){ PREVIEW.sweep=false; cancelAnimationFrame(PREVIEW.raf); }
+function stopPreview(){ if(PREVIEW.v===null&&!PREVIEW.sweep) return; stopSweep(); PREVIEW.v=null; render(); }
+function sweepFrame(t){ if(!PREVIEW.sweep) return;
+  const ph=((t-PREVIEW.t0)/4000)%1; PREVIEW.v=0.5-0.5*Math.cos(2*Math.PI*ph); // eased loop: empty → full → empty in 4 s
+  render(); PREVIEW.raf=requestAnimationFrame(sweepFrame); }
+function toggleSweep(){ if(PREVIEW.sweep){ stopSweep(); render(); return; }
+  if(!LIVE.shown){ toast("Waiting for live data"); return; }
+  vfEnsureOn(); PREVIEW.sweep=true; PREVIEW.t0=performance.now(); PREVIEW.raf=requestAnimationFrame(sweepFrame); }
+$("vfPrev").addEventListener("input",e=>{ if(!LIVE.shown) return; stopSweep(); vfEnsureOn(); PREVIEW.v=+e.target.value/100; schedule(); });
+$("vfSweep").addEventListener("click",toggleSweep);
+$("vfLive").addEventListener("click",stopPreview);
+["exPDF","exSVG","exPNG","btnExportSeries"].forEach(id=>$(id).addEventListener("click",stopPreview,true)); // exports = live width only
+document.addEventListener("keydown",e=>{ const tg=e.target, typing=tg&&(tg.tagName==="INPUT"&&tg.type!=="range"&&tg.type!=="checkbox"||tg.tagName==="TEXTAREA"||tg.tagName==="SELECT"||tg.isContentEditable);
+  if(typing||e.metaKey||e.ctrlKey||e.altKey) return; if(e.key==="w"||e.key==="W"){ e.preventDefault(); toggleSweep(); } });
 $("seedLock").addEventListener("change",e=>{state.seedLock=e.target.checked;save();});
 $("L_elements").addEventListener("change",e=>{state.locks.elements=e.target.checked;save();});
 $("seed").addEventListener("change",e=>{ const v=Math.max(1,Math.min(999999,parseInt(e.target.value)||1)); applySeed(v); });
