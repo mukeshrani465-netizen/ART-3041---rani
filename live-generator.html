@@ -1,9 +1,10 @@
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TM 8.9 Live Generator</title>
+<!-- Session 6: variable Archivo (wdth 62–125, wght 100–900) for the live big number -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
 <style>
 /* Layout: sketch v1 — left column (content panel, structure panel, Generate), right column (top bar + poster stage). */
 :root{
@@ -247,6 +248,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <div class="ctl"><label for="palette">Ink on paper<select id="palette"></select></label><label class="lock" for="L_palette"><input type="checkbox" id="L_palette">Lock</label></div>
         <label for="format">Format<select id="format"></select></label>
         <label for="font">Typeface<select id="font"></select></label>
+        <label for="varHero" style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="varHero" style="width:auto">Variable big number: width follows fullness</label>
+        <p class="hint" id="varHeroHint">The big number widens as the system fills (Archivo width axis 62–125). Needs Archivo: Inter Tight has no width axis.</p>
         <label for="upload">Upload a font (.ttf, .otf, .woff)<input type="file" id="upload" accept=".ttf,.otf,.woff,.woff2"></label>
         <p class="hint">Generate picks a new seed and re-rolls every unlocked setting and the element sizes. The data only changes numbers and box sizes, never the layout.</p>
       </div>
@@ -321,6 +324,7 @@ let customFont = null;    // {name, b64, isTTF}
 function b64(buf){ let s="",u=new Uint8Array(buf),c=0x8000; for(let i=0;i<u.length;i+=c) s+=String.fromCharCode.apply(null,u.subarray(i,i+c)); return btoa(s); }
 function b64ToBuf(b){ const bin=atob(b), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u.buffer; }
 async function loadFonts(){
+  loadVariableFont();
   const jobs=[];
   // interface font (same Inter Tight files)
   try{ [["InterTight-Regular","400"],["InterTight-Bold","700"]].forEach(([n,w])=>{ const ff=new FontFace("Inter Tight",b64ToBuf(EMBED_FONTS[n]),{weight:w}); document.fonts.add(ff); ff.load(); }); }catch(e){}
@@ -348,8 +352,29 @@ const FALLBACK=`"Helvetica Neue",Helvetica,Arial,sans-serif`;
 // ---------- Measuring ----------
 const mctx=document.createElement("canvas").getContext("2d");
 function measure(t,size,weight){ mctx.font=`${size}px "${ps(weight)}", ${FALLBACK}`; return mctx.measureText(t).width; }
+// ---------- Variable font (Session 6) ----------
+// Canvas can't set a numeric width axis, so the variable hero is measured with a hidden DOM span.
+const VF_FAMILY=`"Archivo"`;   // Google Fonts variable Archivo (see <head>)
+let VF_OK=false, VF_B64=null;  // loaded? / woff2 for SVG export
+const vfSpan=document.createElement("span");
+vfSpan.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre;line-height:1";
+function measureVF(t,size,vf){
+  if(!vfSpan.isConnected) document.body.appendChild(vfSpan);
+  vfSpan.style.font=`${vf.wght} ${size}px ${VF_FAMILY}, ${FALLBACK}`;
+  vfSpan.style.fontVariationSettings=`'wdth' ${vf.wdth}, 'wght' ${vf.wght}`;
+  vfSpan.textContent=t; return vfSpan.getBoundingClientRect().width;
+}
+function loadVariableFont(){
+  document.fonts.load(`700 40px ${VF_FAMILY}`,"0123456789").then(f=>{ VF_OK=f.length>0; if(window.__ready) schedule(); }).catch(()=>{});
+  // fetch the woff2 too, so exported SVGs carry the variable font
+  fetch("https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900").then(r=>r.text()).then(css=>{
+    const blocks=css.split("/* "); const latin=blocks.find(b=>b.startsWith("latin */"))||css;
+    const m=latin.match(/url\((https:[^)]+\.woff2)\)/); return m?fetch(m[1]):null;
+  }).then(r=>r&&r.ok?r.arrayBuffer():null).then(buf=>{ if(buf) VF_B64=b64(buf); }).catch(()=>{});
+}
+const vfRunWidth=(r,size)=>r.vf? measureVF(r.t,size,r.vf) : measure(r.t,size,r.w);
 function runsWidth(runs,size){ // visual width (trailing letter-spacing of last char excluded)
-  let w=0; runs.forEach(r=>{ w+=measure(r.t,size,r.w)+(r.ls||0)*[...r.t].length; });
+  let w=0; runs.forEach(r=>{ w+=vfRunWidth(r,size)+(r.ls||0)*[...r.t].length; });
   const last=runs[runs.length-1]; return w-((last&&last.ls)||0);
 }
 
@@ -405,12 +430,12 @@ const BANK=[
 const DEFAULT = ()=>({
   content:{tag:"Live · {date} {time}",hero:"{bikes}",title:BANK[0].title,credit:BANK[0].credit,headline:BANK[0].headline,keyword:BANK[0].keyword,sub:"",
     boxes:[],footer:[...LIVE_FOOTER],designer:"Data: Citi Bike GBFS, live"},
-  settings:{boxCount:3,ratio:1.57,dashCount:7,align:"top",drift:"down",palette:"classic",font:"Inter Tight",format:"tm",titlePos:"top",diagramPos:"bottom",mode:"type"},
+  settings:{boxCount:3,ratio:1.57,dashCount:7,align:"top",drift:"down",palette:"classic",font:"Archivo",format:"tm",titlePos:"top",diagramPos:"bottom",mode:"type",varHero:true},
   locks:{ratio:false,dashCount:false,align:false,drift:false,palette:false,titlePos:false,diagramPos:false,mode:false},
   seed:1972, seedLock:false, jitter:false, offsets:{}, elements:{}
 });
 let state=DEFAULT();
-try{ const s=JSON.parse(localStorage.getItem("tmlive-state")||"null"); if(s&&s.content&&s.settings){ const d=DEFAULT(); state=Object.assign(d,s,{settings:{...d.settings,...s.settings},locks:{...d.locks,...(s.locks||{})},offsets:s.offsets||{},elements:s.elements||{}}); if(!FORMATS[state.settings.format]) state.settings.format="tm"; if(!PALETTES[state.settings.palette]) state.settings.palette="classic"; } }catch(e){}
+try{ const s=JSON.parse(localStorage.getItem("tmlive-state")||"null"); if(s&&s.content&&s.settings){ const d=DEFAULT(); state=Object.assign(d,s,{settings:{...d.settings,...s.settings},locks:{...d.locks,...(s.locks||{})},offsets:s.offsets||{},elements:s.elements||{}}); if(!("varHero" in s.settings)){ state.settings.varHero=true; state.settings.font="Archivo"; } if(!FORMATS[state.settings.format]) state.settings.format="tm"; if(!PALETTES[state.settings.palette]) state.settings.palette="classic"; } }catch(e){}
 let warnedImg=false;
 function save(){
   try{ localStorage.setItem("tmlive-state",JSON.stringify(state)); }
@@ -519,7 +544,14 @@ function layout(content,settings,seed,jitter,offsets,elements){
   // ---- title block: hero, title word, headline, attribution (origin y=0) ----
   function titleBlock(fs){
     const it=[], T=mkT(it), cx=tX+tW/2;
-    let hs=0.115*H; const hr=[{t:content.hero,w:700,c:ink,ls:-0.02*hs}]; hs=fitSize(hr,hs,tW); hr[0].ls=-0.02*hs;
+    let hs=0.115*H; const hr=[{t:content.hero,w:700,c:ink,ls:-0.02*hs}];
+    // Session 6 · variable axis: system fullness → Archivo width ('wdth' 62 empty … 125 full).
+    // Why width: fullness is about space. A fuller system takes up more room, so the number literally gets wider;
+    // the same "form acts out meaning" idea as the boxes (area = count) and the Sperrsatz keyword.
+    // Weight stays 700 so the poster keeps its Light/Bold contrast (skills.md §13.9).
+    if(settings.varHero && VF_OK && settings.font==="Archivo" && typeof content.fullness==="number")
+      hr[0].vf={wdth:+(62+63*Math.max(0,Math.min(1,content.fullness))).toFixed(1), wght:700};
+    hs=fitSize(hr,hs,tW); hr[0].ls=-0.02*hs;
     G="hero"; if(content.hero.trim()) T(place("center",cx,hr,hs),0.73*hs,hs,hr);
     G="title";
     const tTop=content.hero.trim()?0.73*hs+0.08*H+jHT:0;
@@ -740,7 +772,8 @@ function toSVG(L,{embed=false}={}){
   if(embed){
     const used=new Set(); L.items.forEach(it=>it.type==="text"&&it.runs.forEach(r=>used.add(ps(r.w))));
     const faces=[...used].map(n=>{ const data=(customFont&&n===customFont.name)?customFont.b64:FONT_B64[n];
-      return data?`@font-face{font-family:"${n}";src:url(data:font/ttf;base64,${data});}`:""; }).join("");
+      return data?`@font-face{font-family:"${n}";src:url(data:font/ttf;base64,${data});}`:""; }).join("")
+      + (VF_B64&&L.items.some(it=>it.type==="text"&&it.runs.some(r=>r.vf)) ? `@font-face{font-family:"Archivo";src:url(data:font/woff2;base64,${VF_B64});font-weight:100 900;font-stretch:62% 125%;}` : "");
     out.push(`<defs><style>${faces}</style></defs>`);
   }
   out.push(`<rect id="paper" width="${L.W}" height="${L.H}" fill="${L.paper}"/>`);
@@ -752,7 +785,9 @@ function toSVG(L,{embed=false}={}){
     else if(it.type==="line") out.push(`<line x1="${f(it.x1)}" y1="${f(it.y1)}" x2="${f(it.x2)}" y2="${f(it.y2)}" stroke="${it.c}" stroke-width="${it.sw}"/>`);
     else{
       const tr=it.rot?` transform="translate(${f(it.rot.px)} ${f(it.rot.py)}) rotate(-90)"`:"";
-      const spans=it.runs.map(r=>`<tspan font-family="${ps(r.w)}, ${esc(FALLBACK)}" fill="${r.c}"${r.ls?` letter-spacing="${f(r.ls)}"`:""}>${esc(r.t)}</tspan>`).join("");
+      const spans=it.runs.map(r=>r.vf
+        ? `<tspan font-family="Archivo, ${ps(r.w)}, ${esc(FALLBACK)}" font-weight="${r.vf.wght}" style="font-variation-settings:'wdth' ${r.vf.wdth}, 'wght' ${r.vf.wght}" fill="${r.c}"${r.ls?` letter-spacing="${f(r.ls)}"`:""}>${esc(r.t)}</tspan>`
+        : `<tspan font-family="${ps(r.w)}, ${esc(FALLBACK)}" fill="${r.c}"${r.ls?` letter-spacing="${f(r.ls)}"`:""}>${esc(r.t)}</tspan>`).join("");
       out.push(`<text x="${f(it.x)}" y="${f(it.y)}" font-size="${f(it.size)}" xml:space="preserve"${tr}>${spans}</text>`);
     }
   }
@@ -792,8 +827,8 @@ function toPDF(L){
         doc.setFontSize(it.size*s); doc.setTextColor(L.foil&&r.c===L.ink?(FOIL.GOLD_GROUPS.has(it.g)?FOIL.solid.gold:FOIL.solid.silver):r.c);
         const opt={charSpace:(r.ls||0)*s, baseline:"alphabetic"};
         if(it.rot){ opt.angle=90; doc.text(r.t,it.rot.px*s,(it.rot.py-x)*s,opt); }
-        else doc.text(r.t,x*s,it.y*s,opt);
-        x+=measure(r.t,it.size,r.w)+(r.ls||0)*[...r.t].length;
+        else doc.text(r.t,(x+(r.vf?(measureVF(r.t,it.size,r.vf)-measure(r.t,it.size,r.w))/2:0))*s,it.y*s,opt);
+        x+=vfRunWidth(r,it.size)+(r.ls||0)*[...r.t].length;
       }
     }
   }
@@ -1102,6 +1137,7 @@ function syncForm(){
   c.footer.forEach((v,i)=>$("f"+i).value=v);
   ["mode","dashCount","align","drift","palette","font","format","titlePos","diagramPos"].forEach(k=>$(k).value=s[k]);
   ["mode","dashCount","align","drift","palette","titlePos","diagramPos"].forEach(k=>$("L_"+k).checked=!!state.locks[k]);
+  $("varHero").checked=!!s.varHero;
   $("seed").value=state.seed; $("seedLock").checked=state.seedLock; $("L_elements").checked=!!state.locks.elements;
   $("dashCountV").textContent=s.dashCount;
   keywordOptions(); readoutUI();
@@ -1208,6 +1244,9 @@ $("keyword").addEventListener("change",e=>{state.content.keyword=e.target.value;
 $("dashCount").addEventListener("input",e=>{state.settings.dashCount=+e.target.value;schedule();});
 ["mode","align","drift","palette","font","format","titlePos","diagramPos"].forEach(k=>$(k).addEventListener("change",e=>{state.settings[k]=e.target.value;schedule();}));
 ["mode","dashCount","align","drift","palette","titlePos","diagramPos"].forEach(k=>$("L_"+k).addEventListener("change",e=>{state.locks[k]=e.target.checked;save();}));
+$("varHero").addEventListener("change",e=>{ pushHist(); state.settings.varHero=e.target.checked;
+  if(e.target.checked&&state.settings.font!=="Archivo"){ state.settings.font="Archivo"; $("font").value="Archivo"; toast("Typeface set to Archivo: it has the width axis"); }
+  schedule(); });
 $("seedLock").addEventListener("change",e=>{state.seedLock=e.target.checked;save();});
 $("L_elements").addEventListener("change",e=>{state.locks.elements=e.target.checked;save();});
 $("seed").addEventListener("change",e=>{ const v=Math.max(1,Math.min(999999,parseInt(e.target.value)||1)); applySeed(v); });
