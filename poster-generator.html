@@ -65,6 +65,13 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .menu-list button:hover,.menu-list button:focus-visible{background:var(--panel)}
 .btn[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .generate{border-radius:var(--r-md);padding:14px;font-size:15px;letter-spacing:.02em;width:100%}
+.foil-btn{position:relative;overflow:hidden;width:100%;border-radius:var(--r-md);padding:10px 14px;border:0;cursor:pointer;color:#1d1608;
+  display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:14px;letter-spacing:.02em;
+  background:linear-gradient(115deg,#8C6A1C 0%,#E9C766 22%,#FFF3C2 34%,#C9A13B 48%,#D9DDE2 62%,#FFFFFF 70%,#AEB3BA 84%,#E9C766 100%);background-size:220% 100%;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(0,0,0,.2);transition:background-position .9s ease}
+.foil-btn small{font-weight:500;font-size:11px;opacity:.75}
+.foil-btn:hover{background-position:100% 0}
+.foil-btn:focus-visible{outline:2px solid #1d1608;outline-offset:2px}
 .side-foot{position:sticky;bottom:0;margin-top:auto;background:var(--bg);padding-top:4px;display:grid;gap:4px;z-index:2}
 .linkbtn{justify-self:center;background:none;border:0;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px}
 .linkbtn:hover{color:var(--fg)}
@@ -221,18 +228,19 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <label for="format">Format<select id="format"></select></label>
         <label for="font">Typeface<select id="font"></select></label>
         <label for="upload">Upload a font (.ttf, .otf, .woff)<input type="file" id="upload" accept=".ttf,.otf,.woff,.woff2"></label>
-        <p class="hint">Generate picks a new seed and re-rolls every unlocked setting. Your text, sizes and hidden elements stay as they are.</p>
+        <p class="hint">Generate picks a new seed and re-rolls every unlocked setting and the element sizes. Your text stays as it is.</p>
       </div>
     </section>
 
     <section class="panel elements" aria-label="Elements">
-      <div class="phead"><h2>Elements</h2><button class="btn ghost small" id="elReset" type="button">Reset all</button></div>
-      <p class="hint">Untick to hide an element. Use − and + to resize it. In Edit elements you can also click it on the poster.</p>
+      <div class="phead"><h2>Elements</h2><span style="display:flex;gap:8px;align-items:center"><label class="seed" for="L_elements" title="Keep these sizes and hidden elements when you press Generate" style="font-size:12px;display:flex;gap:4px;align-items:center"><input type="checkbox" id="L_elements"> Lock</label><button class="btn ghost small" id="elReset" type="button">Reset all</button></span></div>
+      <p class="hint">Generate re-rolls element sizes and may hide minor ones (tag, attribution, ruler, credit, footer). Tick Lock to keep yours. Untick to hide an element. Use − and + to resize it. In Edit elements you can also click it on the poster.</p>
       <div id="elList"></div>
     </section>
 
     <div class="side-foot">
-      <button class="btn primary generate" id="btnGen" title="New poster (G)">Generate</button>
+      <button class="btn primary generate" id="btnGen" type="button" title="New poster (G)">Generate</button>
+      <button class="btn foil-btn" id="btnFoil" type="button" title="Limited edition gold &amp; silver poster (L)"><span>Limited edition</span><small>gold &amp; silver foil</small></button>
       <button class="linkbtn" id="btnReset" type="button">Reset to the TM 8.9 original</button>
     </div>
   </aside>
@@ -346,8 +354,20 @@ const PALETTES={
   green:{name:"Cream on green",ink:"#F1ECDF",paper:"#1E5A3B",bold:true},
   blackred:{name:"Red on black",ink:"#EE3B2B",paper:"#121212",bold:true},
   oxblood:{name:"Cream on oxblood",ink:"#F2E6D5",paper:"#6B1D17",bold:true},
-  ochre:{name:"Black on ochre",ink:"#141414",paper:"#D9A441",bold:true}
+  ochre:{name:"Black on ochre",ink:"#141414",paper:"#D9A441",bold:true},
+  // Limited edition foils: only reached through the Limited edition button
+  foilnoir:{name:"Limited · gold & silver on black",ink:"#D4AF37",paper:"#0D0D0F",foil:true},
+  foilnavy:{name:"Limited · gold & silver on midnight",ink:"#D4AF37",paper:"#0E1A33",foil:true},
+  foilivory:{name:"Limited · gold & silver on ivory",ink:"#B08D2E",paper:"#F3EEE2",foil:true}
 };
+const FOIL={ GOLD_GROUPS:new Set(["hero","title","headline"]),
+  gold:["#7A5A12","#E9C766","#FFF3C2","#C9A13B","#8C6A1C","#F2D888"],
+  silver:["#6F737A","#D9DDE2","#FFFFFF","#AEB3BA","#7C8188","#E6E9EC"],
+  goldDark:["#5E440C","#B8902E","#E6C463","#8C6A1C","#5E440C","#C9A13B"],
+  silverDark:["#3E4248","#8E949C","#C9CDD3","#5A5F66","#2F3338","#8A9098"],
+  solid:{gold:"#D4AF37",silver:"#C0C4CA"} };
+const lightPaper=hex=>{ const n=parseInt(hex.slice(1),16); return ((n>>16)*.299+((n>>8)&255)*.587+(n&255)*.114)>150; };
+const isFoil=k=>!!(PALETTES[k]&&PALETTES[k].foil);
 function hex2rgb(h){h=h.replace("#","");return[0,2,4].map(i=>parseInt(h.slice(i,i+2),16));}
 function mix(paper,ink,a){const p=hex2rgb(paper),k=hex2rgb(ink);return"#"+p.map((v,i)=>Math.round(v+(k[i]-v)*a).toString(16).padStart(2,"0")).join("");}
 
@@ -388,7 +408,7 @@ function rollSettings(seed,base,locks){
   if(!locks.dashCount) s.dashCount=[5,7,9][Math.floor(r()*3)]; else r();
   if(!locks.align) s.align=r()<0.75?"top":"bottom"; else r();
   if(!locks.drift) s.drift=r()<0.7?"down":"up"; else r();
-  if(!locks.palette){ const bold=Object.keys(PALETTES).filter(k=>PALETTES[k].bold), calm=Object.keys(PALETTES).filter(k=>!PALETTES[k].bold);
+  if(!locks.palette){ const bold=Object.keys(PALETTES).filter(k=>PALETTES[k].bold&&!PALETTES[k].foil), calm=Object.keys(PALETTES).filter(k=>!PALETTES[k].bold&&!PALETTES[k].foil);
     const list=r()<0.8?bold:calm; s.palette=list[Math.floor(r()*list.length)]; } else r();
   if(!locks.titlePos) s.titlePos=pick([["top",0.55],["middle",0.25],["bottom",0.2]]); else r();
   if(!locks.diagramPos){ s.diagramPos=pick([["bottom",0.4],["top",0.15],["middle",0.1],["left",0.17],["right",0.18]]);
@@ -649,11 +669,43 @@ function layout(content,settings,seed,jitter,offsets,elements){
     if(it.type==="line"){ it.x1+=dx; it.x2+=dx; it.y1+=dy; it.y2+=dy; }
     else if(it.type==="text"&&it.rot){ it.rot.px+=dx; it.rot.py+=dy; }
     else { it.x+=dx; it.y+=dy; } });
-  return {W,H,m,TOP,BOT,paper,ink,items,keyword:kw,format:settings.format};
+  return {W,H,m,TOP,BOT,paper,ink,items,keyword:kw,format:settings.format,foil:!!pal.foil,edition:pal.foil?(settings.edition||1):0};
 }
 
 // ---------- SVG renderer ----------
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+// ---------- Limited edition foil ----------
+function foilStops(cols){ return cols.map((c,i)=>`<stop offset="${(i/(cols.length-1)).toFixed(2)}" stop-color="${c}"/>`).join(""); }
+function foilDefs(L,live){
+  // userSpaceOnUse so the metal reads as one sheet across the whole poster
+  const g=(id,cols)=>`<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${L.W}" y2="${L.H}">${foilStops(cols)}</linearGradient>`;
+  const sheen=live?`<linearGradient id="foilSheen" gradientUnits="userSpaceOnUse" x1="${-L.W}" y1="0" x2="0" y2="${L.H*0.5}">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="${L.W*2.2} 0" dur="3.6s" repeatCount="indefinite"/></linearGradient>`:"";
+  const lp=lightPaper(L.paper);
+  return `<defs>${g("foilGold",lp?FOIL.goldDark:FOIL.gold)}${g("foilSilver",lp?FOIL.silverDark:FOIL.silver)}${sheen}
+    <pattern id="foilGrain" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="none"/><circle cx="1" cy="1" r=".5" fill="#fff" opacity=".05"/><circle cx="4" cy="4" r=".5" fill="#000" opacity=".06"/></pattern></defs>
+    <rect width="${L.W}" height="${L.H}" fill="url(#foilGrain)"/>`;
+}
+function foilSeal(L,live){
+  const f=n=>+n.toFixed(2), u=L.W/600, r=20*u, cx=L.W-L.m*0.5, cy=L.H-L.m-r*0.6;
+  const n=String(L.edition).padStart(3,"0");
+  const inset=f(L.m*0.28);
+  const sw=f(1.4*u);
+  let s=`<g id="edition" data-id="edition">
+  <rect x="${inset}" y="${inset}" width="${f(L.W-2*inset)}" height="${f(L.H-2*inset)}" fill="none" stroke="url(#foilGold)" stroke-width="${sw}"/>
+  <rect x="${f(inset+5*u)}" y="${f(inset+5*u)}" width="${f(L.W-2*inset-10*u)}" height="${f(L.H-2*inset-10*u)}" fill="none" stroke="url(#foilSilver)" stroke-width="${f(sw*0.6)}"/>
+  <circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="url(#foilGold)"/>
+  <circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*0.84)}" fill="none" stroke="${L.paper}" stroke-width="${f(0.8*u)}" stroke-dasharray="${f(1.5*u)} ${f(2*u)}"/>
+  <circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*0.66)}" fill="url(#foilSilver)"/>
+  <text x="${f(cx)}" y="${f(cy-r*0.12)}" text-anchor="middle" font-size="${f(4.4*u)}" letter-spacing="${f(0.8*u)}" font-family="${ps(700)}, ${esc(FALLBACK)}" fill="${L.paper}">LIMITED</text>
+  <text x="${f(cx)}" y="${f(cy+r*0.3)}" text-anchor="middle" font-size="${f(8.6*u)}" font-family="${ps(700)}, ${esc(FALLBACK)}" fill="${L.paper}">${n}</text>
+  <text x="${f(cx)}" y="${f(cy+r*0.54)}" text-anchor="middle" font-size="${f(3.6*u)}" letter-spacing="${f(0.6*u)}" font-family="${ps(400)}, ${esc(FALLBACK)}" fill="${L.paper}">OF 100</text>
+  </g>`;
+  if(live) s+=`<rect width="${L.W}" height="${L.H}" fill="url(#foilSheen)" style="mix-blend-mode:soft-light;pointer-events:none"/>`;
+  return s;
+}
+
 function toSVG(L,{embed=false}={}){
   const f=n=>+n.toFixed(2);
   const out=[];
@@ -665,6 +717,7 @@ function toSVG(L,{embed=false}={}){
     out.push(`<defs><style>${faces}</style></defs>`);
   }
   out.push(`<rect id="paper" width="${L.W}" height="${L.H}" fill="${L.paper}"/>`);
+  if(L.foil) out.push(foilDefs(L,!embed));
   const groups=new Map();
   for(const it of L.items){ if(!groups.has(it.g)) groups.set(it.g,[]); const o=groups.get(it.g); const out=o;
     if(it.type==="image") out.push(`<image x="${f(it.x)}" y="${f(it.y)}" width="${f(it.w)}" height="${f(it.h)}" preserveAspectRatio="none" xlink:href="${it.href}"/>`);
@@ -676,7 +729,13 @@ function toSVG(L,{embed=false}={}){
       out.push(`<text x="${f(it.x)}" y="${f(it.y)}" font-size="${f(it.size)}" xml:space="preserve"${tr}>${spans}</text>`);
     }
   }
-  for(const [g,list] of groups) out.push(`<g id="${g}" data-id="${g}">\n${list.join("\n")}\n</g>`);
+  for(const [g,list] of groups){
+    let body=list.join("\n");
+    if(L.foil){ const m=FOIL.GOLD_GROUPS.has(g)?"url(#foilGold)":"url(#foilSilver)";
+      body=body.split(`"${L.ink}"`).join(`"${m}"`); }
+    out.push(`<g id="${g}" data-id="${g}">\n${body}\n</g>`);
+  }
+  if(L.foil) out.push(foilSeal(L,!embed));
   out.push(`</svg>`);
   return out.join("\n");
 }
@@ -698,12 +757,12 @@ function toPDF(L){
     if(it.type==="image"){ try{ doc.addImage(it.href,it.fmt||"PNG",it.x*s,it.y*s,it.w*s,it.h*s,it.key,"FAST"); }catch(e){} }
     else if(it.type==="rect"){ if(it.fill){ doc.setFillColor(it.fill); doc.rect(it.x*s,it.y*s,it.w*s,it.h*s,"F"); }
       if(it.c&&it.c!=="none"){ doc.setDrawColor(it.c); doc.setLineWidth(it.sw*s); doc.rect(it.x*s,it.y*s,it.w*s,it.h*s,"S"); } }
-    else if(it.type==="line"){ doc.setDrawColor(it.c); doc.setLineWidth(it.sw*s); doc.line(it.x1*s,it.y1*s,it.x2*s,it.y2*s); }
+    else if(it.type==="line"){ doc.setDrawColor(L.foil&&it.c===L.ink?FOIL.solid.silver:it.c); doc.setLineWidth(it.sw*s); doc.line(it.x1*s,it.y1*s,it.x2*s,it.y2*s); }
     else{
       let x=it.x;
       for(const r of it.runs){
         if(!useFont(r.w)) doc.setFont("helvetica", r.w>=700?"bold":"normal");
-        doc.setFontSize(it.size*s); doc.setTextColor(r.c);
+        doc.setFontSize(it.size*s); doc.setTextColor(L.foil&&r.c===L.ink?(FOIL.GOLD_GROUPS.has(it.g)?FOIL.solid.gold:FOIL.solid.silver):r.c);
         const opt={charSpace:(r.ls||0)*s, baseline:"alphabetic"};
         if(it.rot){ opt.angle=90; doc.text(r.t,it.rot.px*s,(it.rot.py-x)*s,opt); }
         else doc.text(r.t,x*s,it.y*s,opt);
@@ -711,6 +770,9 @@ function toPDF(L){
       }
     }
   }
+  if(L.foil){ doc.setDrawColor(FOIL.solid.gold); doc.setLineWidth(1.2); const i=L.m*0.28*s; doc.rect(i,i,pw-2*i,ph-2*i,"S");
+    doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(FOIL.solid.gold);
+    doc.text(`LIMITED EDITION  ${String(L.edition).padStart(3,"0")} / 100`,pw-L.m*0.5*s,ph-L.m*0.42*s,{align:"right"}); }
   return doc.output("arraybuffer");
 }
 
@@ -866,7 +928,7 @@ document.addEventListener("keydown",e=>{
 let toastT; function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2600); }
 
 function fillSelects(){
-  $("palette").innerHTML=`<optgroup label="Colour">`+Object.entries(PALETTES).filter(([k,p])=>p.bold).map(([k,p])=>`<option value="${k}">${p.name}</option>`).join("")+`</optgroup><optgroup label="Neutral">`+Object.entries(PALETTES).filter(([k,p])=>!p.bold).map(([k,p])=>`<option value="${k}">${p.name}</option>`).join("")+`</optgroup>`;
+  $("palette").innerHTML=`<optgroup label="Colour">`+Object.entries(PALETTES).filter(([k,p])=>p.bold&&!p.foil).map(([k,p])=>`<option value="${k}">${p.name}</option>`).join("")+`</optgroup><optgroup label="Neutral">`+Object.entries(PALETTES).filter(([k,p])=>!p.bold&&!p.foil).map(([k,p])=>`<option value="${k}">${p.name}</option>`).join("")+`</optgroup>`+`<optgroup label="Limited edition">`+Object.entries(PALETTES).filter(([k,p])=>p.foil).map(([k,p])=>`<option value="${k}">${p.name.replace("Limited · ","")}</option>`).join("")+`</optgroup>`;
   let opts=Object.keys(FAMILIES).map(f=>`<option value="${f}">${f}</option>`).join("");
   if(customFont) opts+=`<option value="__custom">Uploaded: ${esc(customFont.label)}</option>`;
   $("font").innerHTML=opts;
@@ -909,7 +971,7 @@ function syncForm(){
   c.footer.forEach((v,i)=>$("f"+i).value=v);
   ["boxCount","ratio","dashCount","align","drift","palette","font","format","titlePos","diagramPos"].forEach(k=>$(k).value=s[k]);
   ["ratio","dashCount","align","drift","palette","titlePos","diagramPos"].forEach(k=>$("L_"+k).checked=!!state.locks[k]);
-  $("seed").value=state.seed; $("seedLock").checked=state.seedLock;
+  $("seed").value=state.seed; $("seedLock").checked=state.seedLock; $("L_elements").checked=!!state.locks.elements;
   $("boxCountV").textContent=s.boxCount; $("ratioV").textContent=(+s.ratio).toFixed(2); $("dashCountV").textContent=s.dashCount;
   keywordOptions(); boxFields();
 }
@@ -993,6 +1055,7 @@ document.addEventListener("keydown",e=>{
   if(editMode&&sel) return; // edit-mode keys handled above
   const k=e.key.toLowerCase();
   if(k==="g"){ e.preventDefault(); $("btnGen").click(); }
+  else if(k==="l"){ e.preventDefault(); $("btnFoil").click(); }
   else if(k==="v"){ e.preventDefault(); $("btnVar").click(); }
   else if(k==="e"){ e.preventDefault(); $("btnMove").click(); }
   else if(k==="t"){ e.preventDefault(); $("btnText").click(); }
@@ -1011,6 +1074,7 @@ $("dashCount").addEventListener("input",e=>{state.settings.dashCount=+e.target.v
 ["align","drift","palette","font","format","titlePos","diagramPos"].forEach(k=>$(k).addEventListener("change",e=>{state.settings[k]=e.target.value;schedule();}));
 ["ratio","dashCount","align","drift","palette","titlePos","diagramPos"].forEach(k=>$("L_"+k).addEventListener("change",e=>{state.locks[k]=e.target.checked;save();}));
 $("seedLock").addEventListener("change",e=>{state.seedLock=e.target.checked;save();});
+$("L_elements").addEventListener("change",e=>{state.locks.elements=e.target.checked;save();});
 $("seed").addEventListener("change",e=>{ const v=Math.max(1,Math.min(999999,parseInt(e.target.value)||1)); applySeed(v); });
 
 function applySeed(seed){
@@ -1018,7 +1082,48 @@ function applySeed(seed){
   state.settings=rollSettings(seed,state.settings,state.locks);
   syncForm(); render();
 }
-$("btnGen").addEventListener("click",()=>{ pushHist(); applySeed(state.seedLock?state.seed:newSeed()); });
+// Generate also re-rolls the elements: sizes, and which minor ones are shown.
+const EL_ROLL={hero:[.7,1.5],title:[.8,1.4],headline:[.88,1.12],subhead:[.8,1.25],tag:[.8,1.5,.25],credit:[.8,1.6,.3],
+  designer:[.8,1.5,.35],ruler:[1,1,.25],footer:[.85,1.1,.15],"box-1":[.7,1.3],"box-2":[.7,1.3],"box-3":[.7,1.3],"box-4":[.7,1.3],"box-5":[.7,1.3]};
+function rollElements(seed){
+  if(state.locks.elements) return;
+  const r=mulberry32(seed*31+7), el={};
+  for(const [id,[lo,hi,pHide=0]] of Object.entries(EL_ROLL)){
+    const k=Math.round((lo+r()*(hi-lo))*10)/10, hide=r()<pHide, e={};
+    if(k!==1) e.scale=k; if(hide) e.hidden=true;
+    if(Object.keys(e).length) el[id]=e;
+  }
+  state.elements=el;
+}
+function generate(foil){
+  try{
+    if(typeof closeGrid==="function") closeGrid();
+    if(editMode) setEdit(false);
+    pushHist();
+    const wasLocked=state.seedLock;
+    if(foil){
+      state.seedLock=false;
+      applySeed(newSeed()); rollElements(state.seed);
+      const keys=Object.keys(PALETTES).filter(isFoil);
+      state.settings.palette=keys[Math.floor(Math.random()*keys.length)];
+      state.settings.edition=1+Math.floor(Math.random()*100);
+      syncForm(); render();
+      toast(`Limited edition ${String(state.settings.edition).padStart(3,"0")}/100 · ${PALETTES[state.settings.palette].name.replace("Limited · ","")}`);
+      return;
+    }
+    // A plain Generate always gives a new poster: the seed lock only holds for 9 variations / reloads.
+    if(wasLocked){ state.seedLock=false; toast("Seed lock was on, so Generate looked stuck. Lock turned off."); }
+    if(isFoil(state.settings.palette)&&!state.locks.palette) state.settings.palette="classic";
+    const sd=newSeed(); rollElements(sd); applySeed(sd);
+  }catch(err){
+    // Saved settings from an older version can break a render: clear them and try once more.
+    console.error(err);
+    try{ localStorage.removeItem("tm89-state"); state=DEFAULT(); fillSelects(); applySeed(newSeed()); toast("Old saved settings were blocking Generate, so they were cleared."); }
+    catch(e2){ toast("Generate failed: "+(e2.message||e2)); }
+  }
+}
+$("btnGen").addEventListener("click",()=>generate(false));
+$("btnFoil").addEventListener("click",()=>generate(true));
 $("btnText").addEventListener("click",()=>{ pushHist();
   const cur=state.content.title; let b; do{ b=BANK[Math.floor(Math.random()*BANK.length)]; }while(BANK.length>1&&b.title===cur);
   const hero=`${1+Math.floor(Math.random()*12)}.${1+Math.floor(Math.random()*9)}`;
