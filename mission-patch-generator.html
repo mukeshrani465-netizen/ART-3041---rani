@@ -81,6 +81,13 @@
   .vgrid figure{margin:0;cursor:pointer;text-align:center;font-size:11px;color:var(--mid)}
   .vgrid canvas{width:100%;aspect-ratio:1;border-radius:6px;display:block;outline:2px solid transparent;transition:outline-color .15s}
   .vgrid figure:hover canvas{outline-color:var(--acc)}
+  .vgrid figure.current canvas{outline-color:var(--ink)}
+  .vgrid figure.current figcaption{color:var(--ink);font-weight:700}
+  .vmodes{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{border:0;background:#fff;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button.on{background:var(--acc);color:#fff}
   @media (max-width:880px){.app{grid-template-columns:1fr;height:auto}.gen{position:static;width:auto}aside{padding-bottom:18px}.stage .main-view{width:88vw;height:88vw}.mini{position:static;margin-top:14px}}
 </style>
 </head>
@@ -101,11 +108,12 @@
   </fieldset>
 
   <fieldset><legend>Symbol · gravity fading</legend>
+    <div class="row"><label>Composition</label><select id="comp"><option value="line">Line (rising stops)</option><option value="arc">Launch arc</option><option value="orbit">Orbit around Baruch</option><option value="spiral">Spiral (floating away)</option><option value="field">Rising field (diversity)</option><option value="crystal">Crystal lattice</option><option value="transit">Subway map</option></select><input type="checkbox" class="lock" data-lock="comp" title="Lock"></div>
     <div class="row"><label>Stops</label><div class="ctl"><input type="range" id="stops" min="2" max="5" step="1"><output></output></div><input type="checkbox" class="lock" data-lock="stops" title="Lock"></div>
     <div class="row"><label>Dot size</label><div class="ctl"><input type="range" id="dotSize" min="5" max="11" step="0.1"><output></output></div><span></span></div>
     <div class="row"><label>Fade to</label><div class="ctl"><input type="range" id="topTint" min="20" max="80" step="1"><output></output></div><input type="checkbox" class="lock" data-lock="topTint" title="Lock"></div>
     <div class="row"><label>Line</label><select id="lineStyle"><option value="solid">Solid</option><option value="rails">Subway rails</option><option value="dashed">Dashed</option><option value="none">None</option></select><input type="checkbox" class="lock" data-lock="lineStyle" title="Lock"></div>
-    <div class="row"><label>Line length</label><div class="ctl"><input type="range" id="lineLen" min="46" max="64" step="1"><output></output></div><input type="checkbox" class="lock" data-lock="lineLen" title="Lock"></div>
+    <div class="row"><label>Symbol size</label><div class="ctl"><input type="range" id="lineLen" min="46" max="64" step="1"><output></output></div><input type="checkbox" class="lock" data-lock="lineLen" title="Lock"></div>
     <div class="row"><label>Line weight</label><div class="ctl"><input type="range" id="lineW" min="0.8" max="2.4" step="0.1"><output></output></div><span></span></div>
     <div class="row"><label>Tilt</label><div class="ctl"><input type="range" id="tilt" min="-12" max="12" step="1"><output></output></div><input type="checkbox" class="lock" data-lock="tilt" title="Lock"></div>
   </fieldset>
@@ -129,7 +137,7 @@
     <p class="hint"><button class="btn" id="reset" style="padding:5px 10px;font-weight:400">Reset to default</button></p>
   </fieldset>
 
-  <div class="gen"><button class="btn primary" id="generate">Generate <span style="font-weight:400;opacity:.7">(G)</span></button><button class="btn" id="varBtn" title="9 variations (V)">9 ▦</button></div>
+  <div class="gen"><button class="btn primary" id="generate">Generate <span style="font-weight:400;opacity:.7">(G)</span></button><button class="btn" id="remixBtn" title="Small change to this design (R)">Remix</button><button class="btn" id="varBtn" title="Variations (V)">9 ▦</button></div>
 </aside>
 
 <main>
@@ -174,10 +182,16 @@
 </div>
 <div class="modal" id="varModal" role="dialog" aria-label="Variations">
   <div class="card wide">
-    <h2>9 variations</h2>
-    <div style="color:var(--mid);font-size:13px">Locked settings are kept. Click one to use it.</div>
+    <h2>Variations</h2>
+    <div style="color:var(--mid);font-size:13px">Locked settings are always kept. Click a patch to use it.</div>
+    <div class="vmodes">
+      <div class="seg" id="vmode" role="group" aria-label="How different">
+        <button data-m="new">Very different</button><button data-m="bold">Bold remix</button><button data-m="subtle">Subtle remix</button>
+      </div>
+      <span id="vhint" style="font-size:12px;color:var(--mid)"></span>
+    </div>
     <div class="vgrid" id="vgrid"></div>
-    <div class="acts"><button class="btn" id="moreVar">Another 9</button><button class="btn" data-close>Close</button></div>
+    <div class="acts"><button class="btn" id="moreVar">Another set</button><button class="btn" data-close>Close</button></div>
   </div>
 </div>
 
@@ -212,11 +226,13 @@ const TEXTS = [
   ["BARUCH","TO ORBIT"],
   ["Baruch College","Student Spaceflight 2027"],
 ];
-const DEFAULTS = {seed:2027, shape:"circle", palette:0, finish:"flat", border:"ink", innerRing:"1", accents:"none",
+const COMPS=["line","arc","orbit","spiral","field","crystal","transit"];
+const COMP_NAMES={line:"Line",arc:"Launch arc",orbit:"Orbit",spiral:"Spiral",field:"Rising field",crystal:"Crystal",transit:"Subway map"};
+const DEFAULTS = {seed:2027, comp:"line", shape:"circle", palette:0, finish:"flat", border:"ink", innerRing:"1", accents:"none",
   stops:3, dotSize:8.5, topTint:35, lineStyle:"solid", lineLen:58, lineW:1.4, tilt:0,
   orbit:"coil", orbitCount:5, open:1.5, orbitW:0.9,
   textLayout:"rim", textPreset:0, topText:TEXTS[0][0], bottomText:TEXTS[0][1], labels:"0", font:"Archivo", textSize:5.6};
-const RANDOM_KEYS=["shape","palette","finish","border","innerRing","accents","stops","topTint","lineStyle","lineLen","tilt","orbit","orbitCount","open","textLayout","textPreset","labels","font"];
+const RANDOM_KEYS=["comp","shape","palette","finish","border","innerRing","accents","stops","topTint","lineStyle","lineLen","tilt","orbit","orbitCount","open","textLayout","textPreset","labels","font"];
 
 let S={...DEFAULTS}; const locks=new Set(); const $=id=>document.getElementById(id);
 
@@ -239,6 +255,83 @@ function colorArr(f){ // the gravity fade: base colour mixed toward the fabric a
 }
 const colorAt=f=>rgbStr(colorArr(Math.max(0,Math.min(1,f))));
 const inkMix=(pct)=>{const p=PALETTES[S.palette];return rgbStr(lerp(hex2rgb(p.paper),hex2rgb(p.ink),pct/100))};
+
+/* ===== alternative compositions (each one shows gravity fading differently) ===== */
+const DOTK={field:0.55,crystal:0.62}; // these use many dots, so all of them are drawn a bit smaller (still one size)
+function drawAlt(c,u,cx,cy,L,r,ow,op,lineCol,rnd,avail){
+  const N=S.stops, wide=(S.comp==="field"||S.comp==="crystal");
+  const room=wide?(S.shape==="circle"?avail/1.5:avail-r*0.6-0.8*u):avail-r-1*u;
+  const H=Math.max(L*0.3,Math.min(L*0.55,room)), clamp01=v=>Math.max(0,Math.min(1,v));
+  const fY=y=>clamp01((cy+H-y)/(2*H));
+  const stroke=(pts,w,fAt)=>{c.lineWidth=w;const seg=6;for(let i=0;i<pts.length-1;i+=seg){const j=Math.min(i+seg,pts.length-1);c.beginPath();c.moveTo(...pts[i]);for(let k=i+1;k<=j;k++)c.lineTo(...pts[k]);c.strokeStyle=colorAt(fAt(pts[(i+j)>>1],(i+j)/2/(pts.length-1)));c.stroke()}};
+  const offset=(pts,d)=>pts.map((p,i)=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)];const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;return[p[0]-dy/l*d,p[1]+dx/l*d]});
+  const path=(pts,fAt)=>{ // main route, in the chosen line style
+    if(S.lineStyle==="none")return; const w=S.lineW*u;
+    if(S.lineStyle==="dashed"){c.setLineDash([2.2*u,1.6*u]);stroke(pts,w,fAt);c.setLineDash([]);return}
+    if(S.lineStyle==="rails"){stroke(offset(pts,1.2*u),w*0.5,fAt);stroke(offset(pts,-1.2*u),w*0.5,fAt);return}
+    stroke(pts,w,fAt);
+  };
+  const dot=(x,y,f,rr=r)=>{c.beginPath();c.arc(x,y,rr,0,Math.PI*2);c.fillStyle=colorAt(f);c.fill()};
+  const ring=(x,y,rr,f,w=ow)=>{c.beginPath();c.arc(x,y,rr,0,Math.PI*2);c.strokeStyle=colorAt(f);c.lineWidth=w;c.stroke()};
+  const bez=(p0,p1,p2,t)=>[(1-t)**2*p0[0]+2*(1-t)*t*p1[0]+t*t*p2[0],(1-t)**2*p0[1]+2*(1-t)*t*p1[1]+t*t*p2[1]];
+  const flip=rnd()<0.5?-1:1;
+
+  if(S.comp==="arc"){ // launch path from Earth's horizon, bending into orbit
+    const R=H*3.2, hy=cy+H*0.92, ex=cx, ey=hy+R;
+    const k=Math.max(1,Math.min(5,S.orbitCount));
+    for(let j=0;j<k;j++){c.beginPath();c.arc(ex,ey,R+j*2.1*u*op,Math.PI*1.1,Math.PI*1.9);c.strokeStyle=colorAt(j/(k+2)*0.6);c.lineWidth=j?ow:ow*1.6;c.stroke()}
+    const p0=[cx-flip*H*0.62,hy-R*0.012*0+0], p2=[cx+flip*H*0.8,cy-H*0.82], p1=[p0[0],p2[1]+H*0.1];
+    const pts=[...Array(120)].map((_,i)=>bez(p0,p1,p2,i/119));
+    path(pts,(p,t)=>t);
+    for(let i=0;i<N;i++){const t=0.04+0.92*i/(N-1),[x,y]=bez(p0,p1,p2,t);dot(x,y,t)}
+    if(S.orbit!=="none"){const [x,y]=bez(p0,p1,p2,0.96);c.beginPath();c.ellipse(x,y,r*2.1,r*0.7,-0.35*flip,0,Math.PI*2);c.strokeStyle=colorAt(1);c.lineWidth=ow;c.stroke()}
+  }
+  else if(S.comp==="orbit"){ // stops travel around Baruch (centre) and lift away
+    const rot=(S.tilt*3-18)*Math.PI/180*flip, rx=H*0.95, ry=H*0.95*(0.42+0.18*(op-1));
+    const k=Math.max(1,Math.min(4,Math.round(S.orbitCount/2)));
+    for(let j=k-1;j>=0;j--){const s=1-0.2*j;const pts=[...Array(181)].map((_,i)=>{const t=i/180*Math.PI*2,x=rx*s*Math.cos(t),y=ry*s*Math.sin(t);return[cx+x*Math.cos(rot)-y*Math.sin(rot),cy+x*Math.sin(rot)+y*Math.cos(rot)]});
+      if(S.lineStyle==="dashed")c.setLineDash([2*u,1.6*u]); stroke(pts,j?ow:Math.max(ow,S.lineW*0.7*u),p=>fY(p[1])); c.setLineDash([])}
+    dot(cx,cy,0);
+    ring(cx,cy,r*1.7,0.15,ow*0.8);
+    for(let i=1;i<N;i++){const t=Math.PI/2+flip*Math.PI*(i/(N-1))*0.98,x=rx*Math.cos(t),y=ry*Math.sin(t);const px=cx+x*Math.cos(rot)-y*Math.sin(rot),py=cy+x*Math.sin(rot)+y*Math.cos(rot);dot(px,py,0.25+0.75*i/(N-1))}
+  }
+  else if(S.comp==="spiral"){ // floating away from the centre
+    const turns=1.4+Math.min(8,S.orbitCount)*0.22, Th=turns*Math.PI*2, R=H*0.98, a0=rnd()*Math.PI*2;
+    const P=t=>{const th=t*Th,rr=R*Math.pow(t,0.85);return[cx+rr*Math.cos(a0+flip*th),cy+rr*Math.sin(a0+flip*th)]};
+    const pts=[...Array(400)].map((_,i)=>P(i/399));
+    path(pts,(p,t)=>t);
+    for(let i=0;i<N;i++){const t=0.12+0.86*Math.pow(i/(N-1),0.9);const [x,y]=P(t);dot(x,y,i/(N-1))}
+    if(S.orbit==="rays"||S.orbit==="halo"){const n=12;for(let k=0;k<n;k++){const t=k/n*Math.PI*2;c.beginPath();c.moveTo(cx+Math.cos(t)*R*1.04,cy+Math.sin(t)*R*1.04);c.lineTo(cx+Math.cos(t)*R*(1.04+0.06*op),cy+Math.sin(t)*R*(1.04+0.06*op));c.strokeStyle=colorAt(0.9);c.lineWidth=ow;c.stroke()}}
+  }
+  else if(S.comp==="field"){ // many students, each their own orbit; thinning and lightening as they rise
+    const rf=r*DOTK.field, cols=4+(S.orbitCount%3), gap=2*H/cols, rows=Math.round(2*H/gap);
+    for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
+      const x=cx-H+gap*(i+0.5)+(rnd()-0.5)*gap*0.45, y=cy+H-gap*(j+0.5)+(rnd()-0.5)*gap*0.45, f=fY(y);
+      if(rnd()<f*0.32*op)continue;
+      if(S.orbit!=="none")ring(x,y,Math.min(rf*(1.6+0.4*rnd()),gap*0.42),f,ow*0.75);
+      dot(x,y,f,rf);
+    }
+  }
+  else if(S.comp==="crystal"){ // a hexagonal lattice growing upward
+    const R=N<=3?2:3, s=H*0.95/(R*1.05), rc=Math.min(r*DOTK.crystal,s*0.3), ang=(rnd()<0.5?0:30)*Math.PI/180, pts=[];
+    for(let q=-R;q<=R;q++)for(let rr=Math.max(-R,-q-R);rr<=Math.min(R,-q+R);rr++){
+      let x=s*(q+rr/2), y=s*rr*Math.sqrt(3)/2; const X=cx+x*Math.cos(ang)-y*Math.sin(ang), Y=cy+x*Math.sin(ang)+y*Math.cos(ang);
+      const f=fY(Y); if(f>0.6&&rnd()<(f-0.6)*0.9*(op-0.6))continue; pts.push([X,Y,f]);}
+    if(S.orbit!=="none"||S.lineStyle!=="none"){c.lineWidth=ow;for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const d=Math.hypot(pts[i][0]-pts[j][0],pts[i][1]-pts[j][1]);if(d<s*1.05){c.beginPath();c.moveTo(pts[i][0],pts[i][1]);c.lineTo(pts[j][0],pts[j][1]);c.strokeStyle=colorAt((pts[i][2]+pts[j][2])/2);c.stroke()}}}
+    pts.forEach(([x,y,f])=>dot(x,y,f,rc));
+  }
+  else if(S.comp==="transit"){ // a subway route that climbs, with 45° bends
+    const legs=N-1, step=2*H*0.9/legs, way=[[cx-flip*H*0.45,cy+H*0.9]];
+    let x=way[0][0], y=way[0][1], dir=flip;
+    for(let i=0;i<legs;i++){const up=step*(0.45+0.25*rnd()), diag=step-up, nx=Math.max(cx-H*0.85,Math.min(cx+H*0.85,x+dir*diag));
+      way.push([x,y-up]); way.push([nx,y-up-Math.abs(nx-x)]); y=y-up-Math.abs(nx-x); x=nx; dir=(Math.abs(x-cx)>H*0.4)?-Math.sign(x-cx):(rnd()<0.6?dir:-dir);}
+    const dense=[]; for(let i=0;i<way.length-1;i++){for(let k=0;k<12;k++){const t=k/12;dense.push([way[i][0]+(way[i+1][0]-way[i][0])*t,way[i][1]+(way[i+1][1]-way[i][1])*t])}} dense.push(way[way.length-1]);
+    if(S.orbit!=="none"){stroke(offset(dense,3.4*u).map(p=>p),Math.max(.5,S.lineW*0.45*u),(p,t)=>Math.min(1,t+0.35))}
+    path(dense,(p,t)=>t);
+    const stations=[way[0]].concat(way.filter((_,i)=>i>0&&i%2===0));
+    stations.forEach((p,i)=>{const f=i/(stations.length-1);dot(p[0],p[1],f);c.beginPath();c.arc(p[0],p[1],r*0.42,0,Math.PI*2);c.fillStyle=PALETTES[S.palette].paper;c.fill()});
+  }
+}
 
 /* ===== renderer ===== */
 function shapePath(c,u,inset=0){
@@ -282,10 +375,24 @@ function draw(ctx,px,opts={}){
   // ---- symbol ----
   c.save(); shapePath(c,u,1.5); c.clip();
   const cy0=Lo.cy0, L=S.lineLen*u*Lo.Lk, yB=cy0+L/2, yT=cy0-L/2, N=S.stops, r=S.dotSize/2*u*Math.min(1,Lo.Lk+0.1);
+  const ow=Math.max(.5,S.orbitW*u), op=S.open;
+  if(S.comp!=="line"){
+    // free space inside the text, measured from the symbol centre
+    let avail;
+    if(Lo.block) avail=Math.min(((S.shape==="hex"?67:68.5)*u)-cy0, cy0-(S.shape==="hex"?14:12)*u);
+    else if(Lo.circle) avail=(46-2.6-(S.border==="double"?2.6:0))*u-fs*0.95-2.4*u;
+    else avail=Lo.yBot-fs*0.62-2.2*u-cy0;
+    // keep the symbol off the text
+    c.beginPath();
+    if(Lo.circle&&!Lo.block){c.arc(cx,50*u,(46-2.6-(S.border==="double"?2.6:0))*u-fs*0.95-1.4*u,0,Math.PI*2)}
+    else if(Lo.block){c.rect(0,0,100*u,(S.shape==="hex"?68:69.5)*u)}
+    else {c.rect(0,Lo.yTop+fs*0.6+1.2*u,100*u,Lo.yBot-Lo.yTop-fs*1.2-2.4*u)}
+    c.clip();
+    drawAlt(c,u,cx,cy0,L,r,ow,op,pal.ramp?inkMix(80):ink,mulberry32(S.seed*7+3),avail); c.restore(); }
+  else {
   c.translate(cx,cy0); c.rotate(S.tilt*Math.PI/180); c.translate(-cx,-cy0);
   const stops=[...Array(N)].map((_,i)=>{const f=i/(N-1);return{f,y:yB-(0.14+0.72*f)*L}});
   const fOfY=y=>Math.max(0,Math.min(1,((yB-y)/L-0.14)/0.72));
-  const ow=Math.max(.5,S.orbitW*u), op=S.open;
 
   const strokePoly=(pts,w)=>{c.lineWidth=w;const seg=10;for(let i=0;i<pts.length-1;i+=seg){c.beginPath();c.moveTo(...pts[i]);for(let j=i+1;j<=Math.min(i+seg,pts.length-1);j++)c.lineTo(...pts[j]);c.strokeStyle=colorAt(fOfY(pts[Math.min(i+seg/2|0,pts.length-1)][1]));c.stroke()}};
   const ellipsePts=(x,y,rx,ry,rot,a0,a1,n=160)=>{const p=[];for(let i=0;i<=n;i++){const t=a0+(a1-a0)*i/n,ex=rx*Math.cos(t),ey=ry*Math.sin(t);p.push([x+ex*Math.cos(rot)-ey*Math.sin(rot),y+ex*Math.sin(rot)+ey*Math.cos(rot)])}return p};
@@ -340,12 +447,14 @@ function draw(ctx,px,opts={}){
     c.font=`400 ${3*u}px "${S.font}",sans-serif`;c.textBaseline='middle';
     pos.forEach((p,i)=>{c.fillStyle=colorAt(p.f);tracked(c,names[i],edge,p.y,0.12*3*u,'left')});
   }
+  } // end line composition
 
   // ---- accents ----
   c.fillStyle=inkMix(70); c.strokeStyle=inkMix(70);
   const corner = S.shape==="circle"?[[36,36],[64,36],[36,64],[64,64]].map(([x,y])=>[50+(x-50)*0.92,50+(y-50)*0.92]) : S.shape==="hex"?[[30,35],[70,35],[30,65],[70,65]]:[[16,16],[84,16],[16,84],[84,84]];
-  if(S.accents==="dots"){const pts=Lo.block?corner.slice(0,3).concat([[corner[3][0],corner[3][1]]]):corner;pts.forEach(([x,y])=>{c.beginPath();c.arc(x*u,y*u,0.85*u,0,7);c.fill()})}
-  if(S.accents==="stars"){corner.forEach(([x,y],i)=>{const s=(i%2?1.2:1.7)*u;star(c,x*u,y*u,s)})}
+  const cornerPts=Lo.block?corner.filter((_,i)=>i!==2):corner;
+  if(S.accents==="dots"){cornerPts.forEach(([x,y])=>{c.beginPath();c.arc(x*u,y*u,0.85*u,0,7);c.fill()})}
+  if(S.accents==="stars"){cornerPts.forEach(([x,y],i)=>{const s=(i%2?1.2:1.7)*u;star(c,x*u,y*u,s)})}
   if(S.accents==="ticks"){c.lineWidth=0.7*u;const R=S.shape==="circle"?33:36;[[0,-1],[1,0],[0,1],[-1,0]].filter(d=>!(Lo.block&&d[1]===1)).forEach(([dx,dy])=>{c.beginPath();c.moveTo((50+dx*R)*u,(50+dy*R)*u);c.lineTo((50+dx*(R-2.6))*u,(50+dy*(R-2.6))*u);c.stroke()})}
 
   // ---- text ----
@@ -427,7 +536,7 @@ function render(){
   draw(vctx,1050);
   drawMini();
   const p=PALETTES[S.palette];
-  $('caption').textContent=`Seed ${S.seed} · ${p.name} · ${S.finish==='stitch'?'Embroidered':'Flat'} · 3.5″ × 3.5″`;
+  $('caption').textContent=`${COMP_NAMES[S.comp]} · Seed ${S.seed} · ${p.name} · ${S.finish==='stitch'?'Embroidered':'Flat'} · 3.5″ × 3.5″`;
   const cols=p.ramp?p.ramp:[p.ink,inkMix(70),inkMix(S.topTint)];
   $('swatch').innerHTML=`<span style="background:${p.paper}"></span>`+cols.map(x=>`<span style="background:${x}"></span>`).join('');
 }
@@ -448,10 +557,10 @@ document.querySelectorAll('aside select, aside input[type=range], aside input[ty
 document.querySelectorAll('.lock').forEach(l=>l.addEventListener('change',()=>l.checked?locks.add(l.dataset.lock):locks.delete(l.dataset.lock)));
 $('seed').addEventListener('change',()=>{S.seed=parseInt($('seed').value)||1;render()});
 
-function randomState(base){
+function randomState(base,forced){
   const st={...base}; st.seed=Math.floor(Math.random()*999999)+1;
   const r=mulberry32(st.seed), pick=a=>a[Math.floor(r()*a.length)], rng=(a,b,s)=>+(Math.round((a+r()*(b-a))/s)*s).toFixed(2);
-  const R={shape:()=>pick(["circle","circle","rsquare","rsquare","square","hex"]),
+  const R={comp:()=>pick(COMPS.filter(x=>x!==base.comp)),shape:()=>pick(["circle","circle","rsquare","rsquare","square","hex"]),
     palette:()=>Math.floor(r()*PALETTES.length), finish:()=>r()<0.5?"stitch":"flat",
     border:()=>pick(["ink","ink","edge","double"]), innerRing:()=>r()<0.65?"1":"0", accents:()=>pick(["none","none","dots","ticks","stars"]),
     stops:()=>pick([2,3,3,3,4,5]), topTint:()=>rng(28,55,1), lineStyle:()=>pick(["solid","solid","rails","dashed","none"]),
@@ -463,21 +572,84 @@ function randomState(base){
   if(!locks.has("textPreset")){st.topText=TEXTS[st.textPreset][0];st.bottomText=TEXTS[st.textPreset][1]}
   if(st.lineStyle==="none"&&st.orbit==="none"&&!locks.has("orbit"))st.orbit="coil";
   if(!locks.has("labels")&&!["coil","none"].includes(st.orbit))st.labels="0";
+  if(!locks.has("labels")&&st.comp!=="line")st.labels="0";
+  if(["transit","orbit","arc","spiral"].includes(st.comp)&&st.stops<3&&!locks.has("stops"))st.stops=3;
+  if(forced)Object.keys(forced).forEach(k=>{if(!locks.has(k))st[k]=forced[k]});
   return st;
 }
 function generate(){S=randomState(S);syncUI();render()}
 $('generate').onclick=generate;
 $('reset').onclick=()=>{S={...DEFAULTS};syncUI();render()};
 
-/* variations */
-function showVariations(){
-  const g=$('vgrid'); g.innerHTML=''; const keep=S;
-  for(let i=0;i<9;i++){const st=randomState(keep);S=st;const cv=document.createElement('canvas');cv.width=cv.height=420;draw(cv.getContext('2d'),420,{bg:"#F2F0EA"});
-    const fig=document.createElement('figure');fig.appendChild(cv);fig.insertAdjacentHTML('beforeend',`<figcaption>${st.seed} · ${PALETTES[st.palette].name}</figcaption>`);
-    fig.onclick=()=>{S=st;syncUI();render();$('varModal').classList.remove('on')};g.appendChild(fig)}
-  S=keep; $('varModal').classList.add('on');
+/* remix: variations of the current design */
+const isDark=i=>lum(hex2rgb(PALETTES[i].paper))<0.25;
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+function remixState(base,level){ // level: "subtle" keeps the look, "bold" also swaps a few design choices
+  const st={...base}; st.seed=Math.floor(Math.random()*999999)+1;
+  const r=mulberry32(st.seed), pick=a=>a[Math.floor(r()*a.length)], nudge=(v,d,a,b,s)=>+clamp(Math.round((v+(r()*2-1)*d)/s)*s,a,b).toFixed(2);
+  const free=k=>!locks.has(k);
+  const bold=level==="bold", k=bold?1.8:1;
+  // numbers: small moves around the current values
+  if(free("dotSize"))st.dotSize=nudge(st.dotSize,1.0*k,5,11,0.1);
+  if(free("topTint"))st.topTint=nudge(st.topTint,8*k,20,80,1);
+  if(free("lineLen"))st.lineLen=nudge(st.lineLen,3*k,46,64,1);
+  if(free("lineW"))st.lineW=nudge(st.lineW,0.2*k,0.8,2.4,0.1);
+  if(free("tilt"))st.tilt=r()<(bold?0.5:0.3)?nudge(st.tilt,5*k,-12,12,1):st.tilt;
+  if(free("orbitCount"))st.orbitCount=nudge(st.orbitCount,1*k,1,8,1);
+  if(free("open"))st.open=nudge(st.open,0.25*k,1,2.4,0.05);
+  if(free("orbitW"))st.orbitW=nudge(st.orbitW,0.15*k,0.4,1.6,0.05);
+  if(free("textSize"))st.textSize=nudge(st.textSize,0.3*k,5,7,0.1);
+  // palette: stay in the same family (light fabric or dark fabric)
+  const pChance=bold?0.7:0.3;
+  if(free("palette")&&r()<pChance){const fam=PALETTES.map((_,i)=>i).filter(i=>isDark(i)===isDark(st.palette)&&i!==st.palette);if(fam.length)st.palette=pick(fam)}
+  // small details
+  if(free("accents")&&r()<0.25)st.accents=pick(["none","dots","ticks","stars"]);
+  if(free("innerRing")&&r()<0.2)st.innerRing=st.innerRing==="1"?"0":"1";
+  if(bold&&free("comp")){st.comp=pick(COMPS.filter(x=>x!==st.comp))}
+  if(bold){ // swap 2 of the bigger choices, keep the rest
+    const swaps={orbit:()=>pick(["coil","rings","ellipses","halo","rays"]),lineStyle:()=>pick(["solid","rails","dashed"]),border:()=>pick(["ink","edge","double"]),
+      stops:()=>pick([2,3,4,5]),textLayout:()=>pick(st.shape==="circle"?["rim","spaced"]:["rim","spaced","block"]),font:()=>pick(["Archivo","Inter Tight","Space Grotesk","Sora"]),finish:()=>st.finish==="stitch"?"flat":"stitch"};
+    const keys=Object.keys(swaps).filter(free);
+    for(let n=0;n<2&&keys.length;n++){const key=keys.splice(Math.floor(r()*keys.length),1)[0];st[key]=swaps[key]()}
+  }
+  if(!locks.has("labels")&&!["coil","none"].includes(st.orbit))st.labels="0";
+  if(st.lineStyle==="none"&&st.orbit==="none")st.orbit="coil";
+  if(st.comp!=="line")st.labels="0";
+  if(["transit","orbit","arc","spiral"].includes(st.comp)&&st.stops<3&&!locks.has("stops"))st.stops=3;
+  return st;
 }
-$('varBtn').onclick=showVariations; $('moreVar').onclick=showVariations;
+function remix(){S=remixState(S,"subtle");syncUI();render()}
+$('remixBtn').onclick=remix;
+
+/* variations grid */
+let vMode="new", vBase=null;
+const VHINT={subtle:"Same look, small changes: sizes, spacing, fade, nearby colours.",bold:"A new composition for this design, plus two bigger changes each.",new:"Nine one-of-a-kind patches: every tile has its own composition, colours and shape."};
+function tile(st,label,current){
+  const keep=S; S=st; const cv=document.createElement('canvas');cv.width=cv.height=420;draw(cv.getContext('2d'),420,{bg:"#F2F0EA"}); S=keep;
+  const fig=document.createElement('figure'); if(current)fig.className='current'; fig.appendChild(cv);
+  fig.insertAdjacentHTML('beforeend',`<figcaption>${label}</figcaption>`);
+  fig.onclick=()=>{S=st;syncUI();render();$('varModal').classList.remove('on')};
+  return fig;
+}
+function fillVariations(){
+  const g=$('vgrid'); g.innerHTML='';
+  document.querySelectorAll('#vmode button').forEach(b=>b.classList.toggle('on',b.dataset.m===vMode));
+  $('vhint').textContent=VHINT[vMode];
+  if(vMode==="new"){
+    const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+    const comps=sh(COMPS).concat(sh(COMPS)).slice(0,9), pals=sh(PALETTES.map((_,i)=>i)).slice(0,9), shapes=sh(["circle","circle","rsquare","rsquare","square","square","hex","circle","rsquare"]);
+    const orbits=sh(["coil","rings","ellipses","halo","rays","none","rings","coil","halo"]), lines=sh(["solid","rails","dashed","solid","rails","dashed","solid","none","rails"]);
+    const fins=sh(["stitch","stitch","stitch","stitch","flat","flat","flat","flat","stitch"]), lays=sh(["rim","rim","rim","spaced","spaced","spaced","block","block","rim"]);
+    for(let i=0;i<9;i++){const f={comp:comps[i],palette:pals[i],shape:shapes[i],orbit:orbits[i],lineStyle:lines[i],finish:fins[i],textLayout:lays[i]};
+      if(f.comp==="line"&&f.orbit==="none"&&f.lineStyle==="none")f.lineStyle="solid";
+      const st=randomState(vBase,f); g.appendChild(tile(st,`${COMP_NAMES[st.comp]} · ${PALETTES[st.palette].name}`))}
+    return}
+  g.appendChild(tile(vBase,"Current design",true));
+  for(let i=0;i<8;i++){const st=remixState(vBase,vMode);g.appendChild(tile(st,`${COMP_NAMES[st.comp]} · ${PALETTES[st.palette].name}`))}
+}
+function showVariations(){vBase={...S};fillVariations();$('varModal').classList.add('on')}
+document.querySelectorAll('#vmode button').forEach(b=>b.onclick=()=>{vMode=b.dataset.m;fillVariations()});
+$('varBtn').onclick=showVariations; $('moreVar').onclick=fillVariations;
 
 /* live small patch (same patch, shrunk to about 1.2 inches on screen) */
 const miniCtx=$('miniView').getContext('2d');
@@ -495,7 +667,7 @@ $('miniStatus').style.cursor='pointer'; $('miniStatus').title='Open size check';
 /* size check */
 function checks(){
   const top=colorArr(1), paper=hex2rgb(PALETTES[S.palette].paper), cr=contrast(top,paper);
-  const list=[["Top dot contrast with fabric ≥ 1.6:1",cr>=1.6,cr.toFixed(2)+":1"],["Dots ≥ 4% of width",S.dotSize>=4,S.dotSize+"%"],["Rim text ≥ 5% of width",S.textSize>=5,S.textSize+"%"]];
+  const list=[["Top dot contrast with fabric ≥ 1.6:1",cr>=1.6,cr.toFixed(2)+":1"],["Dots ≥ 4% of width",S.dotSize*(DOTK[S.comp]||1)>=4,(S.dotSize*(DOTK[S.comp]||1)).toFixed(1)+"%"],["Rim text ≥ 5% of width",S.textSize>=5,S.textSize+"%"]];
   if(S.lineStyle!=="none")list.push(["Line stroke ≥ 1.2% of width",S.lineW>=1.2,S.lineW+"%"]);
   if(S.orbit!=="none")list.push(["Orbit stroke ≥ 0.6% of width",S.orbitW>=0.6,S.orbitW+"%"]);
   return list;
@@ -503,7 +675,7 @@ function checks(){
 function openSize(){draw($('small').getContext('2d'),100,{bg:"#F2F0EA"});
   $('checks').innerHTML=checks().map(([t,ok,v])=>`<li><span>${t} · ${v}</span><span class="${ok?'p':'f'}">${ok?'Pass':'Fail'}</span></li>`).join('');$('sizeModal').classList.add('on')}
 $('sizeBtn').onclick=openSize;
-$('fixBtn').onclick=()=>{S.lineW=Math.max(1.2,S.lineW);S.textSize=Math.max(5,S.textSize);S.orbitW=Math.max(0.6,S.orbitW);S.dotSize=Math.max(4,S.dotSize);
+$('fixBtn').onclick=()=>{S.lineW=Math.max(1.2,S.lineW);S.textSize=Math.max(5,S.textSize);S.orbitW=Math.max(0.6,S.orbitW);S.dotSize=Math.min(11,Math.max(S.dotSize,4/(DOTK[S.comp]||1)));
   let n=0;while(contrast(colorArr(1),hex2rgb(PALETTES[S.palette].paper))<1.6&&S.topTint<95&&n++<80)S.topTint+=1;syncUI();render();openSize()};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('on'));
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on')}));
@@ -531,7 +703,7 @@ $('dlAll').onclick=async()=>{const k=S;for(const v of saved){S={...DEFAULTS,...v
 
 document.addEventListener('keydown',e=>{
   if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;
-  const k=e.key.toLowerCase(); if(k==='g')generate(); if(k==='s')$('saveBtn').click(); if(k==='v')showVariations();
+  const k=e.key.toLowerCase(); if(k==='g')generate(); if(k==='s')$('saveBtn').click(); if(k==='v')showVariations(); if(k==='r')remix();
   if(k==='escape')document.querySelectorAll('.modal').forEach(m=>m.classList.remove('on'));
 });
 try{if(localStorage.getItem('patchMini')==='0')$('mini').classList.add('hidden'),$('miniToggle').checked=false}catch(e){}
