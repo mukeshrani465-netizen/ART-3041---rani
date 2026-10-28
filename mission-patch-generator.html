@@ -30,6 +30,23 @@
   .lock:checked{background:var(--acc);border-color:var(--acc)}
   .lock:checked::after{border-color:#fff;background:#fff}
   .hint{font-size:12px;color:var(--mid);margin:6px 0 0}
+  .tabs{display:flex;gap:4px;background:#EFEDE7;padding:4px;border-radius:10px;margin-bottom:14px}
+  .tab{flex:1;border:0;background:none;padding:8px 6px;border-radius:7px;font:inherit;font-weight:700;font-size:13px;color:var(--mid);cursor:pointer}
+  .tab.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  #tabLE.on{background:#16151C;color:#F1DC9C}
+  .off{display:none!important}
+  .mainwrap{display:contents}
+  .le-list{display:grid;gap:8px}
+  .le-item{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px;cursor:pointer;font:inherit;color:var(--ink)}
+  .le-item canvas{width:56px;height:56px;display:block}
+  .le-item b{display:block;font-size:13px}
+  .le-item span{font-size:11px;color:var(--mid)}
+  .le-item.on{border-color:#16151C;box-shadow:0 0 0 1px #16151C}
+  .le-stage{gap:0}
+  .le-info{max-width:560px;text-align:center;margin-top:10px}
+  .le-kind{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);font-weight:700}
+  .le-info p{margin:6px 0 0;font-size:13px;color:var(--ink);line-height:1.5}
+  body.le-mode{--acc:#16151C}
   .swatch{display:flex;height:10px;border-radius:3px;overflow:hidden;margin:-2px 0 4px 100px;border:1px solid var(--line)}
   .swatch span{flex:1}
   .gen{position:fixed;left:0;bottom:0;width:330px;padding:12px 18px;background:var(--panel);border-top:1px solid var(--line);display:flex;gap:8px}
@@ -94,9 +111,11 @@
 <body>
 <div class="app">
 <aside>
+  <div class="tabs" role="tablist"><button class="tab on" id="tabStudio" role="tab">Studio</button><button class="tab" id="tabLE" role="tab">★ Limited Edition</button></div>
   <h1>Gravity Fading</h1>
   <div class="sub">Mission patch generator · <i style="font-style:normal">What message would Baruch send into space?</i> · <a href="index.html">← All projects</a></div>
 
+  <div id="studioPanel">
   <fieldset><legend>Patch</legend>
     <div class="row"><label>Shape</label><select id="shape"><option value="circle">Circle</option><option value="rsquare">Rounded square</option><option value="square">Square</option><option value="hex">Hexagon (crystal)</option></select><input type="checkbox" class="lock" data-lock="shape" title="Lock"></div>
     <div class="row"><label>Colors</label><select id="palette"></select><input type="checkbox" class="lock" data-lock="palette" title="Lock"></div>
@@ -145,10 +164,16 @@
     <p class="hint"><button class="btn" id="reset" style="padding:5px 10px;font-weight:400">Reset to default</button></p>
   </fieldset>
 
-  <div class="gen"><button class="btn primary" id="generate">Generate <span style="font-weight:400;opacity:.7">(G)</span></button><button class="btn" id="remixBtn" title="Small change to this design (R)">Remix</button><button class="btn" id="varBtn" title="Variations (V)">9 ▦</button></div>
+  </div>
+  <div id="lePanel" class="off">
+    <p class="hint" style="margin:0 0 10px">Series 01 · edition of 6. These pieces live only here: they never appear in Generate, Remix, Variations or saved versions.</p>
+    <div id="leList" class="le-list"></div>
+  </div>
+  <div class="gen" id="studioGen"><button class="btn primary" id="generate">Generate <span style="font-weight:400;opacity:.7">(G)</span></button><button class="btn" id="remixBtn" title="Small change to this design (R)">Remix</button><button class="btn" id="varBtn" title="Variations (V)">9 ▦</button></div>
 </aside>
 
 <main>
+  <div id="studioMain" class="mainwrap">
   <div class="bar">
     <div class="seed"><label for="seed" style="color:var(--mid);font-size:12px">Seed</label><input type="number" id="seed"></div>
     <button class="btn" id="playBtn" title="Play / pause animation (P)">▶ Play</button>
@@ -177,6 +202,27 @@
   <div class="tray">
     <div class="tray-head"><span>Saved versions</span><button class="btn" id="dlAll" style="padding:4px 10px;font-size:12px">Download all</button></div>
     <div class="thumbs" id="thumbs"></div>
+  </div>
+  </div>
+  <div id="leMain" class="mainwrap off">
+    <div class="bar">
+      <div class="seed" style="font-weight:700" id="leTitle"></div>
+      <button class="btn" id="lePlay">▶ Play</button>
+      <div class="menu" id="leExportMenu">
+        <button class="btn" id="leExportBtn">Export ▾</button>
+        <div class="pop">
+          <button data-lepx="1050">PNG · 1050 × 1050</button>
+          <button data-lepx="2100">PNG · 2100 × 2100</button>
+          <button id="leVid">Animated video · 1080 × 1080</button>
+          <label><input type="checkbox" id="leTransparent" checked> Transparent outside patch</label>
+        </div>
+      </div>
+    </div>
+    <div class="stage le-stage">
+      <canvas id="leView" class="main-view" width="1050" height="1050" aria-label="Limited edition patch"></canvas>
+      <div class="le-info"><div class="le-kind" id="leKind"></div><p id="leNote"></p></div>
+    </div>
+    <div class="tray"><div class="tray-head"><span>Series 01</span><span id="leCount"></span></div><div class="thumbs" id="leStrip"></div></div>
   </div>
 </main>
 </div>
@@ -269,9 +315,11 @@ let AT=null, AU=1;
 const A={playing:false,style:"full",dur:6,bg:"#E9E7E1",t:0,start:0,last:0};
 const ANIM_NAMES={signal:"Signal pulse",float:"Weightless float",travel:"Travel up",full:"Full mission"};
 const isStill=()=>AT===null;
-const hasTravel=()=>!isStill()&&(A.style==="travel"||A.style==="full")&&!["field","crystal"].includes(S.comp);
-const hasSignal=()=>!isStill()&&(A.style==="signal"||A.style==="full"||(A.style==="travel"&&["field","crystal"].includes(S.comp)));
-const hasFloat=()=>!isStill()&&(A.style==="float"||A.style==="full"||(A.style==="travel"&&["field","crystal"].includes(S.comp)));
+const isTrack=()=>S.comp==="line"||S.comp==="transit"; // the line is a subway track: it and its stations stay put
+const moving=()=>!isStill()&&A.style!=="signal";
+const hasTravel=()=>!isStill()&&(A.style==="travel"||A.style==="full")&&!["field","crystal"].includes(S.comp)&&!isTrack();
+const hasSignal=()=>!isStill()&&(A.style==="signal"||A.style==="full"||(A.style==="travel"&&["field","crystal"].includes(S.comp))||(isTrack()&&moving()));
+const hasFloat=()=>!isStill()&&(A.style==="float"||A.style==="full"||(A.style==="travel"&&["field","crystal"].includes(S.comp)))&&!isTrack();
 const TAU=Math.PI*2;
 const edgeA=p=>Math.max(0,Math.min(1,p/0.12,(1-p)/0.12)); // fade in at the bottom, out at the top
 function bob(f){ // weightless drift: higher = floats more
@@ -289,6 +337,43 @@ function colorAt(f){
   return rgbStr(lerp(base,glow,boost*0.85));
 }
 const inkMix=(pct)=>{const p=PALETTES[S.palette];return rgbStr(lerp(hex2rgb(p.paper),hex2rgb(p.ink),pct/100))};
+
+/* ===== Limited Edition (Series 01 · edition of 6) — only reachable from the Limited Edition tab ===== */
+const LE=[
+  {no:1,name:"Gold Standard",kind:"Metallic gold thread · black twill",
+   note:"The formal version of the patch: the Line design stitched in metallic gold on black twill. The track and stations stay still; the gold catches the light as it moves.",
+   pal:{name:"Gold on black",paper:"#0C0C0E",ink:"#E8D39A",ramp:["#C69A35","#DDB95A","#F1DC9C"]},le:{metal:"gold"},
+   st:{comp:"line",shape:"circle",finish:"stitch",border:"edge",orbit:"rings",orbitCount:4,lineStyle:"rails",stops:3,innerRing:"1",accents:"stars",topText:"BARUCH COLLEGE",bottomText:"ONE WAY, TO DESCRIBE MANY",textSize:5.2,font:"Archivo"}},
+  {no:2,name:"Beta Cloth",kind:"Silkscreen on Beta cloth · shield",
+   note:"After the Apollo 1 fire, flight patches were screen-printed on fire-resistant Beta cloth. This piece borrows that idea: printed ink on woven off-white cloth, in a shield shape.",
+   pal:{name:"Navy & red on Beta cloth",paper:"#EEEAE0",ink:"#1A2858",ramp:["#B5262C","#3B4E9A","#7E93CF"]},le:{cloth:"beta"},
+   st:{comp:"arc",shape:"shield",finish:"flat",border:"double",orbit:"rings",orbitCount:3,lineStyle:"dashed",stops:4,innerRing:"1",accents:"none",topText:"BARUCH COLLEGE",bottomText:"SSEP · ISS 2027",textSize:5.2,font:"Archivo",seed:2}},
+  {no:3,name:"Thread Spectrum",kind:"Multicolour thread · black badge",
+   note:"Black twill, fine coloured thread and wide-spaced letters, in the spirit of contemporary embroidered emblem design. The crystal lattice fades from warm to cool as it grows upward.",
+   pal:{name:"Spectrum on black",paper:"#0D0D10",ink:"#EFEFEA",ramp:["#E85BB0","#8C6CF2","#5BB6F5","#62D9A0","#F2E06B"]},le:{},
+   st:{comp:"crystal",shape:"badge",finish:"stitch",border:"edge",orbit:"rings",lineStyle:"solid",stops:4,innerRing:"0",accents:"dots",textLayout:"spaced",topText:"BARUCH",bottomText:"CRYSTAL",textSize:5.4,font:"Space Grotesk",seed:3}},
+  {no:4,name:"Silver Orbit",kind:"Metallic silver · navy twill · motto",
+   note:"A motto on a patch is a tradition going back to Gordon Cooper's Gemini 5 patch in 1965. Silver thread on navy; the stops travel around Baruch at the centre.",
+   pal:{name:"Silver on navy",paper:"#0F1838",ink:"#E4E8EE",ramp:["#8C95A6","#BEC6D2","#EEF1F6"]},le:{metal:"silver"},
+   st:{comp:"orbit",shape:"circle",finish:"stitch",border:"double",orbit:"rings",orbitCount:6,lineStyle:"solid",stops:4,innerRing:"1",accents:"ticks",topText:"BARUCH COLLEGE · NEW YORK",bottomText:"WEIGHTLESS TOGETHER",textSize:5,font:"Archivo",tilt:4,seed:4}},
+  {no:5,name:"Night Signal",kind:"Glow-in-the-dark thread",
+   note:"Glow thread on a near-black patch, so the signal still reads with the lights off. The spiral carries the message outward and the glow breathes with the loop.",
+   pal:{name:"Glow on black",paper:"#07090D",ink:"#CFFBE6",ramp:["#21D99A","#71EDBE","#D3FFEE"]},le:{glow:"rgba(80,255,190,.85)"},
+   st:{comp:"spiral",shape:"rsquare",finish:"flat",border:"edge",orbit:"rays",orbitCount:6,lineStyle:"dashed",stops:4,innerRing:"1",accents:"none",textLayout:"spaced",topText:"BARUCH",bottomText:"SIGNAL",textSize:5.6,font:"Sora",seed:5}},
+  {no:6,name:"Lexington Express",kind:"Subway-map line · route green",
+   note:"Baruch's own route: a subway map line in Lexington Avenue green, climbing from Baruch toward orbit. The track never moves; the companion route flows beside it.",
+   pal:{name:"Route green on cream",paper:"#F3EEE3",ink:"#1C1C1C",ramp:["#00933C","#3CAE68","#9BD8AF"]},le:{},
+   st:{comp:"transit",shape:"square",finish:"flat",border:"ink",orbit:"rings",lineStyle:"rails",stops:5,innerRing:"1",accents:"dots",topText:"BARUCH COLLEGE",bottomText:"LEX AVE TO LOW EARTH ORBIT",textSize:5,font:"Inter Tight",seed:6}},
+];
+const pad2=n=>String(n).padStart(2,"0");
+function withLE(piece,fn){
+  const keep=S, idx=PALETTES.length; PALETTES.push(piece.pal);
+  S={...DEFAULTS,seed:piece.no*1000+7,...piece.st,palette:idx,textPreset:-1};
+  try{return fn()}finally{PALETTES.pop();S=keep}
+}
+function drawLE(ctx,px,piece,opts={}){
+  withLE(piece,()=>draw(ctx,px,{...opts,le:{...piece.le,stamp:`LIMITED EDITION · No. ${pad2(piece.no)} / ${pad2(LE.length)}`}}));
+}
 
 /* ===== alternative compositions (each one shows gravity fading differently) ===== */
 const DOTK={field:0.55,crystal:0.62}; // these use many dots, so all of them are drawn a bit smaller (still one size)
@@ -360,11 +445,11 @@ function drawAlt(c,u,cx,cy,L,r,ow,op,lineCol,rnd,avail){
     for(let i=0;i<legs;i++){const up=step*(0.45+0.25*rnd()), diag=step-up, nx=Math.max(cx-H*0.85,Math.min(cx+H*0.85,x+dir*diag));
       way.push([x,y-up]); way.push([nx,y-up-Math.abs(nx-x)]); y=y-up-Math.abs(nx-x); x=nx; dir=(Math.abs(x-cx)>H*0.4)?-Math.sign(x-cx):(rnd()<0.6?dir:-dir);}
     const dense=[]; for(let i=0;i<way.length-1;i++){for(let k=0;k<12;k++){const t=k/12;dense.push([way[i][0]+(way[i+1][0]-way[i][0])*t,way[i][1]+(way[i+1][1]-way[i][1])*t])}} dense.push(way[way.length-1]);
-    if(S.orbit!=="none"){stroke(offset(dense,3.4*u).map(p=>p),Math.max(.5,S.lineW*0.45*u),(p,t)=>Math.min(1,t+0.35))}
+    if(S.orbit!=="none"){if(moving()){c.setLineDash([1.6*u,2.4*u]);c.lineDashOffset=-AT*4*u*4}stroke(offset(dense,3.4*u),Math.max(.5,S.lineW*0.45*u),(p,t)=>Math.min(1,t+0.35));c.setLineDash([]);c.lineDashOffset=0}
     path(dense,(p,t)=>t);
     const stations=[way[0]].concat(way.filter((_,i)=>i>0&&i%2===0));
     stations.forEach((p,i)=>{const f=i/(stations.length-1);dot(p[0],p[1],f);const[bx,by]=bob(f);c.beginPath();c.arc(p[0]+bx,p[1]+by,r*0.42,0,Math.PI*2);c.fillStyle=PALETTES[S.palette].paper;c.fill()});
-    if(hasTravel()){const q=AT*(dense.length-1),i0=Math.floor(q),i1=Math.min(dense.length-1,i0+1),k=q-i0;const x=dense[i0][0]+(dense[i1][0]-dense[i0][0])*k,y=dense[i0][1]+(dense[i1][1]-dense[i0][1])*k;dot(x,y,AT,r*0.8,edgeA(AT))} // the train
+
   }
 }
 
@@ -372,17 +457,22 @@ function drawAlt(c,u,cx,cy,L,r,ow,op,lineCol,rnd,avail){
 function shapePath(c,u,inset=0){
   const cx=50*u,cy=50*u; c.beginPath();
   if(S.shape==="circle"){c.arc(cx,cy,(46-inset)*u,0,Math.PI*2)}
+  else if(S.shape==="badge"){c.roundRect((13+inset)*u,(3+inset)*u,(74-2*inset)*u,(94-2*inset)*u,Math.max(0,13-inset)*u)}
+  else if(S.shape==="shield"){const s=1-inset/46,P=(x,y)=>[(50+(x-50)*s)*u,(50+(y-50)*s)*u];
+    c.moveTo(...P(9,6));c.lineTo(...P(91,6));c.lineTo(...P(91,50));c.bezierCurveTo(...P(91,74),...P(68,88),...P(50,97));c.bezierCurveTo(...P(32,88),...P(9,74),...P(9,50));c.closePath()}
   else if(S.shape==="hex"){const R=(48-inset)*u;for(let i=0;i<6;i++){const a=i*Math.PI/3;const x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);i?c.lineTo(x,y):c.moveTo(x,y)}c.closePath()}
   else {const a=(4+inset)*u,w=(92-2*inset)*u,r=S.shape==="rsquare"?Math.max(0,(17-inset))*u:Math.max(0,(1.5-inset*0.3))*u; c.roundRect(a,a,w,w,r)}
 }
 function layout(u){
   const fs=S.textSize*u, circle=S.shape==="circle";
-  const block=S.textLayout==="block" && !circle;
+  const block=S.textLayout==="block" && !circle && S.shape!=="shield";
   let cy0=50*u, Lk=1, maxW=74*u, yTop, yBot;
   if(S.shape==="hex"){ yTop=(50-48*0.866+3.4)*u+fs*0.5; maxW=46*u; Lk=0.86; }
+  else if(S.shape==="badge"){ yTop=(3+3.4+1.6)*u+fs*0.5; maxW=58*u; Lk=0.92; }
+  else if(S.shape==="shield"){ yTop=(6+(S.border==="double"?6.2:3.4))*u+fs*0.5; yBot=72*u; maxW=52*u; Lk=0.74; cy0=43*u; }
   else { yTop=(4+(S.border==="double"?6.2:3.4)+(S.shape==="rsquare"?1.6:0))*u+fs*0.5; }
-  yBot=100*u-yTop;
-  if(block){cy0=(S.shape==="hex"?44:41)*u; Lk*=0.74}
+  if(yBot===undefined)yBot=100*u-yTop;
+  if(block&&S.shape!=="shield"){cy0=(S.shape==="hex"?44:41)*u; Lk*=0.74}
   return {fs,circle,block,cy0,Lk,maxW,yTop,yBot};
 }
 
@@ -393,13 +483,17 @@ function draw(ctx,px,opts={}){
 function drawCore(ctx,px,opts={}){
   const u=px/100, pal=PALETTES[S.palette], paper=pal.paper, ink=pal.ink;
   const cx=50*u, rnd=mulberry32(S.seed), Lo=layout(u), fs=Lo.fs;
-  const dark=lum(hex2rgb(paper))<0.25, stitch=S.finish==="stitch";
+  const dark=lum(hex2rgb(paper))<0.25, stitch=S.finish==="stitch"; const LEX=opts.le||{};
   ctx.save(); ctx.clearRect(0,0,px,px);
   if(!opts.transparent){ctx.fillStyle=opts.bg||"#E9E7E1";ctx.fillRect(0,0,px,px)}
 
   // patch base (+ soft shadow)
   ctx.save(); ctx.shadowColor="rgba(10,10,20,.28)"; ctx.shadowBlur=2.2*u; ctx.shadowOffsetY=0.7*u;
   ctx.fillStyle=paper; shapePath(ctx,u); ctx.fill(); ctx.restore();
+  if(LEX.cloth==="beta"){ // Beta cloth: fine woven glass-fibre fabric, printed (silkscreen) rather than stitched
+    ctx.save(); shapePath(ctx,u); ctx.clip(); ctx.lineWidth=Math.max(.5,.07*u); ctx.strokeStyle="rgba(60,50,30,.07)";
+    const g=Math.max(1.4,.36*u); ctx.beginPath(); for(let k=0;k<px;k+=g){ctx.moveTo(k,0);ctx.lineTo(k,px);ctx.moveTo(0,k);ctx.lineTo(px,k)} ctx.stroke(); ctx.restore();
+  }
   if(stitch){ // twill fabric
     ctx.save(); shapePath(ctx,u); ctx.clip(); ctx.lineWidth=Math.max(.5,.09*u);
     ctx.strokeStyle=dark?"rgba(255,255,255,.045)":"rgba(0,0,0,.05)";
@@ -441,21 +535,22 @@ function drawCore(ctx,px,opts={}){
   // orbits behind
   if(S.orbit==="coil"){
     const turns=Math.max(2,S.orbitCount), Th=turns*Math.PI*2; let b0=r*1.35; let a=(L*0.92-1.6*b0*op)/Th; if(a*1.7>b0){b0=a*1.7;a=(L*0.92-1.6*b0*op)/Th} a=Math.max(a,0.3*u); const pts=[];
-    for(let i=0;i<=1400;i++){const th=i/1400*Th,p=i/1400,b=b0*(1+(op-1)*p);const ph=hasTravel()?-AT*TAU:0;pts.push([cx+b*Math.sin(th+ph),yB-L*0.05-(a*th-b*0.8*Math.sin(th+ph+Math.PI/2)+b*0.8)])}
+    for(let i=0;i<=1400;i++){const th=i/1400*Th,p=i/1400,b=b0*(1+(op-1)*p);const ph=moving()?-AT*TAU:0;pts.push([cx+b*Math.sin(th+ph),yB-L*0.05-(a*th-b*0.8*Math.sin(th+ph+Math.PI/2)+b*0.8)])}
     strokePoly(pts,ow);
   } else if(S.orbit==="rings"){
     const k=Math.max(1,Math.min(4,Math.round(S.orbitCount/2)));
-    stops.forEach(s=>{for(let j=0;j<k;j++){const rx=r*(1.75+0.7*j)*(1+(op-1)*s.f*0.8),ry=rx*0.34,rot=-0.2;
+    stops.forEach((s,si)=>{for(let j=0;j<k;j++){const rx=r*(1.75+0.7*j)*(1+(op-1)*s.f*0.8),ry=rx*0.34*(moving()?(0.75+0.25*Math.cos(TAU*(AT+si/N+j*0.15))):1),rot=-0.2+(moving()?Math.sin(TAU*(AT+si/N))*0.25:0);
       const col=rgbStr(lerp(hex2rgb(paper),colorArr(s.f),1-0.18*j));
       c.strokeStyle=col;c.lineWidth=ow;c.beginPath();c.ellipse(cx,s.y,rx,ry,rot,Math.PI,Math.PI*2);c.stroke();
       frontLater.push(()=>{c.strokeStyle=col;c.lineWidth=ow;c.beginPath();c.ellipse(cx,s.y,rx,ry,rot,0,Math.PI);c.stroke()})}});
   } else if(S.orbit==="ellipses"){
     const k=Math.max(2,Math.min(6,S.orbitCount));
-    for(let j=0;j<k;j++){const rx=L*(0.06+0.075*(j+1))*(0.75+0.25*op),ry=L*0.52;strokePoly(ellipsePts(cx,cy0,rx,ry,0,0,Math.PI*2,220),ow)}
+    for(let j=0;j<k;j++){const rx=L*(0.06+0.075*(j+1))*(0.75+0.25*op)*(moving()?1+0.12*Math.sin(TAU*(AT+j/k)):1),ry=L*0.52;strokePoly(ellipsePts(cx,cy0,rx,ry,0,0,Math.PI*2,220),ow)}
   } else if(S.orbit==="halo"){
     const k=Math.max(2,Math.min(7,S.orbitCount));
     const maxR=Lo.circle?(46-2.6-1.8)*u-fs*1.0-2*u:(Lo.block?(S.shape==="hex"?24:27)*u:(50*u-Lo.yTop-fs*0.5-2.6*u)), minR=Math.min(maxR*0.8,L*0.42);
-    for(let j=0;j<k;j++){const R=minR+(maxR-minR)*(k===1?0:j/(k-1))*Math.min(1,0.55+0.3*op);strokePoly(ellipsePts(cx,cy0,R,R,0,0,Math.PI*2,260),ow)}
+    for(let j=0;j<k;j++){if(moving()){const p=(j/k+AT)%1,R=minR+(maxR-minR)*p;c.globalAlpha=Math.min(1,p/0.2,(1-p)/0.2);strokePoly(ellipsePts(cx,cy0,R,R,0,0,Math.PI*2,260),ow);c.globalAlpha=1;continue}
+      const R=minR+(maxR-minR)*(k===1?0:j/(k-1))*Math.min(1,0.55+0.3*op);strokePoly(ellipsePts(cx,cy0,R,R,0,0,Math.PI*2,260),ow)}
   }
 
   // line
@@ -471,7 +566,7 @@ function drawCore(ctx,px,opts={}){
   if(S.orbit==="rays"){
     const n=6+S.orbitCount*2;
     stops.forEach((s,i)=>{const start=r*(1.45+0.45*s.f*(op-0.6)),len=r*(0.45+0.55*s.f*op*0.6);c.strokeStyle=colorAt(s.f);c.lineWidth=ow;
-      for(let k=0;k<n;k++){const t=k/n*Math.PI*2+i*0.31;c.beginPath();c.moveTo(cx+Math.cos(t)*start,s.y+Math.sin(t)*start);c.lineTo(cx+Math.cos(t)*(start+len),s.y+Math.sin(t)*(start+len));c.stroke()}});
+      for(let k=0;k<n;k++){const t=k/n*Math.PI*2+i*0.31+(moving()?AT*TAU/n*(i%2?-1:1):0);c.beginPath();c.moveTo(cx+Math.cos(t)*start,s.y+Math.sin(t)*start);c.lineTo(cx+Math.cos(t)*(start+len),s.y+Math.sin(t)*(start+len));c.stroke()}});
   }
   // dots (all the same size)
   stops.forEach(s=>{const[bx,by]=bob(s.f);c.globalAlpha=s.a;c.beginPath();c.arc(cx+bx,s.y+by,r,0,Math.PI*2);c.fillStyle=colorAt(s.f);c.fill();c.globalAlpha=1});
@@ -495,7 +590,7 @@ function drawCore(ctx,px,opts={}){
   const cornerPts=Lo.block?corner.filter((_,i)=>i!==2):corner;
   if(S.accents==="dots"){cornerPts.forEach(([x,y])=>{c.beginPath();c.arc(x*u,y*u,0.85*u,0,7);c.fill()})}
   if(S.accents==="stars"){cornerPts.forEach(([x,y],i)=>{const s=(i%2?1.2:1.7)*u;star(c,x*u,y*u,s)})}
-  if(S.accents==="ticks"){c.lineWidth=0.7*u;const R=S.shape==="circle"?33:36;[[0,-1],[1,0],[0,1],[-1,0]].filter(d=>!(Lo.block&&d[1]===1)).forEach(([dx,dy])=>{c.beginPath();c.moveTo((50+dx*R)*u,(50+dy*R)*u);c.lineTo((50+dx*(R-2.6))*u,(50+dy*(R-2.6))*u);c.stroke()})}
+  if(S.accents==="ticks"){c.lineWidth=0.7*u;const R=S.shape==="circle"?33:36;[[0,-1],[1,0],[0,1],[-1,0]].filter(d=>!((Lo.block||(opts.le&&opts.le.stamp))&&d[1]===1)).forEach(([dx,dy])=>{c.beginPath();c.moveTo((50+dx*R)*u,(50+dy*R)*u);c.lineTo((50+dx*(R-2.6))*u,(50+dy*(R-2.6))*u);c.stroke()})}
 
   // ---- text ----
   c.fillStyle=ink; c.textBaseline='middle';
@@ -516,14 +611,21 @@ function drawCore(ctx,px,opts={}){
     c.fillStyle=ink;
   } else {
     c.font=font(700);
-    if(S.textLayout==="spaced"){const W=S.shape==="rsquare"?56*u:Lo.maxW*0.94;spread(c,T1,cx,Lo.yTop,W);spread(c,T2,cx,Lo.yBot,W)}
+    if(S.textLayout==="spaced"){const W=S.shape==="rsquare"?56*u:S.shape==="badge"?44*u:Lo.maxW*0.94;spread(c,T1,cx,Lo.yTop,W);spread(c,T2,cx,Lo.yBot,W)}
     else {tracked(c,T1,cx,Lo.yTop,0.16*fs,'center',Lo.maxW);tracked(c,T2,cx,Lo.yBot,0.16*fs,'center',Lo.maxW)}
+  }
+  if(LEX.stamp){ // limited edition number
+    const sfs=2.15*u; c.save(); c.font=`700 ${sfs}px "${S.font}",sans-serif`; c.fillStyle=inkMix(62); c.textBaseline='middle';
+    const y=Lo.circle?50*u+ringR-2.6*u:S.shape==="shield"?Lo.yBot+fs*0.5+3.4*u:(Lo.block?((S.shape==="hex"?74:76)*u+fs*2.3):Lo.yBot-fs*0.5-4.4*u);
+    if(Lo.circle){arcText(c,LEX.stamp,cx,50*u,ringR-2.3*u,false,0.22*sfs)}
+    else if(Lo.block){tracked(c,LEX.stamp,(S.shape==="hex"?27:14)*u,y,0.22*sfs,'left')} else tracked(c,LEX.stamp,cx,y,0.22*sfs,'center',(Lo.circle?40:Lo.maxW/u*0.9)*u);
+    c.restore();
   }
   // inner ring / rules
   if(S.innerRing==="1"){
     c.strokeStyle=inkMix(38); c.lineWidth=Math.max(.5,.5*u);
     if(Lo.circle){c.beginPath();c.arc(cx,50*u,ringR,0,Math.PI*2);c.stroke()}
-    else if(!Lo.block){const a=Lo.yTop+fs*0.5+1.7*u, w=Lo.maxW*0.5;c.beginPath();c.moveTo(cx-w,a);c.lineTo(cx+w,a);c.moveTo(cx-w,100*u-a);c.lineTo(cx+w,100*u-a);c.stroke()}
+    else if(!Lo.block){const a=Lo.yTop+fs*0.5+1.7*u, w=Lo.maxW*0.5;c.beginPath();const b=Lo.yBot-fs*0.5-1.7*u;c.moveTo(cx-w,a);c.lineTo(cx+w,a);c.moveTo(cx-w,b);c.lineTo(cx+w,b);c.stroke()}
     else {const y=(S.shape==="hex"?69:70.5)*u,x0=(S.shape==="hex"?27:14)*u;c.beginPath();c.moveTo(x0,y);c.lineTo(x0+10*u,y);c.stroke()}
   }
   // border
@@ -532,6 +634,13 @@ function drawCore(ctx,px,opts={}){
     c.strokeStyle=inkMix(60);c.lineWidth=Math.max(.5,.45*u);shapePath(c,u,4.1);c.stroke()}
   if(S.border==="double"){c.strokeStyle=ink;c.lineWidth=1.8*u;shapePath(c,u,0.9);c.stroke();c.lineWidth=0.7*u;shapePath(c,u,3.6);c.stroke()}
 
+  // metallic thread: a moving sheen over every stitched mark
+  if(LEX.metal){
+    c.save(); c.globalCompositeOperation='source-atop';
+    const sh=(AT===null?0.3:AT)*px*1.2-px*0.1, g=c.createLinearGradient(sh-px*0.6,0,sh+px*0.6,px);
+    const st=LEX.metal==="gold"?["#6E4F12","#E9C66A","#FFF1C2","#B98A27","#7A5A18"]:["#5E646E","#C9D0D9","#FFFFFF","#9AA2AD","#666D78"];
+    st.forEach((col,i)=>g.addColorStop(i/(st.length-1),col)); c.globalAlpha=0.9; c.fillStyle=g; c.fillRect(0,0,px,px); c.restore();
+  }
   // thread texture
   if(stitch){
     c.save(); c.globalCompositeOperation='source-atop';
@@ -540,6 +649,9 @@ function drawCore(ctx,px,opts={}){
     c.strokeStyle="rgba(0,0,0,.16)"; c.beginPath(); for(let k=-px+g/2;k<px*2;k+=g){c.moveTo(k,0);c.lineTo(k+px*0.55,px)} c.stroke();
     c.restore();
     ctx.save(); ctx.shadowColor="rgba(0,0,0,.35)"; ctx.shadowBlur=.35*u; ctx.shadowOffsetY=.18*u; ctx.drawImage(lay,0,0); ctx.restore();
+  } else if(LEX.glow){ // glow-in-the-dark thread
+    const pulse=AT===null?1:0.75+0.25*Math.sin(TAU*AT);
+    ctx.save(); shapePath(ctx,u); ctx.clip(); ctx.shadowColor=LEX.glow; ctx.shadowBlur=2.6*u*pulse; ctx.drawImage(lay,0,0); ctx.shadowBlur=1*u; ctx.drawImage(lay,0,0); ctx.restore();
   } else ctx.drawImage(lay,0,0);
   ctx.restore();
 }
@@ -731,13 +843,13 @@ document.querySelectorAll('.pop button[data-px]').forEach(b=>b.onclick=()=>{cons
 try{const a=JSON.parse(localStorage.getItem('patchAnim')||'null');if(a){A.style=a.style||A.style;A.dur=a.dur||A.dur;A.bg=a.bg||A.bg}}catch(e){}
 function saveAnim(){try{localStorage.setItem('patchAnim',JSON.stringify({style:A.style,dur:A.dur,bg:A.bg}))}catch(e){}}
 function syncAnimUI(){$('animStyle').value=A.style;$('animDur').value=A.dur;$('animDur').parentElement.querySelector('output').textContent=A.dur+" s";$('animBg').value=A.bg;
-  const lbl=A.playing?'❚❚ Pause':'▶ Play';$('playBtn').textContent=lbl;$('playBtn2').textContent=lbl}
+  const lbl=A.playing?'❚❚ Pause':'▶ Play';$('playBtn').textContent=lbl;$('playBtn2').textContent=lbl;$('lePlay').textContent=lbl}
 function tick(now){
   if(!A.playing)return;
-  if(now-A.last>=32){A.last=now;A.t=((now-A.start)/1000/A.dur)%1;draw(vctx,1050,{t:A.t});drawMini()}
+  if(now-A.last>=32){A.last=now;A.t=((now-A.start)/1000/A.dur)%1;if(leMode)drawLE(leCtx,1050,LE[leIdx],{t:A.t});else{draw(vctx,1050,{t:A.t});drawMini()}}
   requestAnimationFrame(tick);
 }
-function setPlay(on){A.playing=on;if(on){A.start=performance.now()-A.t*A.dur*1000;A.last=0;requestAnimationFrame(tick)}else{render()}syncAnimUI()}
+function setPlay(on){A.playing=on;if(on){A.start=performance.now()-A.t*A.dur*1000;A.last=0;requestAnimationFrame(tick)}else{render();renderLE()}syncAnimUI()}
 $('playBtn').onclick=()=>setPlay(!A.playing); $('playBtn2').onclick=()=>setPlay(!A.playing);
 $('animStyle').onchange=e=>{A.style=e.target.value;saveAnim();if(!A.playing)setPlay(true)};
 $('animDur').oninput=e=>{const t=A.t;A.dur=+e.target.value;A.start=performance.now()-t*A.dur*1000;saveAnim();syncAnimUI()};
@@ -746,26 +858,27 @@ $('animBg').onchange=e=>{A.bg=e.target.value;saveAnim()};
 /* video export: records exactly one seamless loop */
 let recording=false;
 async function exportVideo(){
-  $('exportMenu').classList.remove('open');
+  $('exportMenu').classList.remove('open');$('leExportMenu').classList.remove('open');
   if(recording)return;
-  const status=t=>{$('animStatus').textContent=t};
+  const status=t=>{$('animStatus').textContent=t;if(leMode)$('leKind').textContent=t};
   const types=['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
   const type=window.MediaRecorder?types.find(t=>MediaRecorder.isTypeSupported(t)):null;
   if(!type){status("This browser can't record video. Try Chrome or Edge.");return}
   const px=1080, cv=document.createElement('canvas'); cv.width=cv.height=px; const cc=cv.getContext('2d');
-  draw(cc,px,{t:0,bg:A.bg});
+  drawActive(cc,px,{t:0,bg:A.bg});
   const stream=cv.captureStream(30), rec=new MediaRecorder(stream,{mimeType:type,videoBitsPerSecond:10000000}), chunks=[];
   rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
   const done=new Promise(res=>rec.onstop=res);
-  recording=true; const btns=[$('vidBtn'),$('vidBtn2')]; btns.forEach(b=>b.disabled=true);
+  recording=true; const btns=[$('vidBtn'),$('vidBtn2'),$('leVid')]; btns.forEach(b=>b.disabled=true);
   rec.start(250); const t0=performance.now(), total=A.dur*1000;
-  await new Promise(res=>{const step=now=>{const el=now-t0; if(el>=total){draw(cc,px,{t:0,bg:A.bg});res();return}
-    draw(cc,px,{t:el/total,bg:A.bg}); status(`Recording… ${(el/1000).toFixed(1)} / ${A.dur} s (keep this tab open)`); requestAnimationFrame(step)}; requestAnimationFrame(step)});
+  await new Promise(res=>{const step=now=>{const el=now-t0; if(el>=total){drawActive(cc,px,{t:0,bg:A.bg});res();return}
+    drawActive(cc,px,{t:el/total,bg:A.bg}); status(`Recording… ${(el/1000).toFixed(1)} / ${A.dur} s (keep this tab open)`); requestAnimationFrame(step)}; requestAnimationFrame(step)});
   await new Promise(r=>setTimeout(r,120)); rec.stop(); await done;
   const ext=type.includes('mp4')?'mp4':'webm', blob=new Blob(chunks,{type:type.split(';')[0]}), url=URL.createObjectURL(blob);
-  download(url,`baruch-patch-${S.seed}-${A.style}.${ext}`); setTimeout(()=>URL.revokeObjectURL(url),4000);
+  download(url,`${activeName()}-${A.style}.${ext}`); setTimeout(()=>URL.revokeObjectURL(url),4000);
   status(`Saved ${ext.toUpperCase()} · ${A.dur} s loop · 1080 × 1080.`+(ext==='webm'?' (WebM plays in browsers; convert to MP4 if a site needs it.)':''));
   recording=false; btns.forEach(b=>b.disabled=false);
+  if(leMode)setTimeout(()=>{if(leMode)$('leKind').textContent=LE[leIdx].kind},3500);
 }
 $('vidBtn').onclick=exportVideo; $('vidBtn2').onclick=exportVideo;
 
@@ -783,14 +896,51 @@ function drawTray(){const t=$('thumbs');
 $('saveBtn').onclick=()=>{saved.unshift({state:{...S},thumb:pngURL(160,true)});saved=saved.slice(0,24);persist();drawTray()};
 $('dlAll').onclick=async()=>{const k=S;for(const v of saved){S={...DEFAULTS,...v.state};download(pngURL(1050,$('transparent').checked),`baruch-patch-${S.seed}-1050.png`);await new Promise(r=>setTimeout(r,350))}S=k;render()};
 
+/* ===== Limited Edition tab ===== */
+let leMode=false, leIdx=0; const leCtx=$('leView').getContext('2d');
+const drawActive=(cc,px,o)=>leMode?drawLE(cc,px,LE[leIdx],o):draw(cc,px,o);
+const activeName=()=>leMode?`baruch-limited-edition-${pad2(LE[leIdx].no)}-${LE[leIdx].name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}`:`baruch-patch-${S.seed}`;
+function renderLE(){
+  if(!leMode)return; const p=LE[leIdx];
+  drawLE(leCtx,1050,p,{t:A.playing?A.t:null});
+  $('leTitle').textContent=`No. ${pad2(p.no)} / ${pad2(LE.length)} · ${p.name}`;
+  $('leKind').textContent=p.kind; $('leNote').textContent=p.note; $('leCount').textContent=`Edition of ${LE.length}`;
+  document.querySelectorAll('.le-item').forEach((b,i)=>b.classList.toggle('on',i===leIdx));
+  document.querySelectorAll('#leStrip .thumb').forEach((b,i)=>b.style.opacity=i===leIdx?1:.55);
+}
+function buildLE(){
+  const list=$('leList'), strip=$('leStrip'); list.innerHTML=''; strip.innerHTML='';
+  LE.forEach((p,i)=>{
+    const cv=document.createElement('canvas'); cv.width=cv.height=112; drawLE(cv.getContext('2d'),112,p,{transparent:true});
+    const b=document.createElement('button'); b.className='le-item'; b.appendChild(cv);
+    b.insertAdjacentHTML('beforeend',`<div><b>No. ${pad2(p.no)} · ${p.name}</b><span>${p.kind}</span></div>`);
+    b.onclick=()=>{leIdx=i;renderLE()}; list.appendChild(b);
+    const t=document.createElement('div'); t.className='thumb'; const im=new Image(); im.src=cv.toDataURL(); im.alt=p.name; im.title=`No. ${pad2(p.no)} · ${p.name}`; im.onclick=()=>{leIdx=i;renderLE()}; t.appendChild(im); strip.appendChild(t);
+  });
+}
+function setTab(le){
+  leMode=le; document.body.classList.toggle('le-mode',le);
+  $('tabStudio').classList.toggle('on',!le); $('tabLE').classList.toggle('on',le);
+  $('studioPanel').classList.toggle('off',le); $('studioGen').classList.toggle('off',le); $('lePanel').classList.toggle('off',!le);
+  $('studioMain').classList.toggle('off',le); $('leMain').classList.toggle('off',!le);
+  if(le){buildLE();renderLE()}else render();
+}
+$('tabStudio').onclick=()=>setTab(false); $('tabLE').onclick=()=>setTab(true);
+$('lePlay').onclick=()=>setPlay(!A.playing);
+$('leExportBtn').onclick=e=>{e.stopPropagation();$('leExportMenu').classList.toggle('open')};
+document.addEventListener('click',e=>{if(!$('leExportMenu').contains(e.target))$('leExportMenu').classList.remove('open')});
+document.querySelectorAll('#leExportMenu [data-lepx]').forEach(b=>b.onclick=()=>{const px=+b.dataset.lepx,cv=document.createElement('canvas');cv.width=cv.height=px;
+  drawLE(cv.getContext('2d'),px,LE[leIdx],{transparent:$('leTransparent').checked,bg:"#FFFFFF"});download(cv.toDataURL('image/png'),`${activeName()}-${px}.png`);$('leExportMenu').classList.remove('open')});
+$('leVid').onclick=exportVideo;
+
 document.addEventListener('keydown',e=>{
   if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;
-  const k=e.key.toLowerCase(); if(k==='g')generate(); if(k==='s')$('saveBtn').click(); if(k==='v')showVariations(); if(k==='r')remix(); if(k==='p')setPlay(!A.playing);
+  const k=e.key.toLowerCase(); if(k==='p')setPlay(!A.playing); if(leMode){if(k==='arrowright'||k==='arrowleft'){leIdx=(leIdx+(k==='arrowright'?1:LE.length-1))%LE.length;renderLE()}return} if(k==='g')generate(); if(k==='s')$('saveBtn').click(); if(k==='v')showVariations(); if(k==='r')remix(); 
   if(k==='escape')document.querySelectorAll('.modal').forEach(m=>m.classList.remove('on'));
 });
 try{if(localStorage.getItem('patchMini')==='0')$('mini').classList.add('hidden'),$('miniToggle').checked=false}catch(e){}
 syncUI();syncAnimUI();drawTray();render();
-Promise.all(["Archivo","Inter Tight","Space Grotesk","Sora"].flatMap(f=>[`700 40px "${f}"`,`400 40px "${f}"`]).map(f=>document.fonts.load(f).catch(()=>{}))).then(render);
+Promise.all(["Archivo","Inter Tight","Space Grotesk","Sora"].flatMap(f=>[`700 40px "${f}"`,`400 40px "${f}"`]).map(f=>document.fonts.load(f).catch(()=>{}))).then(()=>{render();if(leMode){buildLE();renderLE()}});
 </script>
 </body>
 </html>
