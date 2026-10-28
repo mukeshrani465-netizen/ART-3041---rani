@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Patch · Session 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1C1B17;
+  --text: #4a4a4a;
+  --muted: #8a8a8a;
+  --pink: #F8DCE3;
+  --pink-deep: #C9788D;
+  --line: #ececec;
+  --bg: #ffffff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--text); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { color: var(--ink); }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 100px; }
+.back { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; text-decoration: none; color: var(--muted); }
+.back:hover { color: var(--ink); }
+
+header { margin: 40px 0 56px; }
+.kicker { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--pink-deep); }
+h1 {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: clamp(32px, 6vw, 46px); line-height: 1.08; letter-spacing: -0.02em;
+  color: var(--ink); margin: 10px 0 16px;
+}
+.lede { max-width: 600px; }
+.meta { margin-top: 14px; font-size: 14px; color: var(--muted); }
+
+h2 {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 26px; letter-spacing: -0.01em; color: var(--ink);
+  margin: 72px 0 8px;
+}
+.section-note { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+
+/* Picks */
+.pick {
+  display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: start;
+  padding: 28px 0; border-top: 1px solid var(--line);
+}
+.pick:last-of-type { border-bottom: 1px solid var(--line); }
+.pick figure img {
+  width: 100%; height: auto; display: block;
+  border-radius: 14px; background: #f6f6f6;
+}
+.pick figcaption { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.pick h3 {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px;
+  color: var(--ink); margin-bottom: 8px;
+}
+.pick .num { color: var(--pink-deep); margin-right: 8px; }
+.pick p + p { margin-top: 12px; }
+.keep {
+  margin-top: 16px; padding: 12px 14px; border-radius: 10px;
+  background: var(--pink); color: var(--ink); font-size: 15px;
+}
+.keep strong { font-weight: 600; }
+
+/* v2 */
+.v2 { display: grid; grid-template-columns: 300px 1fr; gap: 32px; align-items: start; }
+.v2-art svg, .v2-art img { width: 100%; height: auto; display: block; }
+.v2-art .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.v2 ul { list-style: none; margin-top: 14px; }
+.v2 li { padding: 8px 0 8px 18px; position: relative; border-bottom: 1px solid var(--line); font-size: 15px; }
+.v2 li::before { content: ""; position: absolute; left: 0; top: 17px; width: 7px; height: 7px; border-radius: 50%; background: var(--pink-deep); }
+.v2 li b { color: var(--ink); font-weight: 600; }
+.drawing { margin-top: 28px; }
+.drawing img { max-width: 100%; border-radius: 14px; display: block; }
+
+/* Questions */
+.qa { counter-reset: q; }
+.qa div { padding: 18px 0; border-top: 1px solid var(--line); }
+.qa div:last-child { border-bottom: 1px solid var(--line); }
+.qa dt { font-weight: 600; color: var(--ink); counter-increment: q; }
+.qa dt::before { content: counter(q) ". "; color: var(--pink-deep); font-family: 'Space Grotesk', sans-serif; }
+.qa dd { margin-top: 6px; }
+
+footer { margin-top: 72px; font-size: 13px; color: var(--muted); }
+
+@media (max-width: 640px) {
+  .wrap { padding-top: 32px; }
+  .pick, .v2 { grid-template-columns: 1fr; }
+  .pick figure, .v2-art { max-width: 320px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="index.html#recent-hw">← All projects</a>
+
+  <header>
+    <p class="kicker">SSEP Mission Patch · Session 3 · Homework</p>
+    <h1>Using the tool to find new directions</h1>
+    <p class="lede">I ran my <em>Gravity Fading</em> patch generator, pulled out two variations with potential, wrote down what works in each, and combined them into version 2 of the patch.</p>
+    <p class="meta">ART 3041 · A.I. for Designers · Fall 2026 · Assignment page: <a href="https://bwackv.github.io/aifd-site/assets/projects/ssep-mission-patch/session-3.html">Session 3</a></p>
+  </header>
+
+  <!-- ===== 1. Ideating: two picks ===== -->
+  <h2>1 · Two variations worth keeping</h2>
+  <p class="section-note">Both were made with my v1 tool (<a href="mission-patch-generator.html">Mission Patch Generator</a>).</p>
+
+  <article class="pick">
+    <figure>
+      <img src="session3-pick-1.png" alt="Round cream patch with a violet ring. A vertical line rises through the centre with three dots fading from dark violet at the bottom to pale lilac at the top, wrapped by a loose coil. Rim text reads BARUCH COLLEGE and ISS · 2027." loading="lazy">
+      <figcaption>Composition: Line · orbit: Coil · palette: Violet on cream</figcaption>
+    </figure>
+    <div>
+      <h3><span class="num">01</span>Coil orbit on a single line</h3>
+      <p>A vertical line rises through the centre of a cream circle, with three violet dots fading from dark at the bottom to pale at the top. A continuous coil loops around the line like a spring and loosens as it climbs, so the object seems to unwind as gravity lets go. The double ring and curved BARUCH COLLEGE / ISS · 2027 rim text make it read as an official seal.</p>
+      <p>I chose it because it is the clearest version of "Gravity Fading": the darkness of the dots and the loose coil tell the whole story without extra imagery.</p>
+      <p class="keep"><strong>What I'd keep:</strong> the coil that opens with height, and the circular rim text.</p>
+    </div>
+  </article>
+
+  <article class="pick">
+    <figure>
+      <img src="session3-pick-2.png" alt="Rounded-square navy patch with a stitched white border and small stars. A subway-map route climbs with 45-degree bends through three ringed stations that fade from white at the bottom to blue at the top. BARUCH COLLEGE and SSEP · ISS 2027 sit in the lower left." loading="lazy">
+      <figcaption>Composition: Subway map · finish: Embroidered · palette: Sky on deep blue</figcaption>
+    </figure>
+    <div>
+      <h3><span class="num">02</span>Subway map on night fabric</h3>
+      <p>A transit-map route climbs with 45° bends across deep navy fabric, linking three ringed stations. The bottom station is bright white and each station above sinks into blue, so the route fades into space as it rises. The diagonal steps feel like a real subway map turned toward the sky, and the stitched texture, double border and small stars make it look like a real embroidered mission patch.</p>
+      <p>I chose it because it makes the Baruch part (the New York subway) obvious, and the dark background finally makes it read as space.</p>
+      <p class="keep"><strong>What I'd keep:</strong> the ringed station dots, the dark fabric with the white-to-blue fade, and the stitched finish.</p>
+    </div>
+  </article>
+
+  <!-- ===== 2. Version 2 ===== -->
+  <h2>2 · Patch version 2</h2>
+  <p class="section-note">One design that takes the strongest parts of both picks.</p>
+
+  <div class="v2">
+    <div class="v2-art">
+      <svg viewBox="0 0 400 400" role="img" aria-labelledby="v2t">
+        <title id="v2t">Patch v2: round navy patch, a subway route with one 45-degree bend rising through three ringed stations that fade from white to blue, a coil around the top of the route, rim text BARUCH COLLEGE and ISS · 2027.</title>
+        <defs>
+          <linearGradient id="fade" x1="0" y1="300" x2="0" y2="100" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#FFFFFF"/>
+            <stop offset="1" stop-color="#4F72C6"/>
+          </linearGradient>
+          <path id="rimTop" d="M 46 200 A 154 154 0 0 1 354 200"/>
+          <path id="rimBot" d="M 36 200 A 164 164 0 0 0 364 200"/>
+        </defs>
+        <!-- fabric + border -->
+        <circle cx="200" cy="200" r="194" fill="#E9ECF4"/>
+        <circle cx="200" cy="200" r="186" fill="#13214A"/>
+        <circle cx="200" cy="200" r="178" fill="none" stroke="#F1F3FA" stroke-width="3"/>
+        <circle cx="200" cy="200" r="132" fill="none" stroke="#6E86C9" stroke-width="1.2" opacity=".55"/>
+        <!-- small stars -->
+        <g fill="#B9C6E8">
+          <path d="M120 128 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z"/>
+          <path d="M292 270 l1.6 5 5 1.6 -5 1.6 -1.6 5 -1.6 -5 -5 -1.6 5 -1.6z"/>
+          <path d="M284 140 l1.2 3.6 3.6 1.2 -3.6 1.2 -1.2 3.6 -1.2 -3.6 -3.6 -1.2 3.6 -1.2z"/>
+        </g>
+        <!-- rim text -->
+        <text font-family="Space Grotesk, sans-serif" font-weight="700" font-size="25" letter-spacing="5" fill="#F1F3FA" text-anchor="middle">
+          <textPath href="#rimTop" startOffset="50%">BARUCH COLLEGE</textPath>
+        </text>
+        <text font-family="Space Grotesk, sans-serif" font-weight="700" font-size="22" letter-spacing="5" fill="#F1F3FA" text-anchor="middle">
+          <textPath href="#rimBot" startOffset="50%">ISS · 2027</textPath>
+        </text>
+        <circle cx="38" cy="200" r="3.5" fill="#F1F3FA"/>
+        <circle cx="362" cy="200" r="3.5" fill="#F1F3FA"/>
+        <!-- coil (back halves) around the upper route -->
+        <g fill="none" stroke="#6E86C9" stroke-width="2.4" stroke-linecap="round" opacity=".55">
+          <path d="M 211 172 A 14 6 -12 0 1 239 166"/>
+          <path d="M 205 148 A 20 7 -12 0 1 245 140"/>
+          <path d="M 199 124 A 26 8 -12 0 1 251 114"/>
+        </g>
+        <!-- route: up, one 45° bend, up -->
+        <path d="M 172 292 V 238 L 225 185 V 104" fill="none" stroke="url(#fade)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- coil (front halves) -->
+        <g fill="none" stroke-width="2.4" stroke-linecap="round">
+          <path d="M 239 166 A 14 6 -12 0 1 211 172" stroke="#A9BCEB"/>
+          <path d="M 245 140 A 20 7 -12 0 1 205 148" stroke="#8CA4E0"/>
+          <path d="M 251 114 A 26 8 -12 0 1 199 124" stroke="#6E8BD6"/>
+        </g>
+        <!-- ringed stations: Baruch (white) → launch → ISS (blue) -->
+        <circle cx="172" cy="292" r="15" fill="#FFFFFF"/><circle cx="172" cy="292" r="5.5" fill="#13214A"/>
+        <circle cx="198.5" cy="211.5" r="15" fill="#A9BCEB"/><circle cx="198.5" cy="211.5" r="5.5" fill="#13214A"/>
+        <circle cx="225" cy="104" r="15" fill="#4F72C6"/><circle cx="225" cy="104" r="5.5" fill="#13214A"/>
+      </svg>
+      <p class="note">Digital mockup of v2, made from my notes.</p>
+    </div>
+    <div>
+      <p>A round patch on navy fabric. A subway route rises from the bottom with one 45° bend, and three ringed stations fade from white (Baruch) to blue (ISS). The coil from Variation 1 wraps only the upper part of the route, so the object starts floating once it leaves the ground.</p>
+      <ul>
+        <li><b>From pick 1:</b> the opening coil, the circle shape, curved rim text</li>
+        <li><b>From pick 2:</b> the 45° subway bend, ringed stations, navy fabric, white-to-blue fade</li>
+        <li><b>New:</b> the coil starts only after the launch station, so "lift-off" has a visible moment</li>
+        <li><b>Rim text:</b> BARUCH COLLEGE (top) · ISS · 2027 (bottom), white thread</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hand drawing: upload a photo named v2-drawing.jpg to show it here -->
+  <figure class="drawing" id="drawing">
+    <img src="v2-drawing.jpg" alt="Hand drawing of patch version 2" onerror="document.getElementById('drawing').remove()">
+  </figure>
+
+  <!-- ===== 3. Questions ===== -->
+  <h2>3 · Questions about the new design</h2>
+  <p class="section-note">From the Session 3 homework.</p>
+
+  <dl class="qa">
+    <div>
+      <dt>What message do you see?</dt>
+      <dd>Something leaves Baruch on an ordinary subway line and gets lighter until it floats in orbit. A Baruch experiment is going to space.</dd>
+    </div>
+    <div>
+      <dt>What feels distinctly Baruch?</dt>
+      <dd>The subway route and ringed stations. Baruch is a commuter school in Manhattan, and the subway is how most students get there.</dd>
+    </div>
+    <div>
+      <dt>What feels distinctly space research?</dt>
+      <dd>The fade into the dark fabric, which stands for loss of gravity, and the orbit coil. Together they show microgravity, the condition the experiment tests.</dd>
+    </div>
+    <div>
+      <dt>What image would you remember tomorrow?</dt>
+      <dd>A subway line climbing into a night sky and starting to spiral.</dd>
+    </div>
+    <div>
+      <dt>What would be lost if this symbol disappeared?</dt>
+      <dd>The link between everyday student life at Baruch and the space station. Without the route, the patch is just another orbit graphic.</dd>
+    </div>
+    <div>
+      <dt>What elements of your variants would you like to see in your new design?</dt>
+      <dd>The opening coil from Variation 1, and the bends, ringed stations, navy fabric, light-to-dark fade and stitched finish from Variation 2.</dd>
+    </div>
+  </dl>
+
+  <footer>
+    <a href="index.html#recent-hw">← Back to Recent HW</a>
+  </footer>
+
+</div>
+</body>
+</html>
