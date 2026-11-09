@@ -1,6 +1,6 @@
-# brand-skills.md (v1.2) — Glossier × NYC Subway: *Stand Clear of the Glossy Doors*
+# brand-skills.md (v1.3) — Glossier × NYC Subway: *Stand Clear of the Glossy Doors*
 
-_v1.2: every print ad gets its own **ad concept** (§9a) so a series never repeats one layout; only a small campaign signature is shared. v1.1: print ads default to **ad only** (flat artwork, no surroundings); the NYC mockup is optional (professor feedback, Nov 9)._
+_v1.3: visual styles (§9b), consistency lock and the "Fix an image" ad critic (§14). v1.2: every print ad gets its own **ad concept** (§9a) so a series never repeats one layout; only a small campaign signature is shared. v1.1: print ads default to **ad only** (flat artwork, no surroundings); the NYC mockup is optional (professor feedback, Nov 9)._
 
 _Rulebook for the **Prompt Builder Tool** (`prompt-builder.html`). Every image prompt the tool writes must obey these rules; the choices in the tool only vary things *inside* them. Source: `creative-director-style-guide.html` (Pt. 1 Style Guide) and the Dynamic Hero prompt. Target image generator: **ChatGPT (GPT image)**; prompts are written in plain descriptive sentences, not keyword soup._
 
@@ -124,6 +124,11 @@ Each ad in a series uses a **different concept**, headline, tint and format. Nev
 
 **Campaign signature (the only thing every ad shares, kept small):** the round line bullet of the hero tint, the G bullet + "Glossier × NYC Subway" in one corner, the caption "LIMITED EDITION · NYC ONLY", and a thin yellow platform-edge stripe along one edge.
 
+## 9b. Visual styles & consistency
+- **Styles:** Photo (editorial, default) · Flat illustration · Risograph print · 3D render · Paper collage · Vintage 1970s MTA poster. A style changes only the rendering; composition, palette, exact text and every hard rule stay.
+- **Mix:** in a series, each ad may get a different style.
+- **Consistency lock:** the whole series reads as one shoot: the same person (described word for word in every prompt), the same light, colour grade, grain, typography and margins.
+
 ## 10. Angles & framing
 Eye level · low angle (looking up at the billboard / poster) · high angle / overhead (flat lay) · over-the-shoulder into a window reflection · close-up · extreme macro · wide establishing (whole platform or street) · three-quarter view · through the subway door window · mirror/reflection shot.
 
@@ -151,3 +156,5 @@ Eye level · low angle (looking up at the billboard / poster) · high angle / ov
 - Is it clearly NYC transit (tile, steel, bullets, platform edge)?
 - Is all text spelled right and short?
 - Would it make a New Yorker smile on the way to work?
+
+**If not, fix it (ad critic):** tick what went wrong in the tool's *Fix an image* panel (misspelled headline, extra text, wrong tube, wrong tint, not pink enough, too much yellow, plastic skin, bad hands, wrong G logo, wrong bullet, generic layout, surroundings showing, too busy, too dark). It writes an edit prompt that keeps the image and changes only those things; paste it into the same ChatGPT chat.

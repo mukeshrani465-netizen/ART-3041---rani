@@ -58,6 +58,7 @@ button.b:hover{opacity:.88}
 .neg{margin-top:12px;font-size:13px;color:#555;background:#fafafa;border-radius:10px;padding:12px 14px;white-space:pre-wrap}
 .neg b{color:var(--black)}
 .checks{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:13px;color:#444}
+.fixes{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}.fixes label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;cursor:pointer}.fixes input{accent-color:#1A1A1A;margin-top:3px}
 .checks span::before{content:"✓ ";font-weight:700;color:#00933C}
 
 /* series */
@@ -125,6 +126,10 @@ footer{max-width:1320px;margin:0 auto;padding:10px 28px 40px;font-size:12px;colo
     <div><label class="f" for="ratio">Aspect ratio</label><select id="ratio"></select></div>
     <div><label class="f" for="gen">Generator</label><select id="gen"></select></div>
   </div>
+  <h2>4 · Look & series</h2>
+  <label class="f" for="style">Visual style</label>
+  <select id="style"></select>
+  <label class="chk"><input type="checkbox" id="lock"> <span><b>Consistency lock</b> — same person, light and finish across the whole 5-ad series (one photo shoot)</span></label>
   <label class="f" for="extra">Extra direction (optional)</label>
   <textarea id="extra" placeholder="e.g. she's laughing, rain on the window, holiday coat"></textarea>
 
@@ -151,13 +156,21 @@ footer{max-width:1320px;margin:0 auto;padding:10px 28px 40px;font-size:12px;colo
     <div class="checks" id="checks"></div>
   </div>
 
+  <div class="panel out" style="margin-top:24px">
+    <div class="top"><h3>Fix an image <span class="meta" style="font-size:11px">ad critic</span></h3><button class="b" id="fixCopy">Copy fix prompt</button></div>
+    <p class="empty" style="margin:0 0 10px">Generated an image with this prompt? Tick what went wrong, then paste the fix prompt into the same ChatGPT chat.</p>
+    <div class="fixes" id="fixes"></div>
+    <input type="text" id="fixNote" placeholder="Anything else to fix (optional)" style="margin-top:10px">
+    <div class="prompt" id="fixOut" style="margin-top:12px;border-left-color:#1A1A1A"></div>
+  </div>
+
   <div class="series">
     <div class="panel">
       <div class="out"><div class="top" style="margin:0">
         <h3>5-ad print series</h3>
         <button class="mini" id="copyAll" style="display:none">Copy all 5</button>
       </div></div>
-      <p class="empty" id="seriesEmpty">Click <b>Build 5-ad series</b> for one ad per borough, each with its own concept, headline and format. Click again for a new mix. Uses the "Show the ad as" setting (ad only by default).</p>
+      <p class="empty" id="seriesEmpty">Click <b>Build 5-ad series</b> for one ad per borough, each with its own concept and headline: just the ad, 4:5 portrait, no placement. Click again for a new mix.</p>
       <div id="seriesList"></div>
     </div>
     <div class="panel" style="margin-top:24px">
@@ -169,7 +182,7 @@ footer{max-width:1320px;margin:0 auto;padding:10px 28px 40px;font-size:12px;colo
 </section>
 </main>
 
-<footer>ART 3150 · AI for Designers · Become a Crea(i)tive Director · Prompt Builder (brand-skills.md v1.2). A student project, not affiliated with Glossier or the MTA. Shortcuts: S shuffle · F series · C copy.</footer>
+<footer>ART 3150 · AI for Designers · Become a Crea(i)tive Director · Prompt Builder (brand-skills.md v1.3). A student project, not affiliated with Glossier or the MTA. Shortcuts: S shuffle · F series · C copy.</footer>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -192,6 +205,7 @@ const TYPES={
  reel:{label:"Social / reel frame",s:t=>`A vertical phone-camera frame, like a still from a social reel, of {person} on the subway holding a Glossier Balm Dotcom tube in ${t.name} (${t.desc}) up to the camera and smiling`,person:true}
 };
 const PLACES={
+ none:{label:"None (just the ad)",s:"as a framed portrait poster on a white-tiled NYC subway platform wall",ratio:"4:5"},
  card:{label:"Subway car card",s:"as a long horizontal car card above the seats inside a clean NYC subway car, with riders sitting below it",ratio:"3:1"},
  platform:{label:"Platform poster",s:"as a large framed portrait poster on a white-tiled NYC subway platform wall, with the yellow platform edge in the foreground",ratio:"2:3"},
  takeover:{label:"Station takeover",s:"as a full station takeover: stairs, columns and walls of an NYC subway station wrapped in the campaign in Balm Pink, commuters walking through",ratio:"16:9"},
@@ -266,12 +280,37 @@ const CONCEPTS={
  crowd:{label:"Rush hour",copy:"Rush hour, but make it dewy.",people:true,
   v:(t,st)=>`Photograph from inside a crowded but calm subway car at rush hour, shallow depth of field: everyone is a soft blur except ${PEOPLE[st.person]} in sharp focus in the centre, calmly applying ${t.desc} Balm Dotcom. Warm Balm Pink colour cast. Headline on a black sign band across the top.`}
 };
+const STYLES={
+ photo:{label:"Photo (editorial)",s:""},
+ illus:{label:"Flat illustration",s:"render the whole ad as a clean flat vector illustration with simple shapes, no outlines, soft grain texture, like a modern editorial illustration."},
+ riso:{label:"Risograph print",s:"render the whole ad as a two-to-three colour risograph print in Balm Pink, Sign Black and the hero tint, with slight misregistration, halftone dots and paper texture."},
+ render3d:{label:"3D render",s:"render the whole ad as a soft, glossy 3D product render with clay-smooth surfaces, studio lighting and a dreamy pink set."},
+ collage:{label:"Paper collage",s:"render the whole ad as a cut-paper collage: torn subway map scraps, cut-out photo of the tube, tape and paper textures, still clean and minimal."},
+ vintage:{label:"Vintage 1970s MTA poster",s:"render the whole ad as a 1970s NYC transit poster: Vignelli-era Helvetica layout, flat printed colours, slightly faded paper, simple geometric shapes."},
+ mix:{label:"Mix (different style per ad in the series)",s:""}
+};
+const FIXES=[
+ ["text","Headline is misspelled or garbled",(h)=>`Fix the headline so it reads exactly "${h}" — correct spelling, one line or a clean break, bold sans serif.`],
+ ["extra","Extra or made-up text appeared",()=>`Remove all extra or invented text; keep only the headline, "Glossier × NYC Subway" and "LIMITED EDITION · NYC ONLY".`],
+ ["tube","Tube doesn't look like Balm Dotcom",(h,t)=>`Make the product a soft squeezable translucent tube with a flat crimped end and a small round cap, ${t.desc} balm showing through.`],
+ ["tint","Wrong tint colour",(h,t)=>`Change the balm colour to ${t.desc} (${t.hex}); keep everything else.`],
+ ["pink","Not pink enough / wrong palette",()=>`Make Balm Pink (#F7CAD0) the dominant colour (about half the image); use black and tile white for the rest; yellow only as a thin stripe.`],
+ ["yellow","Too much yellow",()=>`Reduce yellow to a single thin platform-edge stripe along one edge.`],
+ ["skin","Skin looks plastic / too retouched",()=>`Make the skin natural with visible texture and pores, minimal makeup; lips sheer and glossy, not opaque.`],
+ ["hands","Hands or fingers are wrong",()=>`Fix the hands: natural, five fingers, relaxed grip, short natural nails.`],
+ ["logo","G logo is wrong",()=>`Make the logo a perfect pink circle (#E9A3AE) with a white bold letter G inside, small, in one corner; never yellow.`],
+ ["bullet","Subway bullet wrong",(h,t)=>`Make the subway bullet a perfect circle in ${t.lineHex} with a white bold "${t.line}" inside.`],
+ ["generic","Looks generic / same as other ads",(h,t,c)=>`Push the concept harder: ${c?c.label+" — make that idea the whole composition, bold and unexpected":"make the layout more distinctive"}; avoid a centred product under a header band.`],
+ ["surround","Shows surroundings, not just the ad",()=>`Show only the flat ad artwork, straight on, edge to edge — no wall, frame, street, station or perspective.`],
+ ["busy","Too busy / cluttered",()=>`Simplify: remove clutter, add more empty Balm Pink space, keep one focal point.`],
+ ["dark","Too dark or gritty",()=>`Brighten it: soft, warm, clean light; no grime, no dark mood.`]
+];
 const RATIOS=["1:1","2:3","3:2","4:5","16:9","9:16","3:1"];
 const GENS={chatgpt:"ChatGPT (GPT image)",midjourney:"Midjourney",gemini:"Gemini / Imagen",firefly:"Adobe Firefly"};
 const NEG="no heavy makeup, no plastic or airbrushed skin, no opaque lipstick, no gradients, no neon, no dark or gritty mood, no trash or dirt, no extra logos or brand names, no misspelled text, no extra fingers, no distorted hands, no warped product, no invented subway line colours, no yellow G, no clutter";
 
 /* ===== STATE ===== */
-const DEF={tint:"plum",second:false,tint2:"cherry",type:"lifestyle",view:"flat",concept:"mirror",place:"platform",setting:"auto",angle:"ots",light:"golden",person:"a",copy:"{concept}",custom:"",ratio:"4:5",gen:"chatgpt",extra:""};
+const DEF={tint:"plum",second:false,tint2:"cherry",type:"lifestyle",view:"flat",concept:"mirror",place:"none",setting:"auto",angle:"ots",light:"golden",person:"a",style:"photo",lock:false,copy:"{concept}",custom:"",ratio:"4:5",gen:"chatgpt",extra:""};
 let S={...DEF};
 const $=id=>document.getElementById(id);
 
@@ -291,7 +330,7 @@ function initUI(){
     tw.appendChild(b);
   });
   const t2=$("tint2");TINTS.forEach(t=>{const o=document.createElement("option");o.value=t.id;o.textContent=`${t.name} (${t.boro})`;t2.appendChild(o);});
-  fill("type",TYPES);fill("concept",CONCEPTS);fill("place",PLACES);fill("setting",SETTINGS);fill("angle",ANGLES,ANGLE_LABELS);fill("light",LIGHTS);fill("person",PEOPLE,PEOPLE_LABELS);
+  fill("type",TYPES);fill("style",STYLES);fill("concept",CONCEPTS);fill("place",PLACES);fill("setting",SETTINGS);fill("angle",ANGLES,ANGLE_LABELS);fill("light",LIGHTS);fill("person",PEOPLE,PEOPLE_LABELS);
   const c=$("copy");COPY.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x==="{concept}"?"Concept's own headline":x.replace("{tint}","[tint name]");c.appendChild(o);});
   const r=$("ratio");RATIOS.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;r.appendChild(o);});
   fill("gen",GENS,GENS);
@@ -301,7 +340,7 @@ function initUI(){
   bind("type","type","change",()=>{if(TYPES[S.type].ad)S.ratio=PLACES[S.place].ratio;});
   bind("place","place","change",()=>{S.ratio=PLACES[S.place].ratio;});
   bind("view","view");bind("concept","concept");bind("setting","setting");bind("angle","angle");bind("light","light");bind("person","person");
-  bind("copy","copy");bind("customCopy","custom","input");bind("ratio","ratio");bind("gen","gen");bind("extra","extra","input");
+  bind("copy","copy");bind("customCopy","custom","input");bind("ratio","ratio");bind("gen","gen");bind("extra","extra","input");bind("style","style");bind("lock","lock");
 
   $("shuffle").onclick=shuffle;$("series").onclick=buildSeries;$("reset").onclick=()=>{S={...DEF};render();toast("Reset");};
   $("copyBtn").onclick=()=>copyText(fullText(build(S)),"Prompt copied");
@@ -326,7 +365,7 @@ function build(st){
   const parts=[];
   const flat=T.ad&&st.view!=="mock";
   let subj=flat
-    ?`A finished, flat print ad design for Glossier × NYC Subway, Balm Dotcom in ${t.name}, shown straight on and filling the whole image edge to edge, like the final artwork file sent to the printer. Format: ${PLACES[st.place].label} (${PLACES[st.place].ratio}). Only the ad itself: no wall, frame, billboard structure, street, station, people around it, perspective or shadows`
+    ?`A finished, flat print ad design for Glossier × NYC Subway, Balm Dotcom in ${t.name}, shown straight on and filling the whole image edge to edge, like the final artwork file sent to the printer. ${st.place==="none"?"":`Format: ${PLACES[st.place].label} (${PLACES[st.place].ratio}). `}Only the ad itself: no wall, frame, billboard structure, street, station, people around it, perspective or shadows`
     :T.s(t).replace("{person}",PEOPLE[st.person]).replace("{place}",PLACES[st.place].s);
   parts.push(subj+".");
   if(T.ad){
@@ -346,6 +385,9 @@ function build(st){
   parts.push(`Palette: mostly Balm Pink (#F7CAD0) with Tile White (#F5F1EA), Sign Black (#1A1A1A) and brushed steel grey (#A7A9AC); ${t.name} ${t.hex} is the one hero colour; Platform Yellow (#FCCC0A) only as a tiny accent.`);
   if(T.person||st.type==="lifestyle")parts.push(`Real, natural skin with visible texture, minimal makeup, lips sheer and glossy — never heavy makeup or opaque lipstick.`);
   parts.push(`Glossier editorial style: minimal, soft, skin-first. Product looks like a soft squeezable translucent tube with a small round cap, glossy balm, matte tube.`);
+  const ST=STYLES[st.style||"photo"];
+  if(ST.s)parts.push(`Visual style: ${ST.s} Keep the same composition, palette and exact text — only the rendering style changes.`);
+  if(st.lock)parts.push(`Series consistency (this ad is one of five from the same shoot): wherever a person appears it is the same ${PEOPLE[st.person]}; same ${LIGHTS[st.light].s}, same warm colour grade, same fine film grain, same typography and margins across all five ads.`);
   if(st.extra.trim())parts.push(`Extra direction: ${st.extra.trim()}.`);
 
   let body=parts.join(" ");
@@ -359,8 +401,9 @@ function build(st){
     case "firefly":ratioLine=`Aspect ratio ${st.ratio}. Content type: Photo.`;break;
     default:ratioLine=`Make the image ${st.ratio} (${ratioWord(st.ratio)}).`;
   }
-  const title=T.ad?`${t.name} · ${CONCEPTS[st.concept||"mirror"].label} · ${PLACES[st.place].label}`:(T.allTints?"Five Boroughs Set":`${t.name} · ${T.label}`);
-  return{title,tint:t,body,ratioLine,neg,meta:`${T.label} · ${t.boro} · ${st.ratio} · ${GENS[st.gen]}`,state:{...st}};
+  const sty=STYLES[st.style||"photo"].label;
+  const title=T.ad?`${t.name} · ${CONCEPTS[st.concept||"mirror"].label}${st.place==="none"?"":" · "+PLACES[st.place].label}`:(T.allTints?"Five Boroughs Set":`${t.name} · ${T.label}`);
+  return{title,tint:t,body,ratioLine,neg,meta:`${T.label} · ${t.boro} · ${sty} · ${st.ratio} · ${GENS[st.gen]}${st.lock?" · locked":""}`,state:{...st}};
 }
 function ratioWord(r){return{"1:1":"square","2:3":"portrait","4:5":"portrait","9:16":"tall vertical","3:2":"landscape","16:9":"wide landscape","3:1":"long panorama"}[r]||"";}
 function fullText(p){return p.body+"\n\n"+p.ratioLine+(p.neg?"\n\nAvoid: "+p.neg+".":"");}
@@ -372,7 +415,7 @@ function render(){
   const T=TYPES[S.type];
   $("second").disabled=!!T.allTints;
   $("placeWrap").style.display=T.ad?"block":"none";
-  ["type","view","concept","place","setting","angle","light","person","copy","ratio","gen"].forEach(k=>$(k).value=S[k]);
+  ["type","view","concept","place","setting","angle","light","person","copy","ratio","gen","style"].forEach(k=>$(k).value=S[k]);$("lock").checked=!!S.lock;
   $("setting").disabled=!!T.ad;const fl=T.ad&&S.view!=="mock";$("angle").disabled=fl;$("light").disabled=fl;$("person").disabled=!(T.person||(T.ad&&CONCEPTS[S.concept].people));
   $("customCopy").style.display=S.copy==="Custom…"?"block":"none";$("customCopy").value=S.custom;$("extra").value=S.extra;
   const p=build(S);
@@ -390,6 +433,7 @@ function render(){
     "No gradients, grime or other brands"
   ];
   $("checks").innerHTML=checks.map(c=>c.startsWith("⚠")?`<em style="color:#C8323A;font-style:normal">${esc(c)}</em>`:`<span>${esc(c)}</span>`).join("");
+  if($("fixOut"))renderFix();
   try{localStorage.setItem("gpb-state",JSON.stringify(S));}catch(e){}
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
@@ -401,16 +445,17 @@ function shuffle(){
   S.tint=pick(TINTS).id;S.type=pick(Object.keys(TYPES));S.place=pick(Object.keys(PLACES));
   S.setting=Math.random()<.4?"auto":pick(Object.keys(SETTINGS));S.angle=pick(Object.keys(ANGLES));
   S.light=pick(Object.keys(LIGHTS));S.person=pick(Object.keys(PEOPLE));S.concept=pick(Object.keys(CONCEPTS));S.copy=Math.random()<.7?"{concept}":pick(COPY.slice(1,5));
-  S.second=false;S.extra="";
+  S.second=false;S.extra="";S.style=Math.random()<.5?"photo":pick(Object.keys(STYLES).filter(k=>k!=="mix"));
   S.ratio=TYPES[S.type].ad?PLACES[S.place].ratio:(S.type==="reel"?"9:16":pick(["4:5","2:3","1:1","3:2"]));
   S.gen=keep.gen;render();toast("Shuffled");
 }
 let lastSeries=[];
 function buildSeries(){
   const shuf=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
-  const cs=shuf(Object.keys(CONCEPTS)),ps=shuf(["card","platform","billboard","times","bus","wheat","projection","magazine"]),pp=shuf(Object.keys(PEOPLE).filter(k=>k!=="f"));
-  const plan=TINTS.map((t,i)=>({tint:t.id,concept:cs[i],place:ps[i],person:pp[i],copy:"{concept}"}));
-  lastSeries=plan.map(p=>build({...S,view:S.view||"flat",...p,type:"ad",second:false,extra:"",ratio:PLACES[p.place].ratio}));
+  const cs=shuf(Object.keys(CONCEPTS)),pp=shuf(Object.keys(PEOPLE).filter(k=>k!=="f"));
+  const sts=shuf(Object.keys(STYLES).filter(k=>k!=="mix"));
+  const plan=TINTS.map((t,i)=>({tint:t.id,concept:cs[i],place:"none",person:S.lock?S.person:pp[i],style:S.style==="mix"?sts[i]:S.style,copy:"{concept}"}));
+  lastSeries=plan.map(p=>build({...S,...p,view:"flat",type:"ad",second:false,extra:"",ratio:"4:5"}));
   $("seriesEmpty").style.display="none";$("copyAll").style.display="inline-block";
   const list=$("seriesList");list.innerHTML="";
   lastSeries.forEach((p,i)=>{
@@ -446,6 +491,23 @@ function copyText(t,msg){
 }
 function fallback(t,done){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");}catch(e){}a.remove();done();}
 let tt;function toast(m){const e=$("toast");e.textContent=m;e.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("on"),1400);}
+
+/* ===== FIX AN IMAGE ===== */
+function initFixes(){
+  $("fixes").innerHTML=FIXES.map(f=>`<label><input type="checkbox" value="${f[0]}"> ${esc(f[1])}</label>`).join("");
+  $("fixes").addEventListener("change",renderFix);$("fixNote").addEventListener("input",renderFix);
+  $("fixCopy").onclick=()=>copyText($("fixOut").textContent,"Fix prompt copied");
+}
+function renderFix(){
+  const t=tintOf(S.tint),T=TYPES[S.type],h=headline(S,t)||"Stand clear of the glossy doors.",C=T.ad?CONCEPTS[S.concept]:null;
+  const on=[...document.querySelectorAll("#fixes input:checked")].map(i=>i.value);
+  const lines=FIXES.filter(f=>on.includes(f[0])).map(f=>"• "+f[2](h,t,C));
+  const note=$("fixNote").value.trim(); if(note)lines.push("• "+note);
+  $("fixOut").textContent=lines.length
+    ?`Edit the image you just made. Keep the same concept, layout, headline and overall look — only change these things:\n${lines.join("\n")}\nStay on brand: Glossier × NYC Subway, Balm Pink dominant, ${t.name} as the one hero tint, clean and dewy.`
+    :"Tick what went wrong above and the fix prompt appears here.";
+}
+initFixes();
 
 initUI();
 try{const s=JSON.parse(localStorage.getItem("gpb-state")||"null");if(s)S={...DEF,...s};}catch(e){}
