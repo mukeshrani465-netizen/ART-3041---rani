@@ -101,7 +101,11 @@ footer{max-width:1320px;margin:0 auto;padding:10px 28px 40px;font-size:12px;colo
   <label class="f" for="type">Image type</label>
   <select id="type"></select>
   <div id="placeWrap">
-    <label class="f" for="place">Ad placement (mockup)</label>
+    <label class="f" for="view">Show the ad as</label>
+    <select id="view"><option value="flat">Ad only (flat artwork, no surroundings)</option><option value="mock">In place in NYC (mockup)</option></select>
+    <label class="f" for="concept">Ad concept</label>
+    <select id="concept"></select>
+    <label class="f" for="place">Ad placement (sets size &amp; format)</label>
     <select id="place"></select>
   </div>
   <label class="f" for="setting">Setting</label>
@@ -153,7 +157,7 @@ footer{max-width:1320px;margin:0 auto;padding:10px 28px 40px;font-size:12px;colo
         <h3>5-ad print series</h3>
         <button class="mini" id="copyAll" style="display:none">Copy all 5</button>
       </div></div>
-      <p class="empty" id="seriesEmpty">Click <b>Build 5-ad series</b> for one ad per borough, each in a different NYC placement, all following the same layout.</p>
+      <p class="empty" id="seriesEmpty">Click <b>Build 5-ad series</b> for one ad per borough, each with its own concept, headline and format. Click again for a new mix. Uses the "Show the ad as" setting (ad only by default).</p>
       <div id="seriesList"></div>
     </div>
     <div class="panel" style="margin-top:24px">
@@ -165,7 +169,7 @@ footer{max-width:1320px;margin:0 auto;padding:10px 28px 40px;font-size:12px;colo
 </section>
 </main>
 
-<footer>ART 3150 · AI for Designers · Become a Crea(i)tive Director · Prompt Builder (brand-skills.md v1.0). A student project, not affiliated with Glossier or the MTA. Shortcuts: S shuffle · F series · C copy.</footer>
+<footer>ART 3150 · AI for Designers · Become a Crea(i)tive Director · Prompt Builder (brand-skills.md v1.2). A student project, not affiliated with Glossier or the MTA. Shortcuts: S shuffle · F series · C copy.</footer>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -232,6 +236,7 @@ const PEOPLE={
 };
 const PEOPLE_LABELS={a:"Twenties, freckles, camel coat",b:"College student, tote bag",c:"Thirties, curly hair, trench",d:"Nonbinary, buzz cut, scarf",e:"South Asian, long hair, sweater",f:"Two friends sharing"};
 const COPY=[
+ "{concept}",
  "Stand clear of the glossy doors.",
  "Next stop: {tint}",
  "Five boroughs. Five tints. One balm.",
@@ -239,12 +244,34 @@ const COPY=[
  "(no text in the image)",
  "Custom…"
 ];
+const CONCEPTS={
+ mirror:{label:"Window mirror",copy:"Your commute is your vanity mirror.",people:true,
+  v:(t,st)=>`Full-bleed photograph: ${PEOPLE[st.person]} applying a sheer ${t.desc} Balm Dotcom (${t.name}) while looking at their reflection in the dark subway window; the reflection is sharp, the city lights blur through the glass. The headline sits in a short black station-sign tab in the top left corner only, not a full-width band.`},
+ nextstop:{label:"Giant station sign",copy:"Next stop: {tint}",
+  v:t=>`Type-led design: the top half is one huge Sign Black station sign with a thin white line near its top edge and the headline set very large in white bold sans serif, with the tint name "${t.name}" in an elegant soft serif. The bottom half is flat Balm Pink with one glossy ${t.desc} Balm Dotcom tube lying horizontally on a thin yellow platform-edge stripe, like a passenger waiting at the edge.`},
+ doors:{label:"Sliding doors",copy:"Stand clear of the glossy doors.",
+  v:t=>`Two brushed-steel subway doors with tall rounded windows are sliding open from the centre; through the gap a soft Balm Pink glow and a single glossy ${t.desc} Balm Dotcom tube floating upright. The headline runs across the top on a black band like the door warning strip. Strong symmetrical composition.`},
+ map:{label:"Route map",copy:"Five boroughs. Five tints. One balm.",
+  v:t=>`A minimal Vignelli-style subway map diagram on Tile White: one thick Balm Pink route line curving across the page with five round stops; the ${t.name} stop is a large glossy ${t.desc} Balm Dotcom tube with its ${t.line} bullet, the other four stops are small coloured dots only. Clean graphic, lots of white space, headline in bold black sans serif at the top left.`},
+ swipe:{label:"Tap to pay",copy:"Tap on. Gloss up.",
+  v:t=>`Close-up photograph of a hand tapping a ${t.desc} Balm Dotcom tube against a round contactless turnstile reader like a transit card, a small green "GO" glow on the reader; the background is a soft Balm Pink blur. Headline in big white bold sans serif across the lower third on a black band.`},
+ mosaic:{label:"Tile mosaic",copy:"{tint}",
+  v:t=>`The words "${t.name}" spelled out in a classic NYC subway tile mosaic (small square tiles in Balm Pink and ${t.desc} on white tile, with a decorative mosaic border), filling the top two thirds; below, a real glossy ${t.desc} Balm Dotcom tube resting on a white tile ledge. Tactile, crafted, like a real station name plaque. Use the mosaic as the headline (no extra headline band).`},
+ lips:{label:"Lip macro",copy:"Next stop: {tint}",people:true,
+  v:t=>`Extreme close-up macro of glossy lips filling the whole frame, wearing a sheer, hydrated wash of ${t.desc} (${t.name}), real skin texture, a tiny highlight; the ${t.line} line bullet sits like a small dot at the corner of the mouth area as a graphic element. Headline small and bold in the bottom left on a black tab.`},
+ pole:{label:"Hold the pole",copy:"Hold on to the gloss.",
+  v:t=>`Minimal studio photograph on seamless Balm Pink: a single shiny steel subway pole running top to bottom through the centre, a hand gripping the pole with a ${t.desc} Balm Dotcom tube held between the fingers, nail natural. Lots of empty pink space. Headline in bold Sign Black sans serif stacked on the left.`},
+ notice:{label:"Service notice",copy:"Service change: lips now running glossy on the {line}.",
+  v:t=>`A witty parody of an MTA service-change notice, printed on Balm Pink paper: a black header strip reading "SERVICE CHANGE", a big ${t.line} line bullet in ${t.lineHex}, the headline as large bold black text, and smaller body text below. A small cut-out photo of a glossy ${t.desc} Balm Dotcom tube in the lower right like a sticker. Mostly typographic, very graphic.`},
+ crowd:{label:"Rush hour",copy:"Rush hour, but make it dewy.",people:true,
+  v:(t,st)=>`Photograph from inside a crowded but calm subway car at rush hour, shallow depth of field: everyone is a soft blur except ${PEOPLE[st.person]} in sharp focus in the centre, calmly applying ${t.desc} Balm Dotcom. Warm Balm Pink colour cast. Headline on a black sign band across the top.`}
+};
 const RATIOS=["1:1","2:3","3:2","4:5","16:9","9:16","3:1"];
 const GENS={chatgpt:"ChatGPT (GPT image)",midjourney:"Midjourney",gemini:"Gemini / Imagen",firefly:"Adobe Firefly"};
 const NEG="no heavy makeup, no plastic or airbrushed skin, no opaque lipstick, no gradients, no neon, no dark or gritty mood, no trash or dirt, no extra logos or brand names, no misspelled text, no extra fingers, no distorted hands, no warped product, no invented subway line colours, no yellow G, no clutter";
 
 /* ===== STATE ===== */
-const DEF={tint:"plum",second:false,tint2:"cherry",type:"lifestyle",place:"platform",setting:"auto",angle:"ots",light:"golden",person:"a",copy:"Next stop: {tint}",custom:"",ratio:"4:5",gen:"chatgpt",extra:""};
+const DEF={tint:"plum",second:false,tint2:"cherry",type:"lifestyle",view:"flat",concept:"mirror",place:"platform",setting:"auto",angle:"ots",light:"golden",person:"a",copy:"{concept}",custom:"",ratio:"4:5",gen:"chatgpt",extra:""};
 let S={...DEF};
 const $=id=>document.getElementById(id);
 
@@ -264,8 +291,8 @@ function initUI(){
     tw.appendChild(b);
   });
   const t2=$("tint2");TINTS.forEach(t=>{const o=document.createElement("option");o.value=t.id;o.textContent=`${t.name} (${t.boro})`;t2.appendChild(o);});
-  fill("type",TYPES);fill("place",PLACES);fill("setting",SETTINGS);fill("angle",ANGLES,ANGLE_LABELS);fill("light",LIGHTS);fill("person",PEOPLE,PEOPLE_LABELS);
-  const c=$("copy");COPY.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x.replace("{tint}","[tint name]");c.appendChild(o);});
+  fill("type",TYPES);fill("concept",CONCEPTS);fill("place",PLACES);fill("setting",SETTINGS);fill("angle",ANGLES,ANGLE_LABELS);fill("light",LIGHTS);fill("person",PEOPLE,PEOPLE_LABELS);
+  const c=$("copy");COPY.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x==="{concept}"?"Concept's own headline":x.replace("{tint}","[tint name]");c.appendChild(o);});
   const r=$("ratio");RATIOS.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;r.appendChild(o);});
   fill("gen",GENS,GENS);
 
@@ -273,7 +300,7 @@ function initUI(){
   bind("second","second");bind("tint2","tint2");
   bind("type","type","change",()=>{if(TYPES[S.type].ad)S.ratio=PLACES[S.place].ratio;});
   bind("place","place","change",()=>{S.ratio=PLACES[S.place].ratio;});
-  bind("setting","setting");bind("angle","angle");bind("light","light");bind("person","person");
+  bind("view","view");bind("concept","concept");bind("setting","setting");bind("angle","angle");bind("light","light");bind("person","person");
   bind("copy","copy");bind("customCopy","custom","input");bind("ratio","ratio");bind("gen","gen");bind("extra","extra","input");
 
   $("shuffle").onclick=shuffle;$("series").onclick=buildSeries;$("reset").onclick=()=>{S={...DEF};render();toast("Reset");};
@@ -290,42 +317,49 @@ function initUI(){
 /* ===== BUILD PROMPT ===== */
 const tintOf=id=>TINTS.find(t=>t.id===id);
 function headline(st,t){
-  const c=st.copy==="Custom…"?(st.custom.trim()||"Stand clear of the glossy doors."):st.copy;
-  return c.startsWith("(no")?null:c.replace("{tint}",t.name);
+  let c=st.copy==="Custom…"?(st.custom.trim()||"Stand clear of the glossy doors."):st.copy;
+  if(c==="{concept}")c=(TYPES[st.type].ad?CONCEPTS[st.concept||"mirror"].copy:"Next stop: {tint}");
+  return c.startsWith("(no")?null:c.replace("{tint}",t.name).replace("{line}",t.line==="SI"?"SI ferry":t.line+" line");
 }
 function build(st){
   const t=tintOf(st.tint),T=TYPES[st.type],t2=st.second?tintOf(st.tint2):null;
   const parts=[];
-  let subj=T.s(t).replace("{person}",PEOPLE[st.person]).replace("{place}",PLACES[st.place].s);
+  const flat=T.ad&&st.view!=="mock";
+  let subj=flat
+    ?`A finished, flat print ad design for Glossier × NYC Subway, Balm Dotcom in ${t.name}, shown straight on and filling the whole image edge to edge, like the final artwork file sent to the printer. Format: ${PLACES[st.place].label} (${PLACES[st.place].ratio}). Only the ad itself: no wall, frame, billboard structure, street, station, people around it, perspective or shadows`
+    :T.s(t).replace("{person}",PEOPLE[st.person]).replace("{place}",PLACES[st.place].s);
   parts.push(subj+".");
   if(T.ad){
     const h=headline(st,t);
-    parts.push(`The ad itself: a Balm Pink (#F7CAD0) poster with a black station-sign band across the top (a thin white line above the text, like MTA signage)${h?` reading "${h}" in bold Helvetica-style sans serif, sentence case`:""}. In the middle, a glossy Balm Dotcom tube in ${t.desc} (${t.hex})${t2?` next to a second tube in ${t2.desc}`:""}. Below it a small round ${t.line} subway line bullet in ${t.lineHex}. Small text "LIMITED EDITION · NYC ONLY" and a simple pink circle with a white bold letter G in the bottom corner. A thin yellow (#FCCC0A) platform-edge stripe along the bottom of the ad.`);
+    const C=CONCEPTS[st.concept||"mirror"];
+    parts.push(`${flat?"Ad concept":"The ad itself"} — "${C.label}": ${C.v(t,st)}${h&&st.concept!=="mosaic"?` Headline, spelled exactly: "${h}"`:""}${t2?` A second, smaller tube in ${t2.desc} appears as a supporting colour.`:""}`);
+    parts.push(`Campaign signature, kept small so it never takes over: a round ${t.line} subway line bullet in ${t.lineHex}, a small pink circle with a white bold letter G next to the words "Glossier × NYC Subway" in one corner, the caption "LIMITED EDITION · NYC ONLY", and a thin yellow (#FCCC0A) platform-edge stripe along one edge. Everything else about the composition is unique to this ad — do not fall back on a generic centred product under a header band.`);
   }else{
     if(t2&&!T.allTints)parts.push(`A second tube in ${t2.name} (${t2.desc}) appears as a supporting colour.`);
     parts.push(`Setting: ${SETTINGS[st.setting].s(t)}.`);
     const h=headline(st,t);
     if(h)parts.push(`Include a black station-sign band at the top of the image with the text "${h}" in white bold Helvetica-style sans serif, sentence case, with a thin white line above it, like an MTA station sign. Spell it exactly.`);
   }
-  parts.push(`Camera: ${ANGLES[st.angle]}, 35mm or 50mm look, shallow depth of field, slight film grain, true-to-life colour.`);
-  parts.push(`Light & mood: ${LIGHTS[st.light].s}; warm, witty, effortless, clean and dewy — "your commute is your vanity mirror."`);
+  if(flat)parts.push(`Overall finish: polished Glossier editorial quality, soft light, glossy highlights, crisp typography, generous empty space.`);
+  else parts.push(`Camera: ${ANGLES[st.angle]}, 35mm or 50mm look, shallow depth of field, slight film grain, true-to-life colour.`);
+  if(!flat)parts.push(`Light & mood: ${LIGHTS[st.light].s}; warm, witty, effortless, clean and dewy — "your commute is your vanity mirror."`);
   parts.push(`Palette: mostly Balm Pink (#F7CAD0) with Tile White (#F5F1EA), Sign Black (#1A1A1A) and brushed steel grey (#A7A9AC); ${t.name} ${t.hex} is the one hero colour; Platform Yellow (#FCCC0A) only as a tiny accent.`);
   if(T.person||st.type==="lifestyle")parts.push(`Real, natural skin with visible texture, minimal makeup, lips sheer and glossy — never heavy makeup or opaque lipstick.`);
   parts.push(`Glossier editorial style: minimal, soft, skin-first. Product looks like a soft squeezable translucent tube with a small round cap, glossy balm, matte tube.`);
   if(st.extra.trim())parts.push(`Extra direction: ${st.extra.trim()}.`);
 
   let body=parts.join(" ");
-  let neg=NEG,ratioLine;
+  let neg=flat?NEG+", no surroundings, no mockup, no billboard frame, no wall, no street, no city background, no perspective, no hands holding the ad":NEG,ratioLine;
   switch(st.gen){
     case "midjourney":
       body=body.replace(/\s*\(#?[0-9A-F]{6}\)/gi,"");
-      ratioLine=`--ar ${st.ratio} --style raw --v 7 --no heavy makeup, plastic skin, gradients, neon, grime, extra logos, misspelled text`;
+      ratioLine=`--ar ${st.ratio} --style raw --v 7 --no heavy makeup, plastic skin, gradients, neon, grime, extra logos, misspelled text${flat?", surroundings, mockup, frame, wall, street, perspective":""}`;
       neg=null;break;
     case "gemini":ratioLine=`Aspect ratio ${st.ratio}.`;break;
     case "firefly":ratioLine=`Aspect ratio ${st.ratio}. Content type: Photo.`;break;
     default:ratioLine=`Make the image ${st.ratio} (${ratioWord(st.ratio)}).`;
   }
-  const title=T.ad?`${t.name} · ${PLACES[st.place].label}`:(T.allTints?"Five Boroughs Set":`${t.name} · ${T.label}`);
+  const title=T.ad?`${t.name} · ${CONCEPTS[st.concept||"mirror"].label} · ${PLACES[st.place].label}`:(T.allTints?"Five Boroughs Set":`${t.name} · ${T.label}`);
   return{title,tint:t,body,ratioLine,neg,meta:`${T.label} · ${t.boro} · ${st.ratio} · ${GENS[st.gen]}`,state:{...st}};
 }
 function ratioWord(r){return{"1:1":"square","2:3":"portrait","4:5":"portrait","9:16":"tall vertical","3:2":"landscape","16:9":"wide landscape","3:1":"long panorama"}[r]||"";}
@@ -338,8 +372,8 @@ function render(){
   const T=TYPES[S.type];
   $("second").disabled=!!T.allTints;
   $("placeWrap").style.display=T.ad?"block":"none";
-  ["type","place","setting","angle","light","person","copy","ratio","gen"].forEach(k=>$(k).value=S[k]);
-  $("setting").disabled=!!T.ad;$("person").disabled=!T.person;
+  ["type","view","concept","place","setting","angle","light","person","copy","ratio","gen"].forEach(k=>$(k).value=S[k]);
+  $("setting").disabled=!!T.ad;const fl=T.ad&&S.view!=="mock";$("angle").disabled=fl;$("light").disabled=fl;$("person").disabled=!(T.person||(T.ad&&CONCEPTS[S.concept].people));
   $("customCopy").style.display=S.copy==="Custom…"?"block":"none";$("customCopy").value=S.custom;$("extra").value=S.extra;
   const p=build(S);
   $("outTitle").innerHTML=`<span class="bullet" style="width:30px;height:30px;font-size:${p.tint.line.length>1?12:15}px;background:${T.allTints?"#E9A3AE":p.tint.lineHex}">${T.allTints?"G":p.tint.line}</span>${esc(p.title)}`;
@@ -351,7 +385,7 @@ function render(){
     T.allTints?"All five tints, in order 1 · J · 7 · 4 · SI":(S.second?"Two tints (the maximum)":"One hero tint: "+p.tint.name),
     "Balm Pink dominant, yellow accent only",
     "Real, dewy skin; sheer glossy lips",
-    "Clearly NYC transit",
+    (T.ad&&S.view!=="mock")?"Ad artwork only, no surroundings":"Clearly NYC transit",
     h?(h.split(" ").length<=8?"Headline ≤ 8 words, spelled in quotes":"⚠ Headline is long — keep it ≤ 8 words"):"No text in image",
     "No gradients, grime or other brands"
   ];
@@ -366,21 +400,17 @@ function shuffle(){
   const keep={gen:S.gen,ratioLocked:false};
   S.tint=pick(TINTS).id;S.type=pick(Object.keys(TYPES));S.place=pick(Object.keys(PLACES));
   S.setting=Math.random()<.4?"auto":pick(Object.keys(SETTINGS));S.angle=pick(Object.keys(ANGLES));
-  S.light=pick(Object.keys(LIGHTS));S.person=pick(Object.keys(PEOPLE));S.copy=pick(COPY.slice(0,4));
+  S.light=pick(Object.keys(LIGHTS));S.person=pick(Object.keys(PEOPLE));S.concept=pick(Object.keys(CONCEPTS));S.copy=Math.random()<.7?"{concept}":pick(COPY.slice(1,5));
   S.second=false;S.extra="";
   S.ratio=TYPES[S.type].ad?PLACES[S.place].ratio:(S.type==="reel"?"9:16":pick(["4:5","2:3","1:1","3:2"]));
   S.gen=keep.gen;render();toast("Shuffled");
 }
 let lastSeries=[];
 function buildSeries(){
-  const plan=[
-    {tint:"cherry",place:"times",angle:"low",light:"night",copy:"Next stop: {tint}"},
-    {tint:"cocoa",place:"wheat",angle:"tq",light:"overcast",copy:"Your commute is your vanity mirror."},
-    {tint:"plum",place:"billboard",angle:"low",light:"golden",copy:"Next stop: {tint}"},
-    {tint:"mint",place:"platform",angle:"eye",light:"tungsten",copy:"Stand clear of the glossy doors."},
-    {tint:"coral",place:"bus",angle:"tq",light:"golden",copy:"Five boroughs. Five tints. One balm."}
-  ];
-  lastSeries=plan.map(p=>build({...S,...p,type:"ad",second:false,extra:"",ratio:PLACES[p.place].ratio}));
+  const shuf=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+  const cs=shuf(Object.keys(CONCEPTS)),ps=shuf(["card","platform","billboard","times","bus","wheat","projection","magazine"]),pp=shuf(Object.keys(PEOPLE).filter(k=>k!=="f"));
+  const plan=TINTS.map((t,i)=>({tint:t.id,concept:cs[i],place:ps[i],person:pp[i],copy:"{concept}"}));
+  lastSeries=plan.map(p=>build({...S,view:S.view||"flat",...p,type:"ad",second:false,extra:"",ratio:PLACES[p.place].ratio}));
   $("seriesEmpty").style.display="none";$("copyAll").style.display="inline-block";
   const list=$("seriesList");list.innerHTML="";
   lastSeries.forEach((p,i)=>{

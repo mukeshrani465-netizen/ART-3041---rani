@@ -1,4 +1,6 @@
-# brand-skills.md (v1.0) — Glossier × NYC Subway: *Stand Clear of the Glossy Doors*
+# brand-skills.md (v1.2) — Glossier × NYC Subway: *Stand Clear of the Glossy Doors*
+
+_v1.2: every print ad gets its own **ad concept** (§9a) so a series never repeats one layout; only a small campaign signature is shared. v1.1: print ads default to **ad only** (flat artwork, no surroundings); the NYC mockup is optional (professor feedback, Nov 9)._
 
 _Rulebook for the **Prompt Builder Tool** (`prompt-builder.html`). Every image prompt the tool writes must obey these rules; the choices in the tool only vary things *inside* them. Source: `creative-director-style-guide.html` (Pt. 1 Style Guide) and the Dynamic Hero prompt. Target image generator: **ChatGPT (GPT image)**; prompts are written in plain descriptive sentences, not keyword soup._
 
@@ -68,6 +70,10 @@ The **line colour** is for the round bullet only; the **softer tint** is the act
   - "Five boroughs. Five tints. One balm."
   - "Your commute is your vanity mirror."
   - "Balm Dotcom Five Boroughs Set. Limited edition, NYC only."
+  - "Tap on. Gloss up."
+  - "Hold on to the gloss."
+  - "Rush hour, but make it dewy."
+  - "Service change: lips now running glossy on the {line}."
   - Caption: "LIMITED EDITION · NYC ONLY"
 
 ## 7. Logomark: the G line
@@ -87,7 +93,9 @@ The **line colour** is for the round bullet only; the **softer tint** is the act
 6. **Print ad mockup:** a finished ad shown in place in NYC (see §9).
 7. **Social / reel frame:** vertical, phone-camera feel, shot on the train.
 
-## 9. Print ad placements (for mockups)
+## 9. Print ad placements
+**Default = ad only:** the prompt asks for the finished, flat ad artwork, straight on, edge to edge, like the file sent to the printer. No wall, frame, billboard structure, street, station, people around it, perspective or shadows. The placement only sets the **format and aspect ratio**. The **mockup** (ad shown in place in NYC) is an optional second view.
+
 | Placement | Ratio | Notes |
 |---|---|---|
 | Subway car card | 11:4 wide (use 3:1) | above the seats inside the car |
@@ -98,7 +106,23 @@ The **line colour** is for the round bullet only; the **softer tint** is the act
 | Wheat paste | 4:5 | repeated posters on a construction wall, slightly wrinkled |
 | Building projection | 16:9 | projected at night on a brick or stone facade |
 
-The ad shown inside a mockup follows the layout: **black station-sign band on top with the headline**, product or person in the middle, line bullets in a row, small lockup bottom corner, thin yellow platform-edge stripe along the bottom.
+## 9a. Ad concepts (every ad is its own idea)
+Each ad in a series uses a **different concept**, headline, tint and format. Never repeat one layout across the series, and never fall back on a generic centred product under a header band.
+
+| Concept | Headline | The idea |
+|---|---|---|
+| Window mirror | Your commute is your vanity mirror. | person applying balm in the dark train window reflection |
+| Giant station sign | Next stop: {tint} | type-led: huge black station sign on top, tube lying on the yellow platform edge |
+| Sliding doors | Stand clear of the glossy doors. | steel doors opening on a pink glow and a floating tube |
+| Route map | Five boroughs. Five tints. One balm. | Vignelli-style map; the hero tint is the big stop |
+| Tap to pay | Tap on. Gloss up. | tube tapped on a turnstile reader like a transit card |
+| Tile mosaic | {tint} | tint name as a subway tile mosaic plaque, tube on the tile ledge |
+| Lip macro | Next stop: {tint} | glossy lips fill the frame, line bullet as a graphic dot |
+| Hold the pole | Hold on to the gloss. | hand on a steel pole holding the tube, empty pink space |
+| Service notice | Service change: lips now running glossy on the {line}. | witty MTA service-change notice parody, mostly type |
+| Rush hour | Rush hour, but make it dewy. | blurred crowd, one calm person in focus applying balm |
+
+**Campaign signature (the only thing every ad shares, kept small):** the round line bullet of the hero tint, the G bullet + "Glossier × NYC Subway" in one corner, the caption "LIMITED EDITION · NYC ONLY", and a thin yellow platform-edge stripe along one edge.
 
 ## 10. Angles & framing
 Eye level · low angle (looking up at the billboard / poster) · high angle / overhead (flat lay) · over-the-shoulder into a window reflection · close-up · extreme macro · wide establishing (whole platform or street) · three-quarter view · through the subway door window · mirror/reflection shot.
