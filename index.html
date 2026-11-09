@@ -214,13 +214,25 @@ body {
   <!-- Tabs: switch between every project and the newest homework -->
   <div class="tabs" role="tablist" aria-label="Sections">
     <button class="tab" role="tab" id="tab-all" aria-controls="panel-all" aria-selected="true">All projects</button>
-    <button class="tab" role="tab" id="tab-hw" aria-controls="panel-hw" aria-selected="false" tabindex="-1">Recent HW<span class="tab-count">3</span></button>
+    <button class="tab" role="tab" id="tab-hw" aria-controls="panel-hw" aria-selected="false" tabindex="-1">Recent HW<span class="tab-count">4</span></button>
   </div>
 
   <!-- Recent HW: add new homework cards here, newest first -->
   <section role="tabpanel" id="panel-hw" aria-labelledby="tab-hw" hidden>
     <p class="hw-note">Latest assignments, newest first.</p>
     <ul class="cards">
+      <li><a class="card" href="prompt-builder.html" style="--tilt:6deg">
+        <div class="card-face">
+        <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <!-- prompt box with typed lines, a balm tube and a sparkle -->
+          <rect x="3" y="8" width="26" height="22" rx="3" fill="#fff"/>
+          <path d="M8 15 h14 M8 20 h10 M8 25 h6"/>
+          <rect x="32" y="14" width="5" height="16" rx="1.5" fill="#C9788D"/>
+          <path d="M34.5 4 v6 M31.5 7 h6" stroke-width="1.6"/>
+        </svg>
+        <span class="card-num">17</span></div>
+        <span class="card-label">Creative Director: Prompt Builder</span>
+      </a></li>
       <li><a class="card" href="hero-generator.html" style="--tilt:-5deg">
       <div class="card-face">
       <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -461,6 +473,18 @@ body {
       </svg>
       <span class="card-num">16</span></div>
       <span class="card-label">Creative Director: Dynamic Hero</span>
+    </a></li>
+    <li><a class="card" href="prompt-builder.html" style="--tilt:-6deg">
+      <div class="card-face">
+      <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="#C9788D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <!-- prompt box with typed lines, a balm tube and a sparkle -->
+        <rect x="3" y="8" width="26" height="22" rx="3" fill="#fff"/>
+        <path d="M8 15 h14 M8 20 h10 M8 25 h6"/>
+        <rect x="32" y="14" width="5" height="16" rx="1.5" fill="#C9788D"/>
+        <path d="M34.5 4 v6 M31.5 7 h6" stroke-width="1.6"/>
+      </svg>
+      <span class="card-num">17</span></div>
+      <span class="card-label">Creative Director: Prompt Builder</span>
     </a></li>
   </ul>
   </section>
