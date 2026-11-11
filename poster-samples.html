@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poster Generator · Samples, Evolution & Markdowns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1C1B17;
+  --text: #4a4a4a;
+  --muted: #8a8a8a;
+  --pink: #F8DCE3;
+  --pink-deep: #C9788D;
+  --line: #ececec;
+  --bg: #ffffff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+}
+a { color: var(--text); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { color: var(--ink); }
+.wrap { max-width: 900px; margin: 0 auto; padding: 48px 24px 100px; }
+.back { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; text-decoration: none; color: var(--muted); }
+.back:hover { color: var(--ink); }
+header { margin: 40px 0 40px; }
+.kicker { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--pink-deep); }
+h1 {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: clamp(32px, 6vw, 46px); line-height: 1.08; letter-spacing: -0.02em;
+  color: var(--ink); margin: 10px 0 16px;
+}
+.lede { max-width: 640px; }
+.meta { margin-top: 14px; font-size: 14px; color: var(--muted); }
+.jump { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.jump a {
+  font-size: 14px; font-weight: 600; text-decoration: none; color: var(--ink);
+  padding: 7px 14px; border-radius: 999px; background: var(--pink);
+}
+.jump a:hover { background: var(--pink-deep); color: #fff; }
+h2 {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 26px; letter-spacing: -0.01em; color: var(--ink);
+  margin: 72px 0 8px; scroll-margin-top: 20px;
+}
+.section-note { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+
+/* Evolution */
+.versions { list-style: none; margin-top: 24px; }
+.versions li { display: grid; grid-template-columns: 120px 1fr; gap: 20px; padding: 18px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.versions li:last-child { border-bottom: 1px solid var(--line); }
+.versions b { font-family: 'Space Grotesk', sans-serif; color: var(--ink); font-size: 18px; display: block; }
+.versions small { color: var(--pink-deep); font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+
+/* Samples */
+.samples { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px 24px; }
+.samples figure img {
+  width: 100%; height: auto; display: block; border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 10px 26px rgba(0,0,0,.08);
+}
+.samples figcaption { font-size: 13px; margin-top: 10px; color: var(--muted); }
+.samples figcaption b { color: var(--ink); font-weight: 600; display: block; font-size: 14px; }
+.samples .ref figcaption b::after { content: " · reference"; color: var(--pink-deep); }
+
+/* Markdowns */
+.files { list-style: none; }
+.files li { display: grid; grid-template-columns: 160px 1fr; gap: 20px; padding: 16px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.files li:last-child { border-bottom: 1px solid var(--line); }
+.files a { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--ink); }
+
+.cta { display: inline-block; margin-top: 18px; padding: 12px 20px; border-radius: 10px; background: var(--ink); color: #fff; text-decoration: none; font-weight: 600; font-size: 15px; }
+.cta:hover { background: var(--pink-deep); color: #fff; }
+
+footer { margin-top: 72px; font-size: 13px; color: var(--muted); }
+
+@media (max-width: 720px) {
+  .samples { grid-template-columns: repeat(2, 1fr); }
+  .versions li, .files li { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="index.html">← All projects</a>
+
+  <header>
+    <p class="kicker">Typography module · Poster Generator · Homework 6.1 + 6.2</p>
+    <h1>Poster samples, evolution &amp; markdowns</h1>
+    <p class="lede">My generator makes posters in the style of the 1972 <em>Typografische Monatsblätter</em> 8.9 "Schrift" cover. This page collects sample posters exported from the final version, explains how the tool changed from v1 to v2 to final, and links the markdown files that drive it.</p>
+    <p class="meta">ART 3041 · A.I. for Designers · Fall 2026</p>
+    <nav class="jump" aria-label="On this page">
+      <a href="#samples">Poster samples</a>
+      <a href="#evolution">Evolution v1 → v2 → final</a>
+      <a href="#markdowns">Markdowns</a>
+      <a href="poster-generator.html">Open the generator ↗</a>
+    </nav>
+  </header>
+
+  <!-- ===== Samples ===== -->
+  <h2 id="samples">1 · Poster samples</h2>
+  <p class="section-note">Exported as PNG straight from the final generator using Generate, Shuffle text and Limited edition. The original 1972 cover is linked under Markdowns.</p>
+
+  <div class="samples">
+    <figure>
+      <img src="poster-sample-1.jpg" alt="Mint green poster: 4.2 GRID:, headline about a structure of invisible lines, three boxes Column, Module, Matrix." loading="lazy">
+      <figcaption><b>4.2 · Grid</b>Mint paper, dark green ink · title top, diagram bottom</figcaption>
+    </figure>
+    <figure>
+      <img src="poster-sample-2.jpg" alt="Orange poster: 5.4 CONTRAST: in the middle left, with boxes Size, Weight, Tone stacked down the right side along a vertical dash ruler." loading="lazy">
+      <figcaption><b>5.4 · Contrast</b>Orange paper · diagram on the right side</figcaption>
+    </figure>
+    <figure>
+      <img src="poster-sample-3.jpg" alt="Limited edition poster: gold foil type on midnight navy, 5.4 CONTRAST:, gold double border and a numbered edition seal in the corner." loading="lazy">
+      <figcaption><b>5.4 · Contrast — Limited edition</b>Gold &amp; silver foil on midnight navy, numbered seal</figcaption>
+    </figure>
+    <figure>
+      <img src="poster-sample-4.jpg" alt="Dark green poster: diagram of three boxes at the top, then a large cream 10.9 and TYPE: with headline below." loading="lazy">
+      <figcaption><b>10.9 · Type</b>Forest green · diagram on top, title block at bottom</figcaption>
+    </figure>
+    <figure>
+      <img src="poster-sample-5.jpg" alt="Pale blue poster with navy type: 5.7 GRID:, headline about invisible lines, boxes Column, Module, Matrix." loading="lazy">
+      <figcaption><b>5.7 · Grid</b>Pale blue paper, navy ink · centred</figcaption>
+    </figure>
+    <figure>
+      <img src="poster-sample-6.jpg" alt="Bright blue poster with white type: oversized 3.7, TYPE:, headline about visible signs, boxes Logography, Syllabary, Alphabet." loading="lazy">
+      <figcaption><b>3.7 · Type</b>Ultramarine paper · enlarged hero number</figcaption>
+    </figure>
+  </div>
+
+  <!-- ===== Evolution ===== -->
+  <h2 id="evolution">2 · Evolution: v1 → v2 → final</h2>
+  <p class="section-note">How the generator changed over the typography module.</p>
+
+  <p>Version 1 was a straight translation of my <code>skills.md</code> rules into an app: it rebuilt the TM 8.9 cover and could shuffle text, change the seed and export, but every poster came out cream with the same layout, so the results felt like copies of one poster. For version 2 I used the professor's slides and feedback to open up the system without breaking the style rules. I added 16 ink-and-paper colour pairs, moveable title and diagram positions, a 0–5 box count, US print sizes, dragging elements by hand and images inside the boxes. That made the posters actually different from each other. The final version focused on control and finish: an Elements panel to hide or resize any part, undo/redo, a Series tray to save and export a set, a Limited edition button that makes gold and silver foil posters with a numbered seal, and a Generate button that also re-rolls element sizes, with a Lock to keep the ones I like. Across all three versions the rules in <code>skills.md</code> stayed the same; what changed is how much of the system the user can explore.</p>
+
+  <ul class="versions">
+    <li><div><small>Homework 5.2</small><b>v1</b></div>
+      <div>Rebuilt the TM 8.9 cover from <code>skills.md</code>. Seeded Generate, seed lock, Shuffle text, 9 variations, font upload, SVG / PNG / PDF export.</div></li>
+    <li><div><small>Homework 6.1</small><b>v2</b></div>
+      <div>16 colour palettes (colour favoured ~80% of the time), title position top / middle / bottom, diagram position including left and right side columns, 0–5 boxes, US formats with real-size PDF, drag-to-move elements, images inside boxes, named layers in SVG export.</div></li>
+    <li><div><small>Homework 6.2</small><b>Final</b></div>
+      <div>Elements panel (hide / resize every element), Edit-elements toolbar, undo / redo, Series tray with "Export all as PDF", one Export menu, Limited edition gold &amp; silver foil with numbered seal, Generate re-rolls element sizes, Lock to keep them.</div></li>
+  </ul>
+
+  <!-- ===== Markdowns ===== -->
+  <h2 id="markdowns">3 · Markdowns</h2>
+  <p class="section-note">The files I gave the AI to build and maintain the generator.</p>
+
+  <ul class="files">
+    <li><a href="skills.md">skills.md</a><span>The style rulebook: grid, type, spacing and colour rules every poster must obey. The randomness only varies things inside these rules.</span></li>
+    <li><a href="build-prompt.md">build-prompt.md</a><span>The prompt used to build the app from my sketch and <code>skills.md</code>.</span></li>
+    <li><a href="handoff.md">handoff.md</a><span>Project memory: what each version added, decisions and why, known limits. Pasted into a new chat to keep working.</span></li>
+    <li><a href="reference-tm-8.9-1972.jpg">reference-tm-8.9-1972.jpg</a><span>The original 1972 poster the generator is based on.</span></li>
+  </ul>
+
+  <a class="cta" href="poster-generator.html">Open the final Poster Generator →</a>
+
+  <footer>
+    <a href="index.html">← Back to all projects</a>
+  </footer>
+
+</div>
+</body>
+</html>
