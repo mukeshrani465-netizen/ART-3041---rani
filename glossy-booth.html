@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Glossy Booth — Glossier × NYC Subway</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--pink:#F7CAD0;--pink-deep:#E9A3AE;--black:#1A1A1A;--tile:#F5F1EA;--steel:#A7A9AC;--yellow:#FCCC0A;--line:#B933AD}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Inter Tight",system-ui,sans-serif;font-weight:300;background:var(--tile);color:var(--black);line-height:1.5}
+  a{color:inherit}
+  button{font:inherit;cursor:pointer}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  .back{display:inline-block;margin:24px 0 0;font-size:14px;text-decoration:none;border-bottom:1px solid var(--black)}
+  header{background:var(--pink);border-bottom:6px solid var(--yellow);padding:44px 0 36px;margin-top:16px}
+  .eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+  .sign{background:var(--black);color:#fff;padding:14px 22px 16px;box-shadow:inset 0 6px 0 var(--black),inset 0 8px 0 #fff;display:inline-block}
+  .sign h1{font-weight:700;font-size:clamp(30px,5vw,56px);letter-spacing:-.02em;line-height:1.1;padding-top:8px}
+  .lockup{display:flex;align-items:center;gap:10px;margin-top:20px;font-weight:700}
+  .g{width:34px;height:34px;border-radius:50%;background:var(--pink-deep);color:#fff;display:grid;place-items:center;font-weight:700}
+  .intro{max-width:760px;margin-top:18px;font-size:18px}
+  .intro em,.serif{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400}
+  .intro em{font-size:22px}
+  section{padding:52px 0 8px}
+  h2{font-weight:700;font-size:28px;letter-spacing:-.01em;margin-bottom:6px}
+  .sub{color:#555;margin-bottom:22px;max-width:720px}
+  .bullet{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;color:#fff;font-weight:700;font-size:13px;flex:none}
+
+  /* ---------- booth ---------- */
+  .booth{display:grid;grid-template-columns:1.45fr 1fr;gap:22px;align-items:start}
+  .stage{position:relative;background:#111;border-radius:18px;overflow:hidden;box-shadow:0 24px 50px rgba(0,0,0,.25)}
+  .station-sign{display:flex;align-items:center;gap:12px;background:var(--black);color:#fff;padding:12px 18px 13px;box-shadow:inset 0 3px 0 var(--black),inset 0 5px 0 #fff;font-weight:700;font-size:20px;min-height:58px}
+  .station-sign small{font-weight:300;opacity:.7;font-size:14px;margin-left:auto}
+  .window{position:relative;aspect-ratio:5/4;background:#0b0b0c;border:14px solid #8f9296;border-radius:0 0 18px 18px;
+          border-image:linear-gradient(90deg,#76797d,#c9cbce 30%,#8d9094 55%,#d6d8db 80%,#7b7e82) 14}
+  .window canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .streaks{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.55;overflow:hidden}
+  .streaks i{position:absolute;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(255,214,160,.9),transparent);animation:streak linear infinite}
+  @keyframes streak{from{transform:translateX(120%)}to{transform:translateX(-140%)}}
+  .glass{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.10) 0 18%,transparent 18% 60%,rgba(255,255,255,.06) 60% 66%,transparent 66%)}
+  .count{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+  .count span{width:160px;height:160px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:96px;background:var(--line);box-shadow:0 0 0 8px rgba(255,255,255,.85);opacity:0;transform:scale(.6);transition:.25s}
+  .count span.on{opacity:1;transform:scale(1)}
+  .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+  .flash.go{animation:flash .5s ease-out}
+  @keyframes flash{0%{opacity:.95}100%{opacity:0}}
+  .announce{position:absolute;left:0;right:0;bottom:16px;text-align:center;pointer-events:none}
+  .announce span{display:inline-block;background:rgba(26,26,26,.82);color:#fff;padding:7px 14px;border-radius:99px;font-size:14px;opacity:0;transition:.3s}
+  .announce span.on{opacity:1}
+  .film{position:absolute;top:14px;right:14px;display:flex;gap:6px}
+  .film i{width:12px;height:12px;border-radius:50%;border:2px solid #fff;opacity:.9}
+  .film i.done{background:#fff}
+  .status{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#ddd;padding:30px;font-size:15px}
+  .status b{display:block;color:#fff;font-size:20px;margin-bottom:6px;font-weight:700}
+
+  /* doors */
+  .doors{position:absolute;inset:0;z-index:5;display:grid;place-items:center}
+  .door{position:absolute;top:0;bottom:0;width:50%;transition:transform 1.1s cubic-bezier(.65,0,.35,1);
+        background:linear-gradient(90deg,#8a8d91,#d9dbde 28%,#9c9fa3 48%,#cfd1d4 72%,#85888c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+  .door.l{left:0;border-right:6px solid #1c1c1c}
+  .door.r{right:0;border-left:6px solid #1c1c1c}
+  .door::before{content:"";position:absolute;top:9%;height:40%;width:56%;left:22%;border-radius:999px;background:linear-gradient(160deg,#2a2426,#1a1618);border:5px solid #e3e4e6;box-shadow:inset 0 0 30px rgba(247,202,208,.25)}
+  .door::after{content:"";position:absolute;bottom:0;left:0;right:0;height:8px;background:var(--yellow)}
+  .doors.open .door.l{transform:translateX(-101%)}
+  .doors.open .door.r{transform:translateX(101%)}
+  .doors.open{pointer-events:none}
+  .stand{position:relative;z-index:2;background:var(--black);color:#fff;border:0;padding:16px 22px 17px;box-shadow:inset 0 4px 0 var(--black),inset 0 6px 0 #fff,0 14px 30px rgba(0,0,0,.35);font-weight:700;font-size:20px;transition:opacity .4s}
+  .stand small{display:block;font-weight:300;font-size:13px;opacity:.75;margin-top:2px}
+  .doors.open .stand{opacity:0}
+
+  /* panel */
+  .panel{background:#fff;border-radius:16px;padding:20px 20px 22px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+  .step{padding:14px 0;border-top:1px solid #eee}
+  .step:first-child{border-top:0;padding-top:0}
+  .step h3{font-size:13px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:10px;display:flex;gap:8px;align-items:center}
+  .step h3 .n{font-family:"JetBrains Mono",monospace;color:#999;font-weight:400}
+  .lines{display:flex;gap:8px;flex-wrap:wrap}
+  .lines button{border:2px solid transparent;border-radius:14px;padding:6px 10px 6px 6px;background:var(--tile);display:flex;align-items:center;gap:8px;font-size:13px}
+  .lines button.on{border-color:var(--black);background:#fff}
+  .lines button .serif{font-size:16px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  label.f{display:block;font-size:12px;color:#666}
+  select{width:100%;margin-top:4px;padding:8px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;font:inherit;font-size:14px}
+  .seg{display:inline-flex;background:var(--tile);border-radius:99px;padding:3px;gap:2px;flex-wrap:wrap}
+  .seg button{border:0;background:transparent;padding:6px 13px;border-radius:99px;font-size:13px}
+  .seg button.on{background:var(--black);color:#fff}
+  .opts{display:grid;gap:10px}
+  .opts > div{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px}
+  .styles{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .styles button{border:2px solid transparent;border-radius:12px;padding:0;background:none;text-align:center;font-size:11px;line-height:1.2}
+  .styles button canvas{width:100%;aspect-ratio:3/4;border-radius:9px;display:block;margin-bottom:5px;background:#eee}
+  .styles button.on canvas{outline:2px solid var(--black);outline-offset:2px}
+  .shutter-row{display:flex;align-items:center;gap:16px;margin-top:18px}
+  .shutter{width:84px;height:84px;border-radius:50%;border:6px solid var(--black);background:radial-gradient(circle at 35% 30%,#fff,var(--pink) 45%,var(--pink-deep));box-shadow:0 8px 20px rgba(0,0,0,.2);flex:none;transition:transform .15s}
+  .shutter:active{transform:scale(.94)}
+  .shutter:disabled{opacity:.4;cursor:default}
+  .shutter-row p{font-size:13px;color:#555}
+  .src{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{border:1px solid var(--black);background:#fff;border-radius:99px;padding:8px 15px;font-size:13px}
+  .btn.fill{background:var(--black);color:#fff}
+  .btn.pink{background:var(--pink);border-color:var(--pink)}
+
+  /* results */
+  .results{display:none;grid-template-columns:auto 1fr;gap:28px;align-items:start;margin-top:8px}
+  .results.on{display:grid}
+  .results .print-wrap{background:#fff;border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+  .results img{display:block;max-width:100%;height:auto}
+  #stripImg{max-height:640px;width:auto;box-shadow:0 10px 24px rgba(0,0,0,.15)}
+  #printImg{max-height:640px;width:auto}
+  .dl{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+
+  /* poster */
+  .poster-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:28px;align-items:start}
+  #poster{width:100%;max-width:520px;height:auto;display:block;box-shadow:0 18px 40px rgba(0,0,0,.18);background:#fff}
+  .poster-ctrl{background:#fff;border-radius:16px;padding:20px}
+  .poster-ctrl .big{font-size:15px;margin:12px 0 16px}
+  .meter{font-family:"JetBrains Mono",monospace;font-size:12px;color:#888;margin-top:14px}
+
+  /* wall */
+  .wall{background:
+      linear-gradient(#e2ddd3 2px,transparent 2px) 0 0/100% 46px,
+      linear-gradient(90deg,#e2ddd3 2px,transparent 2px) 0 0/92px 92px,#fbf9f5;
+      border-radius:16px;padding:28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:24px;align-items:start;min-height:260px;border-bottom:10px solid var(--yellow)}
+  .wall figure{background:#fff;padding:6px;box-shadow:0 8px 18px rgba(0,0,0,.12);transform:rotate(var(--r,0deg));transition:transform .2s}
+  .wall figure:hover{transform:rotate(0) scale(1.04)}
+  .wall img{width:100%;display:block}
+  .wall figcaption{font-family:"JetBrains Mono",monospace;font-size:10px;color:#777;margin-top:5px}
+
+  .how ol{padding-left:20px;max-width:780px}
+  .how li{margin-bottom:8px}
+  footer{margin-top:56px;background:var(--black);color:#fff;padding:24px 0;font-size:13px;border-top:6px solid var(--yellow)}
+  @media (max-width:900px){.booth,.poster-grid,.results.on{grid-template-columns:1fr}.styles{grid-template-columns:repeat(3,1fr)}}
+  @media (prefers-reduced-motion:reduce){.streaks{display:none}.door{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap"><a class="back" href="index.html">← Back to homepage</a></div>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">ART 3150 · Become a Crea(i)tive Director · Experimental tool</p>
+    <div class="sign"><h1>The Glossy Booth</h1></div>
+    <div class="lockup"><span class="g">G</span> Glossier × NYC Subway — <span style="font-weight:300">Stand Clear of the Glossy Doors</span></div>
+    <p class="intro">A subway photobooth where <em>you</em> are the campaign model. Pick your commute, step through the glossy doors, and the booth tints your lips in your borough's balm, live (or just adds a clear shine, or nothing at all). It shoots a strip, prints it in the frame you choose, and turns your ride into a poster. Every visitor makes a different ad. Your camera never leaves your device.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section id="booth-sec">
+  <h2>The booth</h2>
+  <p class="sub">Step 1, pick your ride. Step 2, choose your strip and print. Then press the pink button and hold still for the countdown.</p>
+  <div class="booth">
+    <div class="stage" id="stage">
+      <div class="station-sign" id="sign"><span class="bullet" id="signBullet">7</span><span id="signText">Next stop: gloss.</span><small id="signTint">Plum 7</small></div>
+      <div class="window" id="win">
+        <canvas id="live" width="1000" height="800"></canvas>
+        <div class="streaks" id="streaks"></div>
+        <div class="glass"></div>
+        <div class="status" id="status"><div><b>Stand clear of the glossy doors</b>Open the doors to start the booth.</div></div>
+        <div class="film" id="film"></div>
+        <div class="count"><span id="countNum">3</span></div>
+        <div class="flash" id="flash"></div>
+        <div class="announce"><span id="announce"></span></div>
+      </div>
+      <div class="doors" id="doors">
+        <div class="door l"></div><div class="door r"></div>
+        <button class="stand" id="standBtn">Stand clear of the glossy doors<small>tap to open the booth · uses your camera</small></button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="step">
+        <h3><span class="n">01</span> Your ride</h3>
+        <div class="lines" id="lineBtns"></div>
+        <div class="row">
+          <label class="f">From<select id="fromSel"></select></label>
+          <label class="f">To<select id="toSel"></select></label>
+        </div>
+      </div>
+      <div class="step opts">
+        <h3><span class="n">02</span> Your strip</h3>
+        <div><span>Frames</span><div class="seg" id="framesSeg"><button data-v="3">3</button><button data-v="4" class="on">4</button><button data-v="5">5</button></div></div>
+        <div><span>Balm</span><div class="seg" id="balmSeg"><button data-v="tint" class="on">Tinted</button><button data-v="clear">Clear shine</button><button data-v="off">Off</button></div></div>
+        <div><span>Film</span><div class="seg" id="filmSeg"><button data-v="bw" class="on">B&amp;W</button><button data-v="color">Color</button></div></div>
+        <div><span>Tint</span><div class="seg" id="hopSeg"><button data-v="one" class="on">My line</button><button data-v="hop">Borough hop</button></div></div>
+      </div>
+      <div class="step">
+        <h3><span class="n">03</span> Print style <span style="font-weight:300;text-transform:none;letter-spacing:0;color:#888">optional</span></h3>
+        <div class="styles" id="styleBtns"></div>
+      </div>
+      <div class="shutter-row">
+        <button class="shutter" id="shutter" aria-label="Take photos" disabled></button>
+        <p id="shutterHint">Open the doors first.</p>
+      </div>
+      <div class="src">
+        <button class="btn" id="demoBtn">No camera? Use the demo rider</button>
+        <label class="btn" style="cursor:pointer">Upload photos<input type="file" id="upload" accept="image/*" multiple hidden></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="print-wrap"><img id="stripImg" alt="Your photo strip"></div>
+    <div>
+      <div class="print-wrap"><img id="printImg" alt="Your strip in its print frame"></div>
+      <div class="dl">
+        <button class="btn fill" id="dlStrip">Download strip</button>
+        <button class="btn fill" id="dlPrint">Download framed print</button>
+        <button class="btn" id="dlStory">Download for Stories (9:16)</button>
+        <button class="btn pink" id="pinBtn">Pin to the platform wall</button>
+        <button class="btn" id="againBtn">Ride again</button>
+      </div>
+      <p class="sub" style="margin-top:12px">Change the print style above and the frame updates on its own.</p>
+    </div>
+  </div>
+</section>
+
+<section id="poster-sec">
+  <h2>Your Line, Your Poster</h2>
+  <p class="sub">Your commute, set as a campaign poster. Each press of <b>Next poster</b> mixes a new layout, headline and tint from your ride, so the stream never ends.</p>
+  <div class="poster-grid">
+    <canvas id="poster" width="1080" height="1350"></canvas>
+    <div class="poster-ctrl">
+      <div id="posterRide" class="big"></div>
+      <div class="dl">
+        <button class="btn fill" id="nextPoster">Next poster</button>
+        <button class="btn" id="autoPoster">Auto-play</button>
+        <button class="btn" id="dlPoster">Download poster</button>
+        <button class="btn pink" id="pinPoster">Pin to the platform wall</button>
+        <button class="btn" id="randRide">Random ride</button>
+      </div>
+      <p class="meter" id="meter"></p>
+      <p class="sub" style="margin-top:16px">Five lines, five boroughs, 139 stations: 3,914 possible rides, each with six layouts and a dozen headlines.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The platform wall</h2>
+  <p class="sub">Strips and posters pinned in this browser. Booth strips stay on your device.</p>
+  <div class="wall" id="wall"></div>
+  <div class="dl"><button class="btn" id="clearWall">Clear my pins</button></div>
+</section>
+
+<section class="how">
+  <h2>How it works</h2>
+  <ol>
+    <li><strong>Face tracking:</strong> Google's MediaPipe Face Landmarker runs in the browser and finds 478 points on the face. The booth uses the 40 points around the lips to draw a mask.</li>
+    <li><strong>The tint:</strong> the lip mask is filled with the borough balm (multiply plus soft light) and given a gloss highlight. In B&amp;W film only the lips stay in color, like a hand-tinted booth print.</li>
+    <li><strong>The strip:</strong> each frame is a stop on your real line: the station sign above the window changes as you ride. The footer draws your route Vignelli-style and stamps the ride like a MetroCard.</li>
+    <li><strong>The prints:</strong> five frames drawn in code (subway strip, lace and rhinestones, candy stripes, crochet, tile and steel), inspired by how people frame and decorate real booth strips.</li>
+    <li><strong>The posters:</strong> a generator in the spirit of my earlier poster generator: ride data + brand rules + six layouts + a headline bank = an endless series.</li>
+  </ol>
+</section>
+</main>
+
+<footer><div class="wrap">A student project, not affiliated with Glossier or the MTA. · ART 3150, Baruch College</div></footer>
+
+<script type="module">
+/* =================== DATA =================== */
+const LINES = {
+  '1': {color:'#EE352E', tint:'#C8323A', name:'Cherry Express', boro:'Manhattan', per:1.6, stops:['Van Cortlandt Park–242 St','238 St','231 St','Marble Hill–225 St','215 St','207 St','Dyckman St','191 St','181 St','168 St','157 St','145 St','137 St–City College','125 St','116 St–Columbia University','Cathedral Pkwy–110 St','103 St','96 St','86 St','79 St','72 St','66 St–Lincoln Center','59 St–Columbus Circle','50 St','Times Sq–42 St','34 St–Penn Station','28 St','23 St','18 St','14 St','Christopher St','Houston St','Canal St','Franklin St','Chambers St','WTC Cortlandt','Rector St','South Ferry']},
+  'J': {color:'#996633', tint:'#8A5A3C', name:'Cocoa Local', boro:'Brooklyn', per:2, stops:['Jamaica Center','Sutphin Blvd','121 St','111 St','104 St','Woodhaven Blvd','85 St–Forest Pkwy','75 St–Elderts Ln','Cypress Hills','Crescent St','Norwood Av','Cleveland St','Van Siclen Av','Alabama Av','Broadway Junction','Chauncey St','Halsey St','Gates Av','Kosciuszko St','Myrtle Av','Flushing Av','Lorimer St','Hewes St','Marcy Av','Essex St','Bowery','Canal St','Chambers St','Fulton St','Broad St']},
+  '7': {color:'#B933AD', tint:'#8E2F7E', name:'Plum 7', boro:'Queens', per:1.9, stops:['34 St–Hudson Yards','Times Sq–42 St','5 Av','Grand Central–42 St','Vernon Blvd–Jackson Av','Hunters Point Av','Court Sq','Queensboro Plaza','33 St–Rawson St','40 St–Lowery St','46 St–Bliss St','52 St','61 St–Woodside','69 St','74 St–Broadway','82 St–Jackson Hts','90 St–Elmhurst Av','Junction Blvd','103 St–Corona Plaza','111 St','Mets–Willets Point','Flushing–Main St']},
+  '4': {color:'#00933C', tint:'#D98E8B', name:'Mint Clear', boro:'The Bronx', per:2.1, tube:'#CFE8D5', stops:['Woodlawn','Mosholu Pkwy','Bedford Park Blvd','Kingsbridge Rd','Fordham Rd','183 St','Burnside Av','176 St','Mt Eden Av','170 St','167 St','161 St–Yankee Stadium','149 St–Grand Concourse','138 St–Grand Concourse','125 St','86 St','59 St','Grand Central–42 St','14 St–Union Sq','Brooklyn Bridge–City Hall','Fulton St','Wall St','Bowling Green','Borough Hall','Nevins St','Atlantic Av–Barclays Ctr','Franklin Av','Crown Hts–Utica Av']},
+  'SI': {color:'#FF6319', tint:'#F26B4F', name:'Ferry Coral', boro:'Staten Island', per:2.3, stops:['St. George','Tompkinsville','Stapleton','Clifton','Grasmere','Old Town','Dongan Hills','Jefferson Av','Grant City','New Dorp','Oakwood Heights','Bay Terrace','Great Kills','Eltingville','Annadale','Huguenot',"Prince's Bay",'Pleasant Plains','Richmond Valley','Arthur Kill','Tottenville']}
+};
+const ORDER = ['1','J','7','4','SI'];
+const STYLES = [
+  {id:'subway', label:'Subway strip'},
+  {id:'lace',   label:'Lace + gems'},
+  {id:'candy',  label:'Candy stripe'},
+  {id:'crochet',label:'Crochet'},
+  {id:'tile',   label:'Tile + steel'}
+];
+const OUTER = [61,146,91,181,84,17,314,405,321,375,291,409,270,269,267,0,37,39,40,185];
+const INNER = [78,95,88,178,87,14,317,402,318,324,308,415,310,311,312,13,82,81,80,191];
+
+const state = {line:'7', from:'Queensboro Plaza', to:'Grand Central–42 St', frames:4, film:'bw', balm:'tint', hop:'one', style:'subway',
+  mode:'none', sources:[], srcIdx:0, landmarker:null, lm:null, shots:[], busy:false, rideNo: 0, strip:null, print:null};
+
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const store = { get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+                set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } } };
+state.rideNo = store.get('glossyRideNo', 40);
+
+/* seeded random for the poster generator */
+function rng(seed){ let s = seed >>> 0 || 1; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
+const pick = (r, a) => a[Math.floor(r() * a.length)];
+
+/* =================== RIDE UI =================== */
+function rideInfo(){
+  const L = LINES[state.line], a = L.stops.indexOf(state.from), b = L.stops.indexOf(state.to);
+  const stops = Math.abs(b - a);
+  const lo = Math.min(a, b), hi = Math.max(a, b);
+  let path = L.stops.slice(lo, hi + 1); if (a > b) path.reverse();
+  return {L, stops, mins: Math.max(2, Math.round(stops * L.per)), path};
+}
+function buildLineBtns(){
+  const box = $('#lineBtns'); box.innerHTML = '';
+  for (const id of ORDER){
+    const L = LINES[id], b = document.createElement('button');
+    b.innerHTML = `<span class="bullet" style="background:${L.color}">${id}</span><span><span class="serif">${L.name}</span><br>${L.boro}</span>`;
+    b.className = id === state.line ? 'on' : '';
+    b.onclick = () => { setLine(id); };
+    box.appendChild(b);
+  }
+}
+function setLine(id, keepStations){
+  state.line = id; const L = LINES[id];
+  if (!keepStations){ state.from = L.stops[Math.floor(L.stops.length * .55)]; state.to = L.stops[Math.floor(L.stops.length * .15)]; }
+  document.documentElement.style.setProperty('--line', L.color);
+  buildLineBtns(); fillSelects(); updateSign(0); renderPosterNow();
+}
+function fillSelects(){
+  const L = LINES[state.line];
+  for (const [sel, key] of [[$('#fromSel'),'from'],[$('#toSel'),'to']]){
+    sel.innerHTML = L.stops.map(s => `<option${s === state[key] ? ' selected' : ''}>${s}</option>`).join('');
+    sel.onchange = () => { state[key] = sel.value; if (state.from === state.to){ const i = L.stops.indexOf(state.to); state.to = L.stops[i ? i - 1 : 1]; fillSelects(); } updateSign(0); renderPosterNow(); };
+  }
+}
+function seg(id, key, cast){
+  $(id).querySelectorAll('button').forEach(b => b.onclick = () => {
+    $(id).querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    state[key] = cast ? cast(b.dataset.v) : b.dataset.v; buildFilmDots(); if (state.shots.length && key === 'film') {}
+  });
+}
+
+/* frame plan: which line + station for each shot */
+function plan(){
+  const n = state.frames, {path} = rideInfo(), out = [];
+  for (let i = 0; i < n; i++){
+    if (state.hop === 'hop'){
+      const id = ORDER[(ORDER.indexOf(state.line) + i) % ORDER.length], L = LINES[id];
+      const st = i === 0 ? path[0] : L.stops[Math.floor((L.stops.length - 1) * ((i * 37) % 10) / 10)];
+      out.push({id, station: st});
+    } else {
+      const k = n === 1 ? 0 : Math.round(i * (path.length - 1) / (n - 1));
+      out.push({id: state.line, station: path[k] || path[path.length - 1]});
+    }
+  }
+  return out;
+}
+function updateSign(i){
+  const p = plan()[Math.min(i, state.frames - 1)], L = LINES[p.id];
+  $('#signBullet').textContent = p.id; $('#signBullet').style.background = L.color;
+  $('#signText').textContent = i === 0 && !state.busy ? `Next stop: ${p.station}` : p.station;
+  $('#signTint').textContent = L.name;
+  document.documentElement.style.setProperty('--line', L.color);
+}
+function buildFilmDots(){ $('#film').innerHTML = Array.from({length: state.frames}, (_, i) => `<i class="${i < state.shots.length ? 'done' : ''}"></i>`).join(''); }
+
+/* =================== FACE + DRAW =================== */
+async function loadLandmarker(){
+  if (state.landmarker) return state.landmarker;
+  try{
+    const v = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
+    const files = await v.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    const opts = {baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task'}, runningMode:'VIDEO', numFaces:3};
+    try { state.landmarker = await v.FaceLandmarker.createFromOptions(files, {...opts, baseOptions:{...opts.baseOptions, delegate:'GPU'}}); }
+    catch(e){ state.landmarker = await v.FaceLandmarker.createFromOptions(files, opts); }
+  }catch(e){ console.warn('Face tracking unavailable', e); state.landmarker = null; }
+  return state.landmarker;
+}
+let lastTs = 0;
+function detect(el){
+  if (!state.landmarker) return null;
+  try{ lastTs = Math.max(lastTs + 1, performance.now()); const r = state.landmarker.detectForVideo(el, lastTs); return r.faceLandmarks || []; }
+  catch(e){ return null; }
+}
+
+/* draw a source into ctx (W×H, 5:4), mirrored for the camera, with lip tint */
+function drawShot(ctx, W, H, src, faces, lineId, film, mirror){
+  const sw0 = src.w, sh0 = src.h, r = src.rect || [0, 0, sw0, sh0];
+  let [rx, ry, rw, rh] = r; const target = W / H;
+  if (rw / rh > target){ const nw = rh * target; rx += (rw - nw) / 2; rw = nw; } else { const nh = rw / target; ry += (rh - nh) / 2; rh = nh; }
+  const tx = x => ((x * sw0 - rx) / rw) * W, ty = y => ((y * sh0 - ry) / rh) * H;
+  ctx.save();
+  if (mirror){ ctx.translate(W, 0); ctx.scale(-1, 1); }
+  ctx.filter = film === 'bw' ? 'grayscale(1) contrast(1.18) brightness(1.04)' : 'saturate(1.06) contrast(1.03)';
+  ctx.drawImage(src.el, rx, ry, rw, rh, 0, 0, W, H);
+  ctx.filter = 'none';
+  const L = LINES[lineId];
+  for (const f of (state.balm === 'off' ? [] : (faces || []))){
+    const path = new Path2D();
+    for (const set of [OUTER, INNER]){
+      set.forEach((k, i) => { const p = f[k]; i ? path.lineTo(tx(p.x), ty(p.y)) : path.moveTo(tx(p.x), ty(p.y)); });
+      path.closePath();
+    }
+    const lipW = Math.abs(tx(f[291].x) - tx(f[61].x));
+    ctx.save();
+    ctx.clip(path, 'evenodd');
+    const clear = lineId === '4';
+    if (state.balm === 'tint'){
+      ctx.fillStyle = L.tint;
+      ctx.globalCompositeOperation = 'color'; ctx.globalAlpha = clear ? .35 : .85; ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = clear ? .12 : .35; ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'soft-light'; ctx.globalAlpha = .45; ctx.fillRect(0, 0, W, H);
+    }
+    // gloss: highlight on the lower lip
+    const cx = (tx(f[14].x) + tx(f[17].x)) / 2, cy = ty(f[14].y) + (ty(f[17].y) - ty(f[14].y)) * .42;
+    const g = ctx.createRadialGradient(cx, cy, 1, cx, cy, lipW * .32);
+    g.addColorStop(0, 'rgba(255,255,255,.75)'); g.addColorStop(.35, 'rgba(255,255,255,.22)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = .9; ctx.fillStyle = g;
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(1.9, .55); ctx.translate(-cx, -cy); ctx.fillRect(0, 0, W, H); ctx.restore();
+    const cu = ty(f[0].y) + (ty(f[13].y) - ty(f[0].y)) * .4, g2 = ctx.createRadialGradient(cx, cu, 1, cx, cu, lipW * .14);
+    g2.addColorStop(0, 'rgba(255,255,255,.5)'); g2.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+  ctx.restore();
+  // film grain
+  grain(ctx, W, H, film === 'bw' ? 18 : 10);
+}
+let grainTile = null;
+function grain(ctx, W, H, amt){
+  if (!grainTile){ grainTile = document.createElement('canvas'); grainTile.width = grainTile.height = 160; const g = grainTile.getContext('2d'), d = g.createImageData(160, 160);
+    for (let i = 0; i < d.data.length; i += 4){ const v = Math.random() * 255; d.data[i] = d.data[i+1] = d.data[i+2] = v; d.data[i+3] = 255; } g.putImageData(d, 0, 0); }
+  ctx.save(); ctx.globalAlpha = amt / 255; ctx.globalCompositeOperation = 'overlay'; ctx.fillStyle = ctx.createPattern(grainTile, 'repeat'); ctx.fillRect(0, 0, W, H); ctx.restore();
+}
+
+/* =================== SOURCES =================== */
+const live = $('#live'), lctx = live.getContext('2d');
+let video = null, rafId = 0;
+async function startCamera(){
+  status('Opening the doors…', 'Allow camera access to step into the booth.');
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280}, height:{ideal:720}, facingMode:'user'}, audio:false});
+    video = document.createElement('video'); video.playsInline = true; video.muted = true; video.srcObject = stream; await video.play();
+    state.mode = 'camera'; status('Loading face tracking…', 'One moment, warming up the balm.');
+    await loadLandmarker(); status();
+    ready(state.landmarker ? 'Press the pink button. Four… three…' : 'Face tracking didn’t load, so lips won’t be tinted. You can still shoot.');
+    loop();
+  }catch(e){
+    status('No camera this time', 'Use the demo rider or upload photos below to try the booth.');
+    $('#shutterHint').textContent = 'No camera found. Try the demo rider or upload photos.';
+  }
+}
+function loop(){
+  cancelAnimationFrame(rafId);
+  const tick = () => {
+    if (state.mode === 'camera' && video && video.readyState >= 2){
+      const src = {el: video, w: video.videoWidth, h: video.videoHeight};
+      const faces = detect(video); state.lm = faces;
+      const p = plan()[Math.min(state.shots.length, state.frames - 1)];
+      drawShot(lctx, live.width, live.height, src, faces, p.id, state.film, true);
+    }
+    rafId = requestAnimationFrame(tick);
+  };
+  tick();
+}
+async function useStills(list, label){
+  cancelAnimationFrame(rafId); if (video && video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+  openDoors(true);
+  state.mode = 'stills'; state.sources = list; state.srcIdx = 0;
+  status('Loading face tracking…', label);
+  await loadLandmarker();
+  for (const s of list){ s.faces = detect(s.el) || []; }
+  status(); ready('Press the pink button. The booth uses your photos in order.');
+  drawStill();
+}
+function drawStill(){
+  if (state.mode !== 'stills') return;
+  const s = state.sources[state.srcIdx % state.sources.length], p = plan()[Math.min(state.shots.length, state.frames - 1)];
+  drawShot(lctx, live.width, live.height, s, s.faces, p.id, state.film, false);
+}
+function loadImg(url){ return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
+async function demo(){
+  try{
+    const [a, b] = await Promise.all([loadImg('cd5-ad1-flat.jpg'), loadImg('cd5-ad3-flat.jpg')]);
+    const S = (el, rect) => ({el, w: el.naturalWidth, h: el.naturalHeight, rect});
+    await useStills([S(a, [140, 150, 470, 376]), S(b, [40, 420, 500, 400]), S(a, [200, 210, 380, 304]), S(b, [110, 470, 380, 304]), S(a, [150, 120, 440, 352])], 'The demo rider is the campaign model.');
+  }catch(e){ status('Demo photos missing', 'Upload cd5-ad1-flat.jpg and cd5-ad3-flat.jpg next to this page.'); }
+}
+$('#upload').onchange = async e => {
+  const files = [...e.target.files].slice(0, 5); if (!files.length) return;
+  const imgs = await Promise.all(files.map(f => loadImg(URL.createObjectURL(f))));
+  await useStills(imgs.map(el => ({el, w: el.naturalWidth, h: el.naturalHeight})), 'Using your photos.');
+};
+$('#demoBtn').onclick = demo;
+
+function status(t, s){ const el = $('#status'); if (!t){ el.style.display = 'none'; return; } el.style.display = 'grid'; el.innerHTML = `<div><b>${t}</b>${s || ''}</div>`; }
+function ready(msg){ $('#shutter').disabled = false; $('#shutterHint').textContent = msg; }
+
+/* doors + streaks */
+function openDoors(silent){ const d = $('#doors'); if (d.classList.contains('open')) return; if (!silent) chime(); d.classList.add('open'); }
+$('#standBtn').onclick = () => { openDoors(); startCamera(); };
+(function streaks(){ const s = $('#streaks'); for (let i = 0; i < 14; i++){ const e = document.createElement('i');
+  e.style.cssText = `top:${8 + Math.random() * 84}%;width:${80 + Math.random() * 260}px;left:${Math.random() * 100}%;animation-duration:${1.6 + Math.random() * 3}s;animation-delay:${-Math.random() * 4}s;opacity:${.3 + Math.random() * .7}`; s.appendChild(e); } })();
+
+/* sound: the two-tone door chime */
+let actx;
+function chime(){
+  try{ actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    [[659.3, 0], [523.3, .42]].forEach(([f, t]) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0, actx.currentTime + t); g.gain.linearRampToValueAtTime(.22, actx.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.001, actx.currentTime + t + 1.1);
+      o.connect(g).connect(actx.destination); o.start(actx.currentTime + t); o.stop(actx.currentTime + t + 1.2); }); }catch(e){}
+}
+function beep(f){ try{ actx = actx || new AudioContext(); const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = f; g.gain.setValueAtTime(.12, actx.currentTime); g.gain.exponentialRampToValueAtTime(.001, actx.currentTime + .18); o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime + .2); }catch(e){} }
+
+/* =================== SHOOT =================== */
+$('#shutter').onclick = async () => {
+  if (state.busy) return; state.busy = true; $('#shutter').disabled = true;
+  state.shots = []; buildFilmDots(); $('#results').classList.remove('on');
+  const P = plan();
+  for (let i = 0; i < state.frames; i++){
+    updateSign(i); announce(i === 0 ? `This is ${P[i].station}. Hold still.` : `Next stop: ${P[i].station}`);
+    if (state.mode === 'stills'){ state.srcIdx = i; drawStill(); }
+    await sleep(i === 0 ? 400 : 900);
+    for (const n of [3, 2, 1]){ const c = $('#countNum'); c.textContent = n; c.style.background = LINES[P[i].id].color; c.classList.add('on'); beep(n === 1 ? 880 : 660); await sleep(650); c.classList.remove('on'); await sleep(120); }
+    const f = $('#flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    const shot = document.createElement('canvas'); shot.width = 1000; shot.height = 800;
+    if (state.mode === 'camera'){ drawShot(shot.getContext('2d'), 1000, 800, {el: video, w: video.videoWidth, h: video.videoHeight}, detect(video), P[i].id, state.film, true); }
+    else { const s = state.sources[i % state.sources.length]; drawShot(shot.getContext('2d'), 1000, 800, s, s.faces, P[i].id, state.film, false); }
+    state.shots.push({canvas: shot, id: P[i].id, station: P[i].station}); buildFilmDots();
+    await sleep(500);
+  }
+  announce('Stand clear of the glossy doors. Your strip is printing.'); chime();
+  state.rideNo += 1; store.set('glossyRideNo', state.rideNo);
+  state.when = new Date();
+  await sleep(700); announce('');
+  makePrints(); state.busy = false; $('#shutter').disabled = false; updateSign(0);
+  $('#results').classList.add('on'); $('#results').scrollIntoView({behavior:'smooth', block:'start'});
+  renderPosterNow();
+};
+function announce(t){ const a = $('#announce'); a.textContent = t; a.classList.toggle('on', !!t); }
+$('#againBtn').onclick = () => { $('#booth-sec').scrollIntoView({behavior:'smooth'}); };
+
+/* =================== CANVAS HELPERS =================== */
+const F = (w, s, fam = 'Inter Tight') => `${w} ${s}px "${fam}"`;
+function mk(w, h){ const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; }
+function bulletC(ctx, x, y, r, id){ const L = LINES[id]; ctx.fillStyle = L.color; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = F(800, r * (id.length > 1 ? .95 : 1.25)); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(id, x, y + r * .06); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; }
+function signBand(ctx, x, y, w, h, text, size){ ctx.fillStyle = '#1A1A1A'; ctx.fillRect(x, y, w, h); ctx.fillStyle = '#fff'; ctx.fillRect(x + h * .18, y + h * .14, w - h * .36, Math.max(2, h * .035));
+  ctx.font = F(700, size); ctx.textBaseline = 'middle'; ctx.fillText(text, x + h * .22, y + h * .58); ctx.textBaseline = 'alphabetic'; }
+function gLogo(ctx, x, y, r, label){ ctx.fillStyle = '#E9A3AE'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = F(800, r * 1.15); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('G', x, y + r * .05);
+  ctx.textAlign = 'left'; if (label){ ctx.fillStyle = label.color || '#1A1A1A'; ctx.font = F(700, r * .95); ctx.fillText(label.text || 'Glossier × NYC Subway', x + r * 1.5, y + r * .05); } ctx.textBaseline = 'alphabetic'; }
+function fitText(ctx, text, max, w, size, fam){ let s = size; do { ctx.font = F(w, s, fam); s -= 2; } while (ctx.measureText(text).width > max && s > 8); }
+function wrap(ctx, text, max){ const words = text.split(' '), out = []; let line = ''; for (const wd of words){ const t = line ? line + ' ' + wd : wd; if (ctx.measureText(t).width > max && line){ out.push(line); line = wd; } else line = t; } out.push(line); return out; }
+function tube(ctx, x, y, w, h, color, angle = 0){
+  ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
+  const g = ctx.createLinearGradient(-w / 2, 0, w / 2, 0); g.addColorStop(0, 'rgba(255,240,242,.95)'); g.addColorStop(.5, 'rgba(255,255,255,.98)'); g.addColorStop(1, 'rgba(240,222,226,.95)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-w / 2, -h / 2); ctx.lineTo(w / 2, -h / 2); ctx.lineTo(w * .42, h * .38); ctx.lineTo(-w * .42, h * .38); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = color; ctx.globalAlpha = .75; ctx.beginPath(); ctx.ellipse(0, h * .02, w * .32, h * .26, 0, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+  ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillRect(-w / 2, -h / 2, w, h * .06);
+  ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(-w * .36, h * .38, w * .72, h * .14, 6); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = F(800, w * .42); ctx.textAlign = 'center'; ctx.fillText('G', 0, h * .1); ctx.textAlign = 'left';
+  ctx.restore();
+}
+
+/* =================== STRIP =================== */
+function routeMini(ctx, x, y, w, path, id){
+  const L = LINES[id], n = path.length, show = Math.min(n, 12);
+  ctx.strokeStyle = L.color; ctx.lineWidth = 10; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.stroke();
+  for (let i = 0; i < show; i++){ const px = x + w * (show === 1 ? 0 : i / (show - 1)); const end = i === 0 || i === show - 1;
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1A1A1A'; ctx.lineWidth = end ? 4 : 3; ctx.beginPath(); ctx.arc(px, y, end ? 10 : 6, 0, 7); ctx.fill(); ctx.stroke(); }
+  ctx.fillStyle = '#1A1A1A'; ctx.font = F(700, 17); ctx.fillText(path[0], x - 6, y + 34);
+  const last = path[n - 1]; ctx.textAlign = 'right'; ctx.fillText(last, x + w + 6, y + 34); ctx.textAlign = 'left';
+}
+function buildStrip(){
+  const n = state.shots.length, fw = 600, fh = 480, m = 36, head = 132, gap = 18, foot = 326;
+  const W = fw + m * 2, H = head + n * fh + (n - 1) * gap + foot;
+  const [c, ctx] = mk(W, H);
+  ctx.fillStyle = '#FBF8F2'; ctx.fillRect(0, 0, W, H);
+  signBand(ctx, m, 30, fw, 80, 'Stand clear of the glossy doors.', 30);
+  state.shots.forEach((s, i) => {
+    const y = head + i * (fh + gap);
+    ctx.drawImage(s.canvas, m, y, fw, fh);
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 8; bulletC(ctx, m + 34, y + fh - 34, 20, s.id); ctx.restore();
+    ctx.fillStyle = '#fff'; ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 8; ctx.font = F('italic 400', 28, 'Instrument Serif'); ctx.fillText(state.balm === 'tint' ? LINES[s.id].name : state.balm === 'clear' ? 'Clear Balm' : LINES[s.id].boro, m + 64, y + fh - 25);
+    ctx.font = F(700, 15); ctx.textAlign = 'right'; ctx.fillText(s.station.toUpperCase(), m + fw - 16, y + fh - 28); ctx.textAlign = 'left'; ctx.shadowBlur = 0;
+  });
+  let y = head + n * fh + (n - 1) * gap + 30;
+  const {L, mins, path} = rideInfo();
+  routeMini(ctx, m + 30, y + 26, fw - 60, path, state.line);
+  y += 122;
+  ctx.fillStyle = '#1A1A1A'; ctx.font = F('italic 400', 40, 'Instrument Serif');
+  const line = state.hop === 'hop' ? 'Five boroughs. Five tints. One balm.' : `${mins} minutes of gloss on the ${state.line}.`;
+  fitText(ctx, line, fw, 'italic 400', 40, 'Instrument Serif'); ctx.fillText(line, m, y);
+  y += 40;
+  const d = state.when || new Date(), p2 = v => String(v).padStart(2, '0');
+  ctx.font = F(400, 15, 'JetBrains Mono'); ctx.fillStyle = '#555';
+  ctx.fillText(`RIDE NO. ${String(state.rideNo).padStart(4, '0')} · ${p2(d.getMonth() + 1)}/${p2(d.getDate())}/${String(d.getFullYear()).slice(2)} ${p2(d.getHours())}:${p2(d.getMinutes())} · LIMITED EDITION · NYC ONLY`, m, y);
+  y += 38; gLogo(ctx, m + 18, y, 18, {text:'Glossier × NYC Subway'});
+  ctx.fillStyle = '#FCCC0A'; ctx.fillRect(0, H - 16, W, 16);
+  return c;
+}
+
+/* =================== PRINT STYLES =================== */
+function wood(ctx, x, y, w, h, t, dark){
+  const base = dark ? ['#4a2b1c', '#6b3d27'] : ['#c79a62', '#e2bd86'];
+  const g = ctx.createLinearGradient(x, y, x + w, y + h); g.addColorStop(0, base[0]); g.addColorStop(.5, base[1]); g.addColorStop(1, base[0]);
+  ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  ctx.save(); ctx.globalAlpha = .18; ctx.strokeStyle = dark ? '#1d0f08' : '#8a6233'; for (let i = 0; i < 90; i++){ ctx.lineWidth = Math.random() * 2; const yy = y + Math.random() * h; ctx.beginPath(); ctx.moveTo(x, yy); ctx.bezierCurveTo(x + w * .3, yy + 8, x + w * .6, yy - 8, x + w, yy + 4); ctx.stroke(); } ctx.restore();
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(x + t, y + t, w - 2 * t, h - 2 * t);
+}
+function bow(ctx, x, y, s, rot = 0){
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3;
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#e8e2e2'; ctx.lineWidth = 2;
+  for (const d of [-1, 1]){ ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(d * s * .9, -s * .7, d * s * 1.2, s * .2, 0, 0); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(d * s * .35, s * .7, d * s * .6, s * 1.15); ctx.lineTo(d * s * .38, s * 1.1); ctx.quadraticCurveTo(d * s * .2, s * .6, 0, 0); ctx.fill(); ctx.stroke(); }
+  ctx.beginPath(); ctx.ellipse(0, 0, s * .16, s * .2, 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore();
+}
+function blossom(ctx, x, y, s, col = '#F3A9B8'){
+  ctx.save(); ctx.translate(x, y);
+  for (let i = 0; i < 5; i++){ ctx.rotate(Math.PI * 2 / 5); ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, -s * .55, s * .38, s * .55, 0, 0, 7); ctx.fill(); }
+  ctx.fillStyle = '#C2185B'; ctx.beginPath(); ctx.arc(0, 0, s * .18, 0, 7); ctx.fill(); ctx.restore();
+}
+function gems(ctx, x, y, w, h, r){
+  const step = r * 2.25, put = (px, py) => { const g = ctx.createRadialGradient(px - r * .35, py - r * .35, 1, px, py, r);
+    g.addColorStop(0, '#fff'); g.addColorStop(.35, '#F7C1D0'); g.addColorStop(1, '#D97C99'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, r, 0, 7); ctx.fill(); };
+  for (let px = x; px <= x + w; px += step){ put(px, y); put(px, y + h); }
+  for (let py = y + step; py < y + h; py += step){ put(x, py); put(x + w, py); }
+}
+function lace(dst, X, Y, w, h){
+  const [lc, ctx] = mk(Math.ceil(w), Math.ceil(h));
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(w * .3, 0, w * .4, h);
+  for (let yy = 0; yy < h; yy += 26){ ctx.beginPath(); ctx.arc(w * .3, yy + 13, 13, Math.PI * .5, Math.PI * 1.5); ctx.fill(); ctx.beginPath(); ctx.arc(w * .7, yy + 13, 13, -Math.PI * .5, Math.PI * .5); ctx.fill(); }
+  ctx.globalCompositeOperation = 'destination-out';
+  for (let yy = 20; yy < h; yy += 52){ for (const dx of [.42, .58]){ ctx.beginPath(); ctx.arc(w * dx, yy, 5, 0, 7); ctx.fill(); } ctx.beginPath(); ctx.ellipse(w * .5, yy + 26, 7, 11, 0, 0, 7); ctx.fill(); }
+  ctx.globalCompositeOperation = 'source-over'; ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 2.5;
+  for (let yy = 0; yy < h; yy += 18){ ctx.beginPath(); ctx.arc(w * .15, yy, 6, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.arc(w * .85, yy + 9, 6, 0, 7); ctx.stroke(); }
+  dst.save(); dst.shadowColor = 'rgba(0,0,0,.15)'; dst.shadowBlur = 6; dst.drawImage(lc, X, Y); dst.restore();
+}
+function scallopRing(ctx, x, y, w, h, band, color, r){
+  ctx.save(); ctx.fillStyle = color;
+  const per = (x0, y0, x1, y1) => { const len = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.round(len / (r * 1.7))); for (let i = 0; i <= n; i++){ const t = i / n; ctx.beginPath(); ctx.arc(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, r, 0, 7); ctx.fill(); } };
+  ctx.beginPath(); ctx.roundRect(x - band, y - band, w + band * 2, h + band * 2, band); ctx.roundRect(x, y, w, h, 6); ctx.fill('evenodd');
+  per(x - band, y - band, x + w + band, y - band); per(x - band, y + h + band, x + w + band, y + h + band);
+  per(x - band, y - band, x - band, y + h + band); per(x + w + band, y - band, x + w + band, y + h + band);
+  ctx.globalAlpha = .22; ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+  for (let i = 0; i < (w + h) * 2 / 9; i++){ const t = i * 9; let px, py;
+    if (t < w){ px = x + t; py = y - band / 2; } else if (t < w + h){ px = x + w + band / 2; py = y + t - w; } else if (t < 2 * w + h){ px = x + w - (t - w - h); py = y + h + band / 2; } else { px = x - band / 2; py = y + h - (t - 2 * w - h); }
+    ctx.beginPath(); ctx.moveTo(px - 3, py - 4); ctx.lineTo(px + 3, py + 4); ctx.stroke(); }
+  ctx.restore();
+}
+function buildPrint(strip, style){
+  if (style === 'subway') return strip;
+  const PW = 1500, PH = 2000, [c, ctx] = mk(PW, PH);
+  const sh = Math.min(PH * (style === 'crochet' ? .64 : .78), strip.height), sc = sh / strip.height, sw = strip.width * sc;
+  const L = LINES[state.line];
+  const place = (cx, cy, rot = 0, mat = 0, matCol = '#fff') => { ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot); ctx.shadowColor = 'rgba(0,0,0,.28)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
+    if (mat){ ctx.fillStyle = matCol; ctx.fillRect(-sw / 2 - mat, -sh / 2 - mat, sw + mat * 2, sh + mat * 2); ctx.shadowColor = 'transparent'; }
+    ctx.drawImage(strip, -sw / 2, -sh / 2, sw, sh); ctx.restore(); };
+  if (style === 'lace'){
+    wood(ctx, 0, 0, PW, PH, 70, false);
+    const ix = 70, iy = 70, iw = PW - 140, ih = PH - 140;
+    ctx.save(); ctx.beginPath(); ctx.rect(ix, iy, iw, ih); ctx.clip();
+    ctx.fillStyle = '#F1D3DC'; ctx.fillRect(ix, iy, iw, ih);
+    ctx.fillStyle = '#C98EA3'; for (let xx = ix; xx < ix + iw; xx += 13) ctx.fillRect(xx, iy, 3, ih);
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; for (let xx = ix + 6; xx < ix + iw; xx += 13) ctx.fillRect(xx, iy, 2, ih);
+    lace(ctx, ix + 40, iy, 170, ih);
+    const cx = PW * .56, cy = PH * .5; place(cx, cy, -.01);
+    gems(ctx, cx - sw / 2 - 18, cy - sh / 2 - 18, sw + 36, sh + 36, 11);
+    bow(ctx, cx + sw / 2 + 190, cy - sh * .2, 95, .15); bow(ctx, cx - sw / 2 - 150, cy + sh * .22, 85, -.2); bow(ctx, cx + sw / 2 + 170, cy + sh * .36, 78, .25);
+    [[cx + sw / 2 + 120, cy - sh * .42], [cx + sw / 2 + 210, cy - sh * .38], [cx - sw / 2 - 120, cy + sh * .42], [cx + sw / 2 + 140, cy + sh * .05], [cx - sw / 2 - 90, cy - sh * .35]].forEach(([x, y], i) => { blossom(ctx, x, y, 26 - i * 2); blossom(ctx, x + 34, y + 22, 18, '#F9C9D3'); });
+    ctx.fillStyle = '#B9B9C2'; ctx.font = F('italic 400', 64, 'Instrument Serif'); ctx.fillText('xo', cx - sw / 2 - 150, cy - sh * .4); ctx.fillText('NYC', cx + sw / 2 + 80, cy + sh * .2);
+    ctx.restore();
+  } else if (style === 'candy'){
+    wood(ctx, 0, 0, PW, PH, 64, true);
+    const ix = 64, iy = 64, iw = PW - 128, ih = PH - 128;
+    ctx.save(); ctx.beginPath(); ctx.rect(ix, iy, iw, ih); ctx.clip();
+    const a = state.line === '7' || state.line === '4' ? ['#7DB46C', '#8E2F7E'] : ['#F7A8B8', L.color === '#996633' ? '#8A5A3C' : '#E04A5A'];
+    ctx.fillStyle = a[0]; ctx.fillRect(ix, iy, iw, ih); ctx.translate(PW / 2, PH / 2); ctx.rotate(-Math.PI / 4); ctx.fillStyle = a[1];
+    for (let k = -2000; k < 2000; k += 150) ctx.fillRect(k, -2000, 75, 4000);
+    ctx.restore();
+    const cx = PW / 2, cy = PH / 2; ctx.fillStyle = '#fff'; ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 18; ctx.fillRect(cx - sw / 2 - 70, cy - sh / 2 - 70, sw + 140, sh + 140); ctx.restore();
+    ctx.strokeStyle = a[1]; ctx.lineWidth = 6; ctx.strokeRect(cx - sw / 2 - 30, cy - sh / 2 - 30, sw + 60, sh + 60);
+    place(cx, cy);
+    ctx.fillStyle = '#fff'; ctx.font = F(800, 70); ctx.fillText('✦', cx + sw / 2 + 80, cy - sh / 2 + 10);
+  } else if (style === 'crochet'){
+    const g = ctx.createLinearGradient(0, 0, PW, PH); g.addColorStop(0, '#b98552'); g.addColorStop(1, '#d6a774'); ctx.fillStyle = g; ctx.fillRect(0, 0, PW, PH);
+    ctx.save(); ctx.globalAlpha = .16; ctx.strokeStyle = '#6d4523'; for (let i = 0; i < 140; i++){ ctx.lineWidth = Math.random() * 2.5; const yy = Math.random() * PH; ctx.beginPath(); ctx.moveTo(0, yy); ctx.bezierCurveTo(PW * .3, yy + 14, PW * .7, yy - 14, PW, yy + 6); ctx.stroke(); } ctx.restore();
+    const cx = PW / 2, cy = PH / 2, x = cx - sw / 2, y = cy - sh / 2;
+    const yarn = [['#F2F0E6', 0], [L.color === '#00933C' ? '#9CCB8A' : '#F49AB8', 46], ['#A9C8E8', 92], ['#E46FA0', 138]];
+    for (let k = yarn.length - 1; k >= 0; k--){ const [col, off] = yarn[k]; scallopRing(ctx, x - off, y - off, sw + off * 2, sh + off * 2, 46, col, 30); }
+    place(cx, cy);
+    ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.font = F(400, 40, 'JetBrains Mono'); ctx.textAlign = 'center'; ctx.fillText('crochet frames for my commute', cx, PH - 36); ctx.textAlign = 'left';
+  } else if (style === 'tile'){
+    ctx.fillStyle = '#F5F1EA'; ctx.fillRect(0, 0, PW, PH);
+    ctx.strokeStyle = '#d8d2c6'; ctx.lineWidth = 6; for (let yy = 0, r = 0; yy < PH; yy += 90, r++){ ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(PW, yy); ctx.stroke(); for (let xx = (r % 2) * 90; xx < PW; xx += 180){ ctx.beginPath(); ctx.moveTo(xx, yy); ctx.lineTo(xx, yy + 90); ctx.stroke(); } }
+    signBand(ctx, 120, 90, PW - 240, 130, 'Stand clear of the glossy doors.', 58);
+    const cx = PW / 2, cy = PH / 2 + 70;
+    const st = ctx.createLinearGradient(cx - sw / 2 - 60, 0, cx + sw / 2 + 60, 0); st.addColorStop(0, '#8b8e92'); st.addColorStop(.3, '#dcdee1'); st.addColorStop(.6, '#9a9da1'); st.addColorStop(1, '#d4d6d9');
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 30; ctx.fillStyle = st; ctx.fillRect(cx - sw / 2 - 50, cy - sh / 2 - 50, sw + 100, sh + 100); ctx.restore();
+    place(cx, cy);
+    bulletC(ctx, 160, PH - 160, 50, state.line); ctx.fillStyle = '#1A1A1A'; ctx.font = F('italic 400', 60, 'Instrument Serif'); ctx.fillText(L.name, 230, PH - 140);
+    ctx.fillStyle = '#FCCC0A'; ctx.fillRect(0, PH - 40, PW, 40);
+  }
+  return c;
+}
+function stylePreview(cv, style){
+  const ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  const [s, sx] = mk(70, 230); sx.fillStyle = '#FBF8F2'; sx.fillRect(0, 0, 70, 230); sx.fillStyle = '#1A1A1A'; sx.fillRect(5, 5, 60, 14);
+  for (let i = 0; i < 4; i++){ const g = sx.createLinearGradient(0, 0, 0, 44); g.addColorStop(0, '#666'); g.addColorStop(1, '#bbb'); sx.fillStyle = g; sx.fillRect(5, 24 + i * 48, 60, 44); sx.fillStyle = LINES[state.line].tint; sx.beginPath(); sx.ellipse(35, 52 + i * 48, 6, 3, 0, 0, 7); sx.fill(); }
+  sx.fillStyle = '#FCCC0A'; sx.fillRect(0, 222, 70, 8);
+  const keep = state.shots; state.shots = [];
+  let out;
+  if (style === 'subway'){ ctx.fillStyle = '#ece6dc'; ctx.fillRect(0, 0, W, H); const h = H * .9, w = h * 70 / 230; ctx.drawImage(s, (W - w) / 2, (H - h) / 2, w, h); state.shots = keep; return; }
+  out = buildPrint(s, style); state.shots = keep;
+  ctx.drawImage(out, 0, 0, W, H);
+}
+function buildStyleBtns(){
+  const box = $('#styleBtns'); box.innerHTML = '';
+  for (const s of STYLES){
+    const b = document.createElement('button'), cv = document.createElement('canvas'); cv.width = 150; cv.height = 200;
+    b.appendChild(cv); b.append(s.label); b.className = s.id === state.style ? 'on' : '';
+    b.onclick = () => { state.style = s.id; buildStyleBtns(); if (state.strip) updatePrint(); };
+    box.appendChild(b); stylePreview(cv, s.id);
+  }
+}
+function makePrints(){ state.strip = buildStrip(); $('#stripImg').src = state.strip.toDataURL('image/jpeg', .92); updatePrint(); }
+function updatePrint(){ state.print = buildPrint(state.strip, state.style); $('#printImg').src = state.print.toDataURL('image/jpeg', .9); }
+function download(canvas, name, type = 'image/png'){ canvas.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, type, .95); }
+function story(){
+  const [c, ctx] = mk(1080, 1920); ctx.fillStyle = '#F7CAD0'; ctx.fillRect(0, 0, 1080, 1920);
+  const src = state.print, h = 1500, w = src.width * h / src.height, sw2 = Math.min(w, 940), sh2 = src.height * sw2 / src.width;
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 30; ctx.drawImage(src, (1080 - sw2) / 2, 210, sw2, sh2); ctx.restore();
+  gLogo(ctx, 90, 120, 34, {text:'Glossier × NYC Subway'}); ctx.fillStyle = '#FCCC0A'; ctx.fillRect(0, 1890, 1080, 30);
+  return c;
+}
+$('#dlStrip').onclick = () => download(state.strip, `glossy-booth-strip-${state.rideNo}.png`);
+$('#dlPrint').onclick = () => download(state.print, `glossy-booth-print-${state.rideNo}.png`);
+$('#dlStory').onclick = () => download(story(), `glossy-booth-story-${state.rideNo}.png`);
+$('#pinBtn').onclick = () => pin(state.style === 'subway' ? state.strip : state.print, `RIDE ${state.rideNo} · ${LINES[state.line].name}`);
+
+/* =================== POSTER GENERATOR =================== */
+const poster = $('#poster'), pctx = poster.getContext('2d');
+let pSeed = Date.now() % 100000, pCount = 0, auto = 0;
+const HEAD = [
+  r => `${r.mins} minutes of gloss on the ${r.id}.`,
+  r => `${r.stops} stops. One tint. ${r.L.name}.`,
+  r => `Re-gloss at ${short(r.path[Math.floor(r.path.length / 2)])}.`,
+  r => `From ${short(r.from)} to ${short(r.to)}, glossy all the way.`,
+  r => `Your commute is your vanity mirror.`,
+  r => `Lips now running glossy on the ${r.id}.`,
+  r => `Next stop: ${short(r.to)}. Next coat: ${r.L.name}.`,
+  r => `${r.L.boro} rides in ${r.L.name}.`,
+  r => `Stand clear of the glossy doors.`,
+  r => `${r.mins} min. Enough for two coats.`,
+  r => `This is a ${r.L.name} train to ${short(r.to)}.`,
+  r => `Hold on to the gloss.`
+];
+const short = s => s.split('–')[0];
+function rideFor(){ const {L, stops, mins, path} = rideInfo(); return {L, id: state.line, stops, mins, path, from: state.from, to: state.to}; }
+function bgPick(r){ return pick(r, [['#F7CAD0', '#1A1A1A'], ['#F5F1EA', '#1A1A1A'], ['#F7CAD0', '#1A1A1A'], ['#1A1A1A', '#F5F1EA']]); }
+const LAYOUTS = {
+  route(ctx, R, r){ const [bg, fg] = ['#F7CAD0', '#1A1A1A']; ctx.fillStyle = bg; ctx.fillRect(0, 0, 1080, 1350);
+    signBand(ctx, 0, 70, 1080, 150, '', 10); ctx.fillStyle = '#fff'; fitText(ctx, R.head, 900, 700, 60); ctx.fillText(R.head, 70, 170);
+    const x = 250, y0 = 320, y1 = 1150, path = R.path, show = path.length <= 14 ? path.map((s, i) => i) : [...new Set([0, 1, 2, Math.floor(path.length / 2), path.length - 3, path.length - 2, path.length - 1])].sort((a, b) => a - b);
+    ctx.strokeStyle = R.L.color; ctx.lineWidth = 26; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x, y1); ctx.stroke();
+    show.forEach((k, i) => { const y = y0 + (y1 - y0) * (show.length === 1 ? 0 : i / (show.length - 1)), end = k === 0 || k === path.length - 1;
+      ctx.fillStyle = '#fff'; ctx.strokeStyle = fg; ctx.lineWidth = end ? 8 : 6; ctx.beginPath(); ctx.arc(x, y, end ? 24 : 15, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = fg; ctx.font = F(end ? 700 : 400, end ? 40 : 30); ctx.fillText(path[k], x + 50, y + 12);
+      if (i > 0 && show[i] - show[i - 1] > 1){ ctx.fillStyle = '#888'; ctx.font = F(400, 22, 'JetBrains Mono'); ctx.fillText(`· ${show[i] - show[i - 1] - 1} more stops ·`, x + 50, y - (y1 - y0) / (show.length - 1) / 2 + 8); } });
+    bulletC(ctx, x - 130, y0 + 10, 60, R.id); tube(ctx, 900, 820, 120, 330, R.L.tint, .18);
+    ctx.fillStyle = fg; ctx.font = F('italic 400', 46, 'Instrument Serif'); ctx.fillText(`${R.mins} min · ${R.L.name}`, 70, 1250); },
+  big(ctx, R, r){ ctx.fillStyle = '#F5F1EA'; ctx.fillRect(0, 0, 1080, 1350);
+    ctx.fillStyle = R.L.color; ctx.font = F(800, 560); ctx.textBaseline = 'alphabetic'; const t = String(R.mins); ctx.fillText(t, 50, 720);
+    ctx.fillStyle = '#1A1A1A'; ctx.font = F('italic 400', 92, 'Instrument Serif'); ctx.fillText('minutes of gloss', 70, 840);
+    signBand(ctx, 0, 900, 1080, 140, '', 10); ctx.fillStyle = '#fff'; const s = `${short(R.from)} → ${short(R.to)}`; fitText(ctx, s, 800, 700, 58); ctx.fillText(s, 70, 990);
+    bulletC(ctx, 980, 970, 46, R.id); tube(ctx, 880, 400, 130, 360, R.L.tint, -.3);
+    ctx.fillStyle = '#1A1A1A'; ctx.font = F(700, 44); wrap(ctx, R.head, 900).slice(0, 2).forEach((l, i) => ctx.fillText(l, 70, 1130 + i * 54)); },
+  notice(ctx, R, r){ ctx.fillStyle = '#F7CAD0'; ctx.fillRect(0, 0, 1080, 1350); ctx.fillStyle = '#F5F1EA'; ctx.fillRect(50, 50, 980, 1250);
+    signBand(ctx, 50, 50, 980, 140, 'Service change', 64); bulletC(ctx, 160, 300, 70, R.id);
+    ctx.fillStyle = '#1A1A1A'; ctx.font = F(800, 92); const lines = wrap(ctx, `Lips now running glossy between ${short(R.from)} and ${short(R.to)}.`, 860); lines.slice(0, 5).forEach((l, i) => ctx.fillText(l, 100, 480 + i * 104));
+    ctx.font = F(400, 32); ctx.fillStyle = '#444'; wrap(ctx, `${R.L.name} is in effect on all ${R.stops} stops. Expect shine. Plan extra time for compliments.`, 620).forEach((l, i) => ctx.fillText(l, 100, 1060 + i * 42));
+    tube(ctx, 880, 1090, 110, 300, R.L.tint, .9); },
+  vignelli(ctx, R, r){ ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 1080, 1350);
+    const pts = [[100, 1050], [430, 1050], [700, 780], [700, 420], [980, 420]]; ctx.strokeStyle = R.L.color; ctx.lineWidth = 40; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke();
+    ctx.strokeStyle = '#E8E4DC'; ctx.lineWidth = 40; ctx.beginPath(); ctx.moveTo(100, 600); ctx.lineTo(520, 600); ctx.stroke(); ctx.beginPath(); ctx.moveTo(880, 1200); ctx.lineTo(880, 700); ctx.stroke();
+    for (const [x, y, lbl, al] of [[100, 1050, R.from, 'left'], [980, 420, R.to, 'right']]){ ctx.fillStyle = '#fff'; ctx.strokeStyle = '#1A1A1A'; ctx.lineWidth = 9; ctx.beginPath(); ctx.arc(x, y, 34, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#1A1A1A'; ctx.font = F(700, 40); ctx.textAlign = al; ctx.fillText(short(lbl), al === 'left' ? x - 20 : x + 20, al === 'left' ? y + 90 : y - 60); ctx.textAlign = 'left'; }
+    for (let i = 1; i < Math.min(R.stops, 8); i++){ const t = i / Math.min(R.stops, 8); const seg = t * 3; const k = Math.floor(seg), f = seg - k, [a, b] = [pts[k + 1] || pts[3], pts[k + 2] || pts[4]];
+      ctx.fillStyle = '#1A1A1A'; ctx.beginPath(); ctx.arc(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, 7, 0, 7); ctx.fill(); }
+    ctx.fillStyle = '#1A1A1A'; ctx.font = F(800, 76); wrap(ctx, R.head, 900).slice(0, 3).forEach((l, i) => ctx.fillText(l, 80, 150 + i * 86));
+    bulletC(ctx, 150, 1230, 52, R.id); ctx.font = F('italic 400', 50, 'Instrument Serif'); ctx.fillText(R.L.name, 225, 1248); },
+  board(ctx, R, r){ ctx.fillStyle = '#F7CAD0'; ctx.fillRect(0, 0, 1080, 1350);
+    ctx.fillStyle = '#111'; ctx.beginPath(); ctx.roundRect(60, 240, 960, 420, 30); ctx.fill();
+    const rows = [`${R.id} ${short(R.to)}`, `${R.mins} min`, R.L.name];
+    rows.forEach((t, i) => dots(ctx, t, 110, 290 + i * 120, 860, 100, '#FF9F2E'));
+    ctx.fillStyle = '#1A1A1A'; ctx.font = F(800, 84); wrap(ctx, R.head, 940).slice(0, 3).forEach((l, i) => ctx.fillText(l, 70, 820 + i * 96));
+    tube(ctx, 880, 1130, 110, 300, R.L.tint, -1.2); bulletC(ctx, 120, 150, 54, R.id); ctx.fillStyle = '#1A1A1A'; ctx.font = F(700, 44); ctx.fillText('Now arriving', 200, 165); },
+  portrait(ctx, R, r){ ctx.fillStyle = '#1A1A1A'; ctx.fillRect(0, 0, 1080, 1350);
+    const sh = state.shots.length ? state.shots : null;
+    if (sh){ const s = sh[Math.floor(r() * sh.length)].canvas; ctx.drawImage(s, 125, 0, 750, 600, 0, 0, 1080, 864); }
+    else { const g = ctx.createLinearGradient(0, 0, 0, 864); g.addColorStop(0, '#2a2426'); g.addColorStop(1, R.L.color); ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 864); tube(ctx, 540, 430, 180, 520, R.L.tint, .3); }
+    signBand(ctx, 0, 864, 1080, 150, '', 10); ctx.fillStyle = '#fff'; fitText(ctx, R.head, 900, 700, 58); ctx.fillText(R.head, 70, 962);
+    bulletC(ctx, 990, 940, 44, R.id);
+    ctx.fillStyle = '#fff'; ctx.font = F('italic 400', 64, 'Instrument Serif'); ctx.fillText(R.L.name, 70, 1140);
+    ctx.font = F(400, 30, 'JetBrains Mono'); ctx.fillStyle = '#bbb'; ctx.fillText(`${short(R.from).toUpperCase()} → ${short(R.to).toUpperCase()} · ${R.stops} STOPS`, 70, 1200); }
+};
+function dots(ctx, text, x, y, w, h, col){
+  const [c, g] = mk(Math.round(w / 9), Math.round(h / 9)); g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height);
+  g.fillStyle = '#fff'; g.font = F(700, c.height * .82); g.textBaseline = 'middle'; g.fillText(text, 1, c.height / 2 + 1);
+  const d = g.getImageData(0, 0, c.width, c.height).data;
+  for (let j = 0; j < c.height; j++) for (let i = 0; i < c.width; i++){ const on = d[(j * c.width + i) * 4] > 110;
+    ctx.fillStyle = on ? col : '#2a2018'; ctx.beginPath(); ctx.arc(x + i * 9 + 4.5, y + j * 9 + 4.5, on ? 3.6 : 2.6, 0, 7); ctx.fill(); }
+}
+function renderPoster(ctx, seed, ride){
+  const r = rng(seed), R = ride || rideFor(); const names = Object.keys(LAYOUTS);
+  const layout = state.shots.length && r() < .22 ? 'portrait' : pick(r, names.filter(n => n !== 'portrait'));
+  R.head = pick(r, HEAD)(R);
+  ctx.save(); ctx.clearRect(0, 0, 1080, 1350); LAYOUTS[layout](ctx, R, r); ctx.restore();
+  gLogo(ctx, 1080 - 380, 1300 - 4, 20, {text:'Glossier × NYC Subway', color: layout === 'portrait' ? '#fff' : '#1A1A1A'});
+  ctx.fillStyle = '#FCCC0A'; ctx.fillRect(0, 1336, 1080, 14);
+  grain(ctx, 1080, 1350, 8);
+  return layout;
+}
+function renderPosterNow(){
+  pCount++; const layout = renderPoster(pctx, pSeed);
+  const {L, stops, mins} = rideInfo();
+  $('#posterRide').innerHTML = `<span class="bullet" style="background:${L.color}">${state.line}</span> <b>${state.from}</b> → <b>${state.to}</b> · ${stops} stops · about ${mins} min`;
+  $('#meter').textContent = `POSTER NO. ${String(pSeed).padStart(5, '0')} · LAYOUT: ${layout.toUpperCase()} · ${pCount} MADE THIS VISIT`;
+}
+$('#nextPoster').onclick = () => { pSeed = (pSeed * 7 + 13) % 99991 + 1; renderPosterNow(); };
+$('#autoPoster').onclick = e => { if (auto){ clearInterval(auto); auto = 0; e.target.textContent = 'Auto-play'; } else { auto = setInterval(() => $('#nextPoster').click(), 2200); e.target.textContent = 'Stop'; } };
+$('#dlPoster').onclick = () => download(poster, `your-line-poster-${pSeed}.png`);
+$('#pinPoster').onclick = () => pin(poster, `POSTER ${pSeed}`);
+$('#randRide').onclick = () => { const id = ORDER[Math.floor(Math.random() * 5)], L = LINES[id]; setLine(id, true);
+  let a = Math.floor(Math.random() * L.stops.length), b = Math.floor(Math.random() * L.stops.length); if (a === b) b = (a + 5) % L.stops.length;
+  state.from = L.stops[a]; state.to = L.stops[b]; fillSelects(); updateSign(0); $('#nextPoster').click(); };
+
+/* =================== WALL =================== */
+function thumb(canvas){ const w = 300, h = Math.round(canvas.height * w / canvas.width), [c, ctx] = mk(w, h); ctx.drawImage(canvas, 0, 0, w, h); return c.toDataURL('image/jpeg', .72); }
+function pin(canvas, label){ if (!canvas) return; const pins = store.get('glossyWall', []); pins.unshift({src: thumb(canvas), label});
+  while (pins.length > 14) pins.pop(); while (!store.set('glossyWall', pins) && pins.length > 1) pins.pop(); drawWall(); $('#wall').scrollIntoView({behavior:'smooth', block:'center'}); }
+function drawWall(){
+  const box = $('#wall'); box.innerHTML = '';
+  const pins = store.get('glossyWall', []);
+  const sample = [];
+  if (pins.length < 6){ // fill the wall with generated posters so it never looks empty
+    const [c, ctx] = mk(1080, 1350);
+    for (let i = 0; i < 6 - pins.length; i++){ const id = ORDER[i % 5], L = LINES[id], a = (i * 7) % L.stops.length, b = (a + 6 + i * 3) % L.stops.length;
+      const lay = renderPoster(ctx, 1000 + i * 37, {L, id, stops: Math.abs(b - a), mins: Math.max(2, Math.round(Math.abs(b - a) * L.per)), path: a < b ? L.stops.slice(a, b + 1) : L.stops.slice(b, a + 1).reverse(), from: L.stops[a], to: L.stops[b]});
+      sample.push({src: thumb(c), label: `POSTER · ${L.name.toUpperCase()}`}); }
+  }
+  [...pins, ...sample].forEach((p, i) => { const f = document.createElement('figure'); f.style.setProperty('--r', `${((i * 53) % 7) - 3}deg`);
+    f.innerHTML = `<img src="${p.src}" alt="${p.label}"><figcaption>${p.label}</figcaption>`; box.appendChild(f); });
+}
+$('#clearWall').onclick = () => { store.set('glossyWall', []); drawWall(); };
+
+/* =================== INIT =================== */
+seg('#framesSeg', 'frames', Number); seg('#filmSeg', 'film'); seg('#hopSeg', 'hop'); seg('#balmSeg', 'balm');
+document.querySelectorAll('#framesSeg button,#filmSeg button,#hopSeg button,#balmSeg button').forEach(b => b.addEventListener('click', () => { updateSign(0); if (state.mode === 'stills') drawStill(); }));
+await document.fonts.load('700 20px "Inter Tight"').catch(() => {}); await document.fonts.load('italic 20px "Instrument Serif"').catch(() => {}); await document.fonts.load('400 20px "JetBrains Mono"').catch(() => {});
+setLine('7', true); buildFilmDots(); buildStyleBtns(); drawWall();
+window.__booth = {state, demo, makePrints, buildPrint, updatePrint};
+</script>
+</body>
+</html>
